@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Camera, ChevronDown, ChevronUp, Gauge, Fuel, Loader2, Calendar, ClipboardCheck } from 'lucide-react';
+<<<<<<< HEAD
 import { buildUploadUrl, EMPLEADOS_INSPECCIONES_URL, BASE_API } from '../../../config.js';
+=======
+import { buildUploadUrl, EMPLEADOS_INSPECCIONES_URL } from '../../../config.js';
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 const HistorialInspecciones = ({ empleado }) => {
     const [inspecciones, setInspecciones] = useState([]);
@@ -46,6 +50,7 @@ const HistorialInspecciones = ({ empleado }) => {
     const resolveImg = (path) => {
         if (!path) return null;
         if (path.includes('http')) return path;
+<<<<<<< HEAD
         
         // Si el path ya contiene 'uploads/', asumimos que es una ruta relativa desde la raíz de la API
         if (path.includes('uploads/')) {
@@ -54,6 +59,8 @@ const HistorialInspecciones = ({ empleado }) => {
         }
         
         // Por defecto, asumimos que es un nombre de archivo en la carpeta uploads de v1
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
         return `${BASE_URL}${path}`;
     };
 
@@ -103,7 +110,11 @@ const HistorialInspecciones = ({ empleado }) => {
                                                 <div>
                                                     <div className="fw-bold text-dark small">Unidad: {item.unidad_nombre}</div>
                                                     <div className="text-muted d-flex gap-2" style={{ fontSize: '11px' }}>
+<<<<<<< HEAD
                                                         <span><strong>ODO:</strong> {item.odometro_inicio} → {item.odometro_final || '...'} <span className="text-primary fw-bold text-uppercase" style={{ fontSize: '9px' }}>{item.unidad_medida || 'km'}</span></span>
+=======
+                                                        <span><strong>ODO:</strong> {item.odometro_inicio} → {item.odometro_final || '...'}</span>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                                                         <span className="text-secondary">|</span>
                                                         <span><strong>GAS:</strong> {item.gasolina}% → {item.gasolina_final || item.gasolina}%</span>
                                                     </div>
@@ -136,6 +147,7 @@ const HistorialInspecciones = ({ empleado }) => {
                                                                             className="img-fluid rounded-2"
                                                                             style={{ height: '100px', width: '100%', objectFit: 'cover' }}
                                                                             onClick={() => window.open(resolveImg(item[foto.key]), '_blank')}
+<<<<<<< HEAD
                                                                             onError={(e) => {
                                                                                 if (!e.target.dataset.triedFallback) {
                                                                                     e.target.dataset.triedFallback = 'true';
@@ -148,6 +160,8 @@ const HistorialInspecciones = ({ empleado }) => {
                                                                                     e.target.src = `${rootUploads}${item[foto.key]}`;
                                                                                 }
                                                                             }}
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                                                                         />
                                                                     ) : (
                                                                         <div className="d-flex align-items-center justify-content-center text-muted" style={{ height: '100px' }}>
@@ -166,6 +180,7 @@ const HistorialInspecciones = ({ empleado }) => {
                                                                 src={resolveImg(item.firma_url)}
                                                                 alt="Firma"
                                                                 style={{ maxHeight: '60px', filter: 'contrast(1.2)' }}
+<<<<<<< HEAD
                                                                 onError={(e) => {
                                                                     if (!e.target.dataset.triedFallback) {
                                                                         e.target.dataset.triedFallback = 'true';
@@ -176,6 +191,8 @@ const HistorialInspecciones = ({ empleado }) => {
                                                                         e.target.src = `${rootUploads}${item.firma_url}`;
                                                                     }
                                                                 }}
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                                                             />
                                                         </div>
                                                     )}

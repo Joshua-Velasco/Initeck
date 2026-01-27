@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, TrendingDown, Calendar, Clock, Image as ImageIcon, Gauge, Loader2, Receipt, ChevronDown, ChevronUp } from 'lucide-react';
 import { EMPLEADO_HISTORIAL, UPLOADS_BASE_URL } from '../../../config';
 
+<<<<<<< HEAD
 const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
   const [historial, setHistorial] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,27 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
     setLoading(true);
     try {
       const response = await fetch(`${EMPLEADO_HISTORIAL}?empleado_id=${user.id}&fecha_inicio=${fechas.inicio}&fecha_fin=${fechas.fin}`);
+=======
+const HistorialLiquidaciones = ({ user }) => {
+  const [historial, setHistorial] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
+  const getLocalDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [fechaConsulta, setFechaConsulta] = useState(getLocalDate());
+
+  const fetchHistorial = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`${EMPLEADO_HISTORIAL}?empleado_id=${user.id}&fecha=${fechaConsulta}`);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       const result = await response.json();
       if (result.status === 'success') {
         setHistorial(result.data);
@@ -33,18 +55,46 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
 
   useEffect(() => {
     fetchHistorial();
+<<<<<<< HEAD
   }, [user?.id, fechas]);
+=======
+  }, [user?.id, fechaConsulta]);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   const toggleExpand = (id) => setExpandedId(expandedId === id ? null : id);
 
   const resolveImg = (path) => {
     if (!path || typeof path !== 'string') return null;
+<<<<<<< HEAD
     if (path.includes('data:image')) return path;
     if (path.includes('http') && path.includes(',')) {
       const base64Part = path.substring(path.indexOf('data:image'));
       if (base64Part.startsWith('data:image')) return base64Part;
     }
     if (path.includes('http')) return path;
+=======
+
+    // Si ya es base64, devolverlo directamente
+    if (path.includes('data:image')) {
+      return path;
+    }
+
+    // Si la URL tiene el prefijo del servidor pero el contenido es base64, extraer solo el base64
+    if (path.includes('http') && path.includes(',')) {
+      // Extraer la parte base64 si existe
+      const base64Part = path.substring(path.indexOf('data:image'));
+      if (base64Part.startsWith('data:image')) {
+        return base64Part;
+      }
+    }
+
+    // Si es una URL completa, devolverla
+    if (path.includes('http')) {
+      return path;
+    }
+
+    // Si es solo el nombre del archivo, añadir la URL del servidor
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     return `${UPLOADS_BASE_URL}${path}`;
   };
 
@@ -52,7 +102,11 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
     <div className="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)' }}>
       {/* Header */}
       <div className="p-3 p-md-4 border-bottom" style={{ background: 'linear-gradient(135deg, #800020 0%, #a0002a 100%)' }}>
+<<<<<<< HEAD
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+=======
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
           <div>
             <h5 className="fw-bold mb-1 text-white d-flex align-items-center">
               <Clock size={20} className="me-2" />
@@ -60,6 +114,7 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
             </h5>
             <p className="mb-0 text-white-50 small">Historial de liquidaciones y gastos</p>
           </div>
+<<<<<<< HEAD
           
           <div className="d-flex gap-2 bg-white bg-opacity-20 p-1 rounded-3 backdrop-blur">
              <div className="position-relative">
@@ -83,6 +138,32 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
                   onChange={(e) => onDateChange({ ...fechas, fin: e.target.value })}
                 />
              </div>
+=======
+          <div className="position-relative bg-white bg-opacity-25 backdrop-blur px-3 py-2 rounded-3 d-flex align-items-center gap-2" style={{ cursor: 'pointer' }}>
+            <Calendar size={16} className="text-white" />
+            <span className="text-white fw-bold" style={{ fontSize: '14px' }}>
+              {(() => {
+                if (!fechaConsulta) return 'Seleccionar fecha';
+                const [y, m, d] = fechaConsulta.substring(0, 10).split('-');
+                const date = new Date(y, m - 1, d);
+                const nextDay = new Date(date);
+                nextDay.setDate(date.getDate() + 1);
+
+                const opts = { day: 'numeric', month: 'short' };
+                const currStr = date.toLocaleDateString('es-MX', opts);
+                const nextStr = nextDay.toLocaleDateString('es-MX', opts);
+                const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+                return `Turno: ${cap(currStr)} - ${cap(nextStr)}`;
+              })()}
+            </span>
+            <input
+              type="date"
+              className="position-absolute w-100 h-100 top-0 start-0 opacity-0"
+              style={{ cursor: 'pointer' }}
+              value={fechaConsulta?.substring(0, 10)}
+              onChange={(e) => setFechaConsulta(e.target.value)}
+            />
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
           </div>
         </div>
       </div>

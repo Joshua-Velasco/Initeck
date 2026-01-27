@@ -1,0 +1,163 @@
+/* ==========================================================================
+   1. CONTENEDOR PRINCIPAL (ESTRUCTURA FIJA)
+   ========================================================================== */
+.custom-modal-content {
+    border-radius: 1.25rem !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 92vh; 
+    border: none !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    background-color: #ffffff;
+}
+
+/* El formulario envuelve el cuerpo y el footer para un flujo de datos correcto */
+.modal-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden; 
+}
+
+/* ENCABEZADO: Azul Marino Profundo ( Slate-900 ) */
+.modal-header.bg-primary {
+    background-color: #0f172a !important; 
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+    flex-shrink: 0;
+}
+
+.modal-header .modal-title {
+    color: #ffffff !important;
+    letter-spacing: 0.5px;
+}
+
+/* CUERPO: Control de Scroll */
+.modal-body {
+    flex: 1 1 auto;
+    background-color: #f8fafc; /* Fondo grisáceo muy claro */
+    overflow-y: auto !important;
+    padding: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Scrollbar Personalizado */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+   2. TARJETAS Y SECCIONES (SISTEMA DE BLOQUES)
+   ========================================================================= */
+.card.border-0.shadow-sm {
+    background: white;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.card-header {
+    background-color: transparent !important;
+    padding: 1.25rem 1.25rem 0.5rem 1.25rem !important;
+    border-bottom: none !important;
+}
+
+.card-header h6 {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #3b82f6; /* Azul brillante para títulos */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   3. ELEMENTOS DE FORMULARIO
+   ========================================================================== */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    border-color: #3b82f6;
+    background-color: #fff;
+}
+
+label {
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   4. GALERÍA Y BOTÓN DE CARGA
+   ========================================================================== */
+.img-upload-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 0.75rem;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.img-upload-box:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+    color: #3b82f6;
+}
+
+/* ==========================================================================
+   5. FOOTER FIJO
+   ========================================================================== */
+.modal-footer {
+    flex-shrink: 0;
+    background: white;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 1.25rem 1.5rem !important;
+    z-index: 10;
+}
+
+.btn-primary.btn-lg {
+    background-color: #3b82f6;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    padding: 0.8rem;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-primary.btn-lg:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary.btn-lg:active {
+    transform: translateY(0);
+}
+
+/* Badges de contador */
+.badge-count {
+    background: #1e293b;
+    color: white;
+    font-weight: 600;
+}

@@ -1,4 +1,5 @@
 const hostname = window.location.hostname;
+<<<<<<< HEAD
 const isCapacitor = import.meta.env.VITE_IS_CAPACITOR === 'true';
 
 const isLocal = !isCapacitor && (hostname === "localhost" ||
@@ -10,15 +11,33 @@ const isLocal = !isCapacitor && (hostname === "localhost" ||
 // Detectamos la carpeta en producción (ej: /uber o /dev)
 // En Capacitor, asumimos 'uber' ya que no tenemos la ruta en la URL
 const currentFolder = isCapacitor ? 'uber' : window.location.pathname.split('/')[1];
+=======
+const isLocal = hostname === "localhost" ||
+  hostname === "127.0.0.1" ||
+  hostname.startsWith("192.168.") ||
+  hostname.startsWith("10.") ||
+  hostname.startsWith("172.");
+
+// Detectamos la carpeta en producción (ej: /uber o /dev)
+const currentFolder = window.location.pathname.split('/')[1];
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 /**
  * CONFIGURACIÓN DE BASE_API
  * En local: Apuntamos a tu carpeta /v1/
+<<<<<<< HEAD
  * En producción: Apuntamos a la carpeta detectada + initeck-flota + tu estructura de API
  */
 const BASE_API = isLocal
   ? "/initeck-flota/Initeck-api/v1/"
   : `https://admin.initeck.com.mx/uber/Initeck-api/v1/`;
+=======
+ * En producción: Apuntamos a la carpeta detectada + tu estructura de API
+ */
+const BASE_API = isLocal
+  ? "/Inimovil/Initeck-api/v1/"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/v1/`;
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 // Exportar BASE_API para uso en otros módulos
 export { BASE_API };
@@ -48,9 +67,13 @@ export const ANADIR_URL = buildApiUrl("vehiculos/vehiculosAnadir.php");
 export const MODIFICAR_URL = buildApiUrl("vehiculos/vehiculosModificar.php");
 export const ELIMINAR_URL = buildApiUrl("vehiculos/vehiculosEliminar.php");
 export const VEHICULO_LISTAR_URL = buildApiUrl("vehiculos/listar.php");
+<<<<<<< HEAD
 export const GASTOS_COMBUSTIBLE_URL = buildApiUrl("vehiculos/gastos_combustible.php");
 export const BALANCE_URL = buildApiUrl("balance/balance.php");
 export const BALANCE_AVANZADO_URL = buildApiUrl("balance/balance_avanzado.php");
+=======
+export const BALANCE_URL = buildApiUrl("balance/balance.php");
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 export const USUARIO_VEHICULOS_URL = buildApiUrl("empleados/usuario/get_vehiculos.php");
 export const LIQUIDACIONES_URL = buildApiUrl("empleados/usuario/finalizar_jornada.php");
@@ -71,6 +94,7 @@ export const MONITOR_STATS_URL = buildApiUrl("empleados/monitor_stats.php");
 export const DASHBOARD_V2_URL = buildApiUrl("dashboard/dashboard_v2.php");
 export const EMPLEADOS_ACTUALIZAR_HORARIO_URL = buildApiUrl("empleados/actualizar_horario.php");
 
+<<<<<<< HEAD
 // URLs de TALLER (Nuevo Módulo)
 export const TALLER_ALERTAS_URL = buildApiUrl("taller/alertas.php");
 export const TALLER_INVENTARIO_URL = buildApiUrl("taller/inventario.php");
@@ -85,6 +109,8 @@ export const NOMINA_LISTAR_TICKETS_URL = buildApiUrl("nomina/listar_tickets.php"
 export const NOMINA_GUARDAR_TRANSFERENCIA_URL = buildApiUrl("nomina/guardar_transferencia.php");
 export const NOMINA_LISTAR_TRANSFERENCIAS_URL = buildApiUrl("nomina/listar_transferencias.php");
 
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 // URLs de usuario y operaciones
 export const USUARIO_LOGIN_URL = buildApiUrl("empleados/usuario/login.php");
 export const USUARIO_GASTOS_URL = buildApiUrl("empleados/usuario/gastos.php");
@@ -97,6 +123,7 @@ export const UPLOADS_URL = buildApiUrl("uploads/");
 
 // URLs de autenticación (están fuera de v1)
 export const AUTH_SESSION_KEEPALIVE_URL = isLocal
+<<<<<<< HEAD
   ? "/initeck-flota/Initeck-api/auth/session_keepalive.php"
   : `https://admin.initeck.com.mx/uber/Initeck-api/auth/session_keepalive.php`;
 export const AUTH_CHECK_SESSION_URL = isLocal
@@ -108,6 +135,19 @@ export const AUTH_LOGIN_URL = isLocal
 export const AUTH_PERFIL_URL = isLocal
   ? "/initeck-flota/Initeck-api/auth/actualizar_perfil.php"
   : `https://admin.initeck.com.mx/uber/Initeck-api/auth/actualizar_perfil.php`;
+=======
+  ? "/Inimovil/Initeck-api/auth/session_keepalive.php"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/auth/session_keepalive.php`;
+export const AUTH_CHECK_SESSION_URL = isLocal
+  ? "/Inimovil/Initeck-api/auth/check_session.php"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/auth/check_session.php`;
+export const AUTH_LOGIN_URL = isLocal
+  ? "/Inimovil/Initeck-api/auth/login.php"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/auth/login.php`;
+export const AUTH_PERFIL_URL = isLocal
+  ? "/Inimovil/Initeck-api/auth/actualizar_perfil.php"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/auth/actualizar_perfil.php`;
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 // URLs de ubicación
 export const EMPLEADOS_UPDATE_LOCATION_URL = buildApiUrl("empleados/update_location.php");
@@ -139,6 +179,7 @@ export const EMPLEADO_OBTENER_ODOMETRO = `${EMPLEADO_API_BASE}/obtener_odometro.
 
 // Uploads URLs por módulo
 export const UPLOADS_BASE_URL = isLocal
+<<<<<<< HEAD
   ? "http://localhost/initeck-flota/Initeck-api/v1/uploads/"
   : `https://admin.initeck.com.mx/uber/Initeck-api/v1/uploads/`;
 
@@ -149,6 +190,18 @@ export const VEHICULOS_UPLOADS_URL = isLocal
 export const EMPLEADOS_UPLOADS_URL = isLocal
   ? "http://localhost/initeck-flota/Initeck-api/v1/empleados/uploads/"
   : `https://admin.initeck.com.mx/uber/Initeck-api/v1/empleados/uploads/`;
+=======
+  ? "/Inimovil/Initeck-api/v1/uploads/"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/v1/uploads/`;
+
+export const VEHICULOS_UPLOADS_URL = isLocal
+  ? "/Inimovil/Initeck-api/v1/vehiculos/uploads/"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/v1/vehiculos/uploads/`;
+
+export const EMPLEADOS_UPLOADS_URL = isLocal
+  ? "/Inimovil/Initeck-api/v1/empleados/uploads/"
+  : `https://admin.initeck.com.mx/${currentFolder}/Initeck-api/v1/empleados/uploads/`;
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 
 console.log(`🚀 API Configuración:`, {

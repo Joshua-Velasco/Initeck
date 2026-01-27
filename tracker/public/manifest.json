@@ -8,7 +8,11 @@
             "type": "image/x-icon"
         }
     ],
+<<<<<<< HEAD
     "start_url": "./",
+=======
+    "start_url": "/uber/",
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     "display": "standalone",
     "theme_color": "#800020",
     "background_color": "#ffffff"

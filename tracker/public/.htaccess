@@ -3,16 +3,25 @@
   RewriteEngine On
   RewriteBase /uber/
   
+<<<<<<< HEAD
   # Don't rewrite API requests (adjust if your API path is different)
   RewriteCond %{REQUEST_URI} ^/Initeck-api [NC]
   RewriteRule ^ - [L]
 
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   # Don't rewrite files or directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
+<<<<<<< HEAD
   # Rewrite everything else to /uber/index.html for React Router
   RewriteRule ^ /uber/index.html [L]
 </IfModule>
 
+=======
+  # Rewrite everything else to index.html for React Router
+  RewriteRule ^ index.html [L]
+</IfModule>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)

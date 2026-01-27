@@ -1,0 +1,190 @@
+/* ==========================================================================
+   VARIABLES Y CONFIGURACIÓN BASE (Modern System)
+   ========================================================================== */
+:root {
+  /* Paleta Principal */
+  --primary-color: #0f172a;    /* Slate 900 */
+  --secondary-color: #1e293b;  /* Slate 800 */
+  --bg-color: #f1f5f9;         /* Slate 100 */
+  --card-bg: #ffffff;
+  --accent-blue: #3b82f6;      /* Blue 500 */
+  --accent-amber: #f59e0b;     /* Amber 500 (Edición) */
+  
+  /* Colores de Categoría (Semántica) */
+  --insurance-color: #3b82f6;
+  --legal-color: #10b981;
+  --maint-color: #8b5cf6;
+  --danger-color: #ef4444;
+  
+  /* Sombras y Elevación */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Transiciones */
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.autos-container {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--primary-color);
+  padding: 1.5rem;
+}
+
+/* ==========================================================================
+   LISTA DE UNIDADES (PANEL LATERAL)
+   ========================================================================== */
+.unit-list-card {
+  border-radius: 1rem;
+  border: none;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.unit-item {
+  cursor: pointer;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+  padding: 1rem;
+}
+
+.unit-item:hover {
+  background-color: #f8fafc;
+  transform: translateX(4px);
+}
+
+.unit-item.active {
+  background-color: #eff6ff;
+  border-left-color: var(--accent-blue);
+}
+
+/* ==========================================================================
+   FICHA TÉCNICA (INFO ROWS)
+   ========================================================================== */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: var(--transition);
+}
+
+.info-row:hover {
+  border-color: var(--accent-blue);
+  background-color: #fcfcfd;
+  transform: scale(1.01);
+}
+
+.info-label {
+  font-weight: 600;
+  color: #64748b; /* Slate 500 */
+  font-size: 0.75rem; 
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-value {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   MODALES (ESTRUCTURA UNIFICADA)
+   ========================================================================== */
+.modal-content {
+  border-radius: 1.25rem !important;
+  border: none !important;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-body {
+  background-color: #f8fafc;
+  scrollbar-width: thin;
+}
+
+.modal-footer {
+  border-top: 1px solid #e2e8f0 !important;
+  padding: 1.25rem 1.5rem !important;
+  background: #ffffff;
+}
+
+/* ==========================================================================
+   KPI Y MÉTRICAS
+   ========================================================================== */
+.kpi-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--primary-color);
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   UI UTILITIES
+   ========================================================================== */
+.badge-soft {
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.bg-success-soft { background: #dcfce7; color: #15803d; }
+.bg-warning-soft { background: #fef9c3; color: #854d0e; }
+.bg-danger-soft  { background: #fee2e2; color: #991b1b; }
+
+.img-container-rounded {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD AVANZADA
+   ========================================================================== */
+@media (max-width: 992px) {
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .info-value { text-align: left; }
+}
+
+@media (max-width: 768px) {
+  .autos-container { padding: 0.75rem; }
+  .modal-dialog-scrollable { margin: 0.5rem; }
+}

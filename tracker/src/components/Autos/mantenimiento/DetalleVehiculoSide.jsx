@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { Info, Gauge, Droplets, Disc, Settings, CarFront, Calendar, User, Wrench, Battery, CreditCard, FileText, Leaf, BookOpen, Activity, AlertTriangle } from 'lucide-react';
 import NotasVehiculo from './NotasVehiculo';
@@ -47,6 +48,15 @@ export default function DetalleVehiculoSide({ unidad, alertas = [], onEstadoChan
      /* ... unchanged ... */
     return (
       <div className="card border-0 shadow-sm rounded-4 p-5 text-center bg-white" style={{ minHeight: '200px', background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)' }}>
+=======
+import React from 'react';
+import { Info, Gauge, Droplets, Disc, Settings, CarFront, Calendar, User, Wrench, Battery, CreditCard, FileText, Leaf } from 'lucide-react';
+
+export default function DetalleVehiculoSide({ unidad }) {
+  if (!unidad) {
+    return (
+      <div className="card border-0 shadow-sm rounded-4 p-5 text-center bg-white" style={{ minHeight: '400px', background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)' }}>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
         <div className="bg-primary bg-opacity-10 rounded-circle p-4 mx-auto mb-3" style={{ width: '80px', height: '80px' }}>
           <CarFront size={32} className="text-primary" />
         </div>
@@ -56,6 +66,7 @@ export default function DetalleVehiculoSide({ unidad, alertas = [], onEstadoChan
     );
   }
 
+<<<<<<< HEAD
   /* ... unchanged ... */
   // Especificaciones técnicas (Safe access)
   const especificaciones = unidad ? [
@@ -252,6 +263,169 @@ export default function DetalleVehiculoSide({ unidad, alertas = [], onEstadoChan
         <NotasVehiculo unidad={unidad} />
       </div>
 
+=======
+  // Especificaciones técnicas basadas en los campos reales de la BD
+  const especificaciones = [
+    { label: 'Motor', value: unidad.motor_tipo || 'No especificado', icon: <Settings size={16}/> },
+    { label: 'Tipo de Aceite', value: unidad.aceite_tipo || 'No especificado', icon: <Droplets size={16}/> },
+    { label: 'Filtro de Aceite', value: unidad.filtro_aceite || 'No especificado', icon: <Info size={16}/> },
+    { label: 'Bujías', value: unidad.bujias_tipo || 'No especificado', icon: <Gauge size={16}/> },
+    { label: 'Medida Llantas', value: unidad.llantas_medida || 'No especificado', icon: <Disc size={16}/> },
+  ];
+
+  return (
+    <div className="card border-0 shadow-lg rounded-4 overflow-hidden bg-white sticky-top" style={{ top: '20px', boxShadow: '0 8px 25px rgba(0,0,0,0.1)' }}>
+      {/* Header de la Tarjeta */}
+      <div className="bg-gradient-primary text-white p-4" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <div className="d-flex justify-content-between align-items-start mb-2">
+          <span className="badge bg-white text-primary fw-bold mb-2 px-3 py-1 rounded-pill" style={{ fontSize: '0.75rem' }}>
+            {unidad.placas}
+          </span>
+        </div>
+        <h4 className="fw-black mb-1" style={{ fontSize: '1.25rem' }}>{unidad.unidad_nombre}</h4>
+        <p className="small mb-0 opacity-75 d-flex align-items-center gap-2">
+          <Settings size={14} />
+          {unidad.modelo} {unidad.modelo_anio || ''}
+        </p>
+      </div>
+
+      <div className="card-body p-0">
+        {/* Información General */}
+        <div className="p-4 border-bottom bg-light" style={{ background: 'linear-gradient(to right, #f8fafc, #ffffff)' }}>
+          <h6 className="text-uppercase small fw-black text-muted mb-3 d-flex align-items-center gap-2">
+            <Info size={14} className="text-primary" />
+            Información General
+          </h6>
+          <div className="row g-3">
+            <div className="col-6">
+              <div className="d-flex align-items-center gap-2 p-2 rounded-3 bg-white">
+                <div className="bg-primary bg-opacity-10 rounded-circle p-2">
+                  <Calendar size={12} className="text-primary" />
+                </div>
+                <div>
+                  <div className="text-muted" style={{ fontSize: '0.65rem' }}>Año</div>
+                  <div className="fw-bold small">{unidad.modelo_anio || 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6">
+              <div className="d-flex align-items-center gap-2 p-2 rounded-3 bg-white">
+                <div className="bg-success bg-opacity-10 rounded-circle p-2">
+                  <Gauge size={12} className="text-success" />
+                </div>
+                <div>
+                  <div className="text-muted" style={{ fontSize: '0.65rem' }}>Kilometraje</div>
+                  <div className="fw-bold small">{unidad.kilometraje_actual ? unidad.kilometraje_actual.toLocaleString() + ' km' : 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista de Especificaciones Técnicas */}
+        <div className="p-4">
+          <h6 className="text-uppercase small fw-black text-muted mb-3 d-flex align-items-center gap-2">
+            <Settings size={14} className="text-primary" />
+            Especificaciones Técnicas
+          </h6>
+          <div className="d-flex flex-column gap-2">
+            {especificaciones.map((item, idx) => (
+              <div key={idx} className="d-flex align-items-center gap-3 p-3 rounded-3 bg-light hover-light transition-all" style={{ background: 'linear-gradient(to right, #f8fafc, #ffffff)' }}>
+                <div className="bg-primary bg-opacity-10 p-2 rounded-2 text-primary">
+                  {item.icon}
+                </div>
+                <div className="flex-grow-1">
+                  <div className="text-muted fw-bold" style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{item.label}</div>
+                  <div className="fw-bold text-dark" style={{ fontSize: '0.85rem' }}>{item.value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Último Mantenimiento */}
+        {unidad.ultimo_mantenimiento && (
+          <div className="p-4 mt-2 bg-success bg-opacity-10 border-top border-success" style={{ background: 'linear-gradient(to right, #f0fdf4, #ffffff)' }}>
+            <h6 className="text-uppercase small fw-black text-success mb-3 d-flex align-items-center gap-2">
+              <Wrench size={14} className="text-success" />
+              Último Mantenimiento
+            </h6>
+            <div className="bg-white p-3 rounded-3">
+              <div className="fw-bold text-success mb-1">{unidad.ultimo_mantenimiento.tipo}</div>
+              <div className="text-muted small mb-1">{new Date(unidad.ultimo_mantenimiento.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              <div className="text-muted small">Km: {unidad.ultimo_mantenimiento.kilometraje?.toLocaleString() || 'N/A'}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Próximos Servicios Programados */}
+        <div className="p-4 mt-2 bg-info bg-opacity-10 border-top" style={{ background: 'linear-gradient(to right, #f0f9ff, #ffffff)' }}>
+          <h6 className="text-uppercase small fw-black text-info mb-3 d-flex align-items-center gap-2">
+            <Calendar size={14} className="text-info" />
+            Próximos Servicios
+          </h6>
+          <div className="d-flex flex-column gap-2">
+            {unidad.fecha_pago_seguro && (
+              <div className="d-flex align-items-center gap-3 p-3 bg-white rounded-3 transition-all hover-scale">
+                <div className="bg-primary bg-opacity-10 rounded-circle p-2">
+                  <CreditCard size={16} className="text-primary" />
+                </div>
+                <div className="flex-grow-1">
+                  <div className="fw-bold small text-dark">Seguro</div>
+                  <div className="text-muted small">{new Date(unidad.fecha_pago_seguro + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                </div>
+              </div>
+            )}
+
+            {unidad.fecha_pago_revalidacion && (
+              <div className="d-flex align-items-center gap-3 p-3 bg-white rounded-3 transition-all hover-scale">
+                <div className="bg-success bg-opacity-10 rounded-circle p-2">
+                  <FileText size={16} className="text-success" />
+                </div>
+                <div className="flex-grow-1">
+                  <div className="fw-bold small text-dark">Revalidación</div>
+                  <div className="text-muted small">{new Date(unidad.fecha_pago_revalidacion + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                </div>
+              </div>
+            )}
+
+            {unidad.fecha_pago_ecologico && (
+              <div className="d-flex align-items-center gap-3 p-3 bg-white rounded-3 transition-all hover-scale">
+                <div className="bg-warning bg-opacity-10 rounded-circle p-2">
+                  <Leaf size={16} className="text-warning" />
+                </div>
+                <div className="flex-grow-1">
+                  <div className="fw-bold small text-dark">Ecológica</div>
+                  <div className="text-muted small">{new Date(unidad.fecha_pago_ecologico + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                </div>
+              </div>
+            )}
+
+            {unidad.fecha_proximo_mantenimiento && (
+              <div className="d-flex align-items-center gap-3 p-3 bg-white rounded-3 transition-all hover-scale">
+                <div className="bg-danger bg-opacity-10 rounded-circle p-2">
+                  <Wrench size={16} className="text-danger" />
+                </div>
+                <div className="flex-grow-1">
+                  <div className="fw-bold small text-dark">Mantenimiento</div>
+                  <div className="text-muted small">{new Date(unidad.fecha_proximo_mantenimiento + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                </div>
+              </div>
+            )}
+
+            {!unidad.fecha_pago_seguro && !unidad.fecha_pago_revalidacion && !unidad.fecha_pago_ecologico && !unidad.fecha_proximo_mantenimiento && (
+              <div className="text-center text-muted small p-4">
+                <div className="bg-info bg-opacity-10 rounded-circle p-3 mx-auto mb-2" style={{ width: '60px', height: '60px' }}>
+                  <Calendar size={24} className="text-info" />
+                </div>
+                <p className="mb-0 fw-semibold">No hay fechas programadas</p>
+                <p className="mb-0 small">Los próximos servicios aparecerán aquí</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     </div>
   );
 }

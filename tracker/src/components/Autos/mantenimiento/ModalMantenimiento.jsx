@@ -7,7 +7,11 @@ import { MANTENIMIENTO_URL } from '../../../config.js';
 // Importar estilos CSS
 import '../estilos/EstiloMantenimiento.css';
 
+<<<<<<< HEAD
 export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSave, registros = [] }) {
+=======
+export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSave }) {
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   const [loading, setLoading] = useState(false);
   const sigCanvasDesktop = useRef(null);
   const sigCanvasMobile = useRef(null);
@@ -27,6 +31,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
   }, [isOpen]);
 
   const [fotoEvidencia, setFotoEvidencia] = useState(null); // Una sola foto de evidencia
+<<<<<<< HEAD
   
   const [presupuestoInfo, setPresupuestoInfo] = useState({ anual: 0, gastado: 0, disponible: 0 });
 
@@ -40,6 +45,8 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
      { label: "Llantas", field: 'costo_llantas_anual' },
      { label: "Frenos", field: 'costo_frenos_anual' },
   ];
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   // Función para obtener la fecha actual en formato YYYY-MM-DD
   const getTodayDate = () => new Date().toISOString().split('T')[0];
@@ -51,6 +58,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
     costo_total: '',
     presupuesto: '',
     kilometraje_al_momento: '',
+<<<<<<< HEAD
     responsable: user?.nombre || '',
     estado: 'Completado',
     fecha: getTodayDate(),
@@ -85,11 +93,19 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
     }));
   };
 
+=======
+    responsable: user?.nombre || '', // Pre-llenar con el usuario logeado
+    estado: 'Completado', // Estado del mantenimiento
+    fecha: getTodayDate()
+  });
+
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   const tiposMantenimiento = [
     "Servicio General", "Cambio de Aceite", "Sistema Anticongelante",
     "Revisión de Llantas", "Frenos", "Suspensión", "Transmisión",
     "Sistema Eléctrico", "Batería", "Alineación y Balanceo", "Carrocería", "Otro"
   ];
+<<<<<<< HEAD
   
   // Auto-seleccionar categoría al cambiar tipo
   useEffect(() => {
@@ -112,6 +128,8 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
      // Update form data only if category hasn't been manually set differently (optional logic, but for now simple sync)
      setFormData(prev => ({ ...prev, categoria_presupuesto: suggestedField }));
   }, [formData.tipo, isOpen]);
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   const estadosMantenimiento = ['Completado', 'Pendiente', 'En Progreso', 'Cancelado'];
 
@@ -122,6 +140,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
         tipo_otro: '',
         descripcion: '',
         costo_total: '',
+<<<<<<< HEAD
         presupuesto: '', 
         kilometraje_al_momento: unidad.kilometraje_actual || '',
         responsable: String(user?.nombre || ''),
@@ -131,11 +150,21 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
       });
       setFotoEvidencia(null);
       setItems([]); // Reiniciar items
+=======
+        presupuesto: '', // Reset presupuesto field
+        kilometraje_al_momento: unidad.kilometraje_actual || '',
+        responsable: String(user?.nombre || ''),
+        estado: 'Completado',
+        fecha: getTodayDate()
+      });
+      setFotoEvidencia(null);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       if (sigCanvasDesktop.current) sigCanvasDesktop.current.clear();
       if (sigCanvasMobile.current) sigCanvasMobile.current.clear();
     }
   }, [isOpen, unidad]);
 
+<<<<<<< HEAD
   // Helper para limpiar números
   const cleanFloat = (val) => {
     if (val === undefined || val === null || val === '') return 0;
@@ -212,6 +241,8 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
     
   }, [formData.categoria_presupuesto, formData.costo_total, unidad, isOpen, registros]); 
 
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   const handleFotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -262,6 +293,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
 
     const tipoFinal = formData.tipo === 'Otro' ? formData.tipo_otro : formData.tipo;
     data.append('tipo', tipoFinal);
+<<<<<<< HEAD
     
     // Si hay items, agregarlos al final de la descripción
     let descripcionFinal = formData.descripcion;
@@ -276,21 +308,31 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
         }
     }
     data.append('descripcion', descripcionFinal);
+=======
+    data.append('descripcion', formData.descripcion);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
     // Limpiar datos numéricos formateados antes de enviar
     const cleanData = cleanFormData(formData);
     data.append('costo_total', cleanData.costo_total);
+<<<<<<< HEAD
     // Presupuesto restante después de esta compra
     data.append('presupuesto', String(presupuestoInfo.restante || 0)); 
     data.append('kilometraje_al_momento', cleanData.kilometraje_al_momento);
     // Categoría presupuestal para tracking
     data.append('categoria_presupuesto', formData.categoria_presupuesto || '');
+=======
+    data.append('presupuesto', cleanData.presupuesto);
+    data.append('kilometraje_al_momento', cleanData.kilometraje_al_momento);
+
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     data.append('responsable', formData.responsable);
     data.append('estado', formData.estado);
     data.append('fecha', formData.fecha);
 
     // Una sola foto de evidencia
     if (fotoEvidencia?.file) {
+<<<<<<< HEAD
       console.log('📸 Foto evidencia:', {
         name: fotoEvidencia.file.name,
         size: fotoEvidencia.file.size,
@@ -299,11 +341,15 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
       data.append('evidencia_foto', fotoEvidencia.file);
     } else {
       console.log('⚠️ No hay foto de evidencia');
+=======
+      data.append('evidencia_foto', fotoEvidencia.file);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     }
 
     // Firma como archivo
     const firmaFile = await signatureToFile();
     if (firmaFile) {
+<<<<<<< HEAD
       console.log('✍️ Firma empleado:', {
         name: firmaFile.name,
         size: firmaFile.size,
@@ -312,6 +358,9 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
       data.append('firma_empleado', firmaFile);
     } else {
       console.log('⚠️ No hay firma (canvas vacío o error)');
+=======
+      data.append('firma_empleado', firmaFile);
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     }
 
     try {
@@ -426,6 +475,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                           </select>
                         </div>
                         <div className="col-md-6">
+<<<<<<< HEAD
                           <label className="form-label small text-muted fw-semibold mb-2">Categoría (Rubro Presupuestal)</label>
                           <select
                             className="form-select border-0 bg-light rounded-4 shadow-sm"
@@ -459,6 +509,22 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                             </select>
                         </div>
                       </div>
+=======
+                          <label className="form-label small text-muted fw-semibold mb-2">Estado</label>
+                          <select
+                            className="form-select border-0 bg-light rounded-4 shadow-sm"
+                            value={formData.estado}
+                            onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                            required
+                            style={{ fontSize: '0.95rem', padding: '0.75rem 1rem' }}
+                          >
+                            {estadosMantenimiento.map(estado => (
+                              <option key={estado} value={estado}>{estado}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                     </div>
 
                     <div className="row g-4">
@@ -503,6 +569,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                       </div>
                     )}
 
+<<<<<<< HEAD
                     <div className="row g-4 mt-1">
                        <div className="col-12">
                           <label className="form-label fw-bold text-primary mb-2 d-flex justify-content-between align-items-center">
@@ -566,6 +633,11 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                     <div className="row g-4">
                       <div className="col-md-6">
                         <label className="form-label small text-muted fw-semibold mb-2">Presupuesto Restante</label>
+=======
+                    <div className="row g-4">
+                      <div className="col-md-6">
+                        <label className="form-label small text-muted fw-semibold mb-2">Presupuesto</label>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                         <div className="input-group">
                           <span className="input-group-text bg-light border-0 rounded-start-4">
                             <DollarSign size={18} className="text-muted" />
@@ -573,6 +645,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                           <input
                             type="text"
                             className="form-control border-0 bg-light rounded-end-4"
+<<<<<<< HEAD
                             value={
                                 presupuestoInfo.restante != null 
                                 ? presupuestoInfo.restante.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
@@ -598,6 +671,14 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                             </span>
                           </div>
                         )}
+=======
+                            value={formData.presupuesto}
+                            onChange={(e) => handleNumericChange('presupuesto', e)}
+                            placeholder="Ej: 1,500.00"
+                            style={{ fontSize: '0.95rem', padding: '0.75rem 1rem' }}
+                          />
+                        </div>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                       </div>
                       <div className="col-md-6">
                         <label className="form-label small text-muted fw-semibold mb-2">Costo Total</label>
@@ -611,6 +692,7 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                             value={formData.costo_total}
                             onChange={(e) => handleNumericChange('costo_total', e)}
                             placeholder="Ej: 1,234.56"
+<<<<<<< HEAD
                             readOnly={items.length > 0}
                             required
                             style={{ 
@@ -618,6 +700,10 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                                 padding: '0.75rem 1rem',
                                 backgroundColor: items.length > 0 ? '#e9ecef' : 'white'
                             }}
+=======
+                            required
+                            style={{ fontSize: '0.95rem', padding: '0.75rem 1rem' }}
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                           />
                         </div>
                       </div>

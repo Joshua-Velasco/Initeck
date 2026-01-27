@@ -1,0 +1,285 @@
+/* --- BASE Y CONTENEDOR PRINCIPAL --- */
+.autos-container {
+    padding: 1rem !important;
+}
+
+/* --- AJUSTE DE COLUMNAS (SCROLL LATERAL) --- */
+/* En escritorio mantenemos la altura fija para el scroll interno */
+@media (min-width: 992px) {
+    .lateral-scroll-custom {
+        max-height: 520px;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* En móvil, la altura debe ser automática para que el usuario use el scroll del dedo */
+@media (max-width: 991px) {
+    .lateral-scroll-custom {
+        max-height: none !important;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Evitamos que las columnas se vean amontonadas */
+    .row.g-4 {
+        --bs-gutter-y: 1.5rem;
+    }
+}
+
+/* --- TARJETAS Y MÉTRICAS --- */
+.card {
+    transition: transform 0.2s ease;
+}
+
+@media (max-width: 576px) {
+    /* Ajuste de métricas para que no se vean diminutas en móvil */
+    .metricas-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en lugar de 4 */
+        gap: 10px;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+}
+
+/* --- LISTADO DE VEHÍCULOS --- */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Mejoramos el área de toque en móviles para el listado */
+@media (max-width: 991px) {
+    .cursor-pointer {
+        padding: 12px !important;
+    }
+}
+
+/* --- PERSONALIZACIÓN DE SCROLLBAR (Opcional pero recomendado) --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* --- ANIMACIONES RESPONSIVAS --- */
+@media (max-width: 768px) {
+    .animate__animated {
+        /* Desactivamos o suavizamos animaciones pesadas en móvil para mejorar performance */
+        animation-duration: 0.5s !important;
+    }
+}
+
+/* --- ESTILOS PARA MODALES EN MÓVILES --- */
+@media (max-width: 768px) {
+    /* Modal principal */
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100% - 1rem) !important;
+        height: calc(100vh - 1rem);
+        max-height: calc(100vh - 1rem);
+    }
+    
+    .modal-content {
+        height: 100%;
+        max-height: 100%;
+        border-radius: 12px !important;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .modal-header {
+        flex-shrink: 0;
+        padding: 1rem !important;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+        border-bottom: none !important;
+    }
+    
+    .modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto !important;
+        padding: 1rem !important;
+        background: #f8fafc;
+        /* Espacio para el footer fijo */
+        padding-bottom: 80px !important;
+    }
+    
+    .modal-footer {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: white !important;
+        border-top: 1px solid #e2e8f0 !important;
+        padding: 1rem !important;
+        z-index: 10 !important;
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        display: flex !important;
+        gap: 0.75rem !important;
+    }
+    
+    /* Botones del footer */
+    .modal-footer .btn {
+        flex: 1 !important;
+        min-height: 48px !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .modal-footer .btn-primary {
+        background: #3b82f6 !important;
+        border: none !important;
+    }
+    
+    .modal-footer .btn-secondary {
+        background: #64748b !important;
+        border: none !important;
+    }
+    
+    /* Ajustes para pestañas */
+    .nav-pills {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    
+    .nav-pills::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    .nav-pills .nav-link {
+        white-space: nowrap !important;
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.75rem !important;
+        min-width: auto !important;
+    }
+    
+    /* Formularios en móviles */
+    .form-control, .form-select {
+        font-size: 16px !important; /* Evita zoom en iOS */
+        min-height: 44px !important;
+        padding: 0.75rem !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Cards y secciones */
+    .card {
+        margin-bottom: 1rem !important;
+        border-radius: 12px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    /* Grids responsivos */
+    .row.g-3 {
+        --bs-gutter-y: 0.75rem !important;
+        --bs-gutter-x: 0.75rem !important;
+    }
+    
+    .col-md-6 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA MODAL EDICIÓN --- */
+@media (max-width: 768px) {
+    .modal-edicion .modal-body {
+        padding: 0.75rem !important;
+    }
+    
+    .modal-edicion .form-label {
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .modal-edicion .section-card {
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+        margin-bottom: 1rem !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .modal-edicion .img-upload-box {
+        height: 80px !important;
+        border-radius: 8px !important;
+    }
+    
+    .modal-edicion .btn-sm {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+        min-height: 36px !important;
+    }
+}
+
+/* --- ESTILOS PARA MODAL AGREGAR --- */
+@media (max-width: 768px) {
+    .modal-agregar .modal-body {
+        padding-bottom: 90px !important; /* Más espacio para botones grandes */
+    }
+    
+    .modal-agregar .modal-footer {
+        padding: 1.25rem !important;
+        min-height: 80px !important;
+    }
+    
+    .modal-agregar .btn-lg {
+        min-height: 52px !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+    }
+}
+
+/* --- ESTILOS PARA MODAL MANTENIMIENTO --- */
+@media (max-width: 768px) {
+    .modal-mantenimiento .modal-body {
+        padding-bottom: 90px !important;
+    }
+    
+    .modal-mantenimiento .modal-footer {
+        padding: 1rem !important;
+        min-height: 80px !important;
+        display: flex !important;
+        gap: 0.75rem !important;
+    }
+    
+    .modal-mantenimiento .signature-canvas {
+        border: 2px dashed #cbd5e1 !important;
+        border-radius: 8px !important;
+        background: #f8fafc !important;
+    }
+}
+
+/* --- ESTILOS PARA MODAL MANUAL --- */
+@media (max-width: 768px) {
+    .modal-manual .modal-body {
+        padding-bottom: 80px !important;
+    }
+    
+    .modal-manual .modal-footer {
+        padding: 1rem !important;
+        min-height: 70px !important;
+    }
+    
+    .modal-manual iframe {
+        border-radius: 8px !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+}

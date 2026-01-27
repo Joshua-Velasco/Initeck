@@ -11,8 +11,12 @@ const CerrarJornada = ({ user, datosInicio, onCancel }) => {
   // Estados para los datos de cierre
   const [cierre, setCierre] = useState({
     odometro: datosInicio?.odometro || 0,
+<<<<<<< HEAD
     gasolina: datosInicio?.gasolina || 50, // Inicia con lo que reportó al entrar
     comentarios: ''
+=======
+    gasolina: datosInicio?.gasolina || 50 // Inicia con lo que reportó al entrar
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   });
 
   // Helper para convertir base64 a Blob
@@ -46,7 +50,10 @@ const CerrarJornada = ({ user, datosInicio, onCancel }) => {
       formData.append('vehiculo_id', datosInicio?.id_vehiculo);
       formData.append('odometro_final', cierre.odometro);
       formData.append('gasolina_final', cierre.gasolina);
+<<<<<<< HEAD
       formData.append('comentarios', cierre.comentarios || '');
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
       // Firma (Base64 -> File)
       const firmaBase64 = sigCanvas.current.getCanvas().toDataURL('image/png');
@@ -157,6 +164,7 @@ const CerrarJornada = ({ user, datosInicio, onCancel }) => {
                 onChange={(e) => setCierre({ ...cierre, gasolina: parseInt(e.target.value) })}
               />
             </div>
+<<<<<<< HEAD
 
         <div className="mb-4">
           <label className="small fw-bold text-muted text-uppercase mb-2">Comentarios / Fallas Finales</label>
@@ -168,6 +176,8 @@ const CerrarJornada = ({ user, datosInicio, onCancel }) => {
             onChange={(e) => setCierre({ ...cierre, comentarios: e.target.value })}
           ></textarea>
         </div>
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
           </div>
         </div>
 

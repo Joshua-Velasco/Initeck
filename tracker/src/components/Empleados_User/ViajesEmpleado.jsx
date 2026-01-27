@@ -145,7 +145,10 @@ export default function ViajesEmpleado({ user }) {
       formData.append('id_vehiculo', payloadCompleto.id_vehiculo);
       formData.append('odometro', payloadCompleto.odometro);
       formData.append('gasolina', payloadCompleto.gasolina);
+<<<<<<< HEAD
       formData.append('comentarios', payloadCompleto.comentarios || '');
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
       // Firma (Base64 -> File)
       if (payloadCompleto.firma) {
@@ -337,7 +340,29 @@ export default function ViajesEmpleado({ user }) {
                 </div>
 
                 {/* Segunda línea: Botón Modo Activo (Wake Lock) */}
+<<<<<<< HEAD
 
+=======
+                <div className="d-flex mt-2">
+                  <button
+                    onClick={toggleModoActivo}
+                    className={`btn btn-sm rounded-pill d-flex align-items-center gap-2 shadow-sm transition-all border-0 ${modoActivo ? 'text-white' : 'bg-light text-secondary'}`}
+                    style={{
+                      backgroundColor: modoActivo ? colorGuinda : '#f8f9fa',
+                      fontSize: '11px',
+                      padding: '8px 18px',
+                      fontWeight: '700',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    {modoActivo ? "SEGUIMIENTO ACTIVO" : "MODO MONITOR OFF"}
+                  </button>
+                  <audio ref={audioRef} loop style={{ display: 'none' }}>
+                    {/* Audio silencioso (Base64) para prevenir suspensión en móviles sin ser audible */}
+                    <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" type="audio/wav" />
+                  </audio>
+                </div>
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
               </div>
             </div>
           </div>
@@ -377,12 +402,16 @@ export default function ViajesEmpleado({ user }) {
 
                   {/* Historial de Liquidaciones ('Mi actividad') */}
                   <div className="col-12">
+<<<<<<< HEAD
                     <HistorialLiquidaciones 
                       user={user} 
                       fechas={fechas} 
                       onDateChange={setFechas}
                       key={`historial-${refreshKey}`} 
                     />
+=======
+                    <HistorialLiquidaciones user={user} key={`historial-${refreshKey}`} />
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                   </div>
                 </div>
               )}

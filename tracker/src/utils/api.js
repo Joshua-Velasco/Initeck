@@ -12,7 +12,10 @@ import {
   AUTH_CHECK_SESSION_URL,
   AUTH_LOGIN_URL
 } from '../config.js';
+<<<<<<< HEAD
 import { compressImage } from './imageOptimizer.js';
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
 /**
  * Función especializada para requests de autenticación
@@ -112,6 +115,7 @@ export const apiFetch = async (endpoint, options = {}) => {
 export const uploadFile = async (endpoint, formData) => {
   const url = buildApiUrl(endpoint);
 
+<<<<<<< HEAD
   // 🔄 AUTO-COMPRESIÓN DE IMÁGENES
   // Iteramos sobre el FormData original para buscar imágenes y comprimirlas
   const processedFormData = new FormData();
@@ -139,6 +143,12 @@ export const uploadFile = async (endpoint, formData) => {
     const response = await fetch(url, {
       method: 'POST',
       body: processedFormData,
+=======
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       credentials: 'include'
       // No Content-Type para que el navegador lo establezca automáticamente con boundary
     });

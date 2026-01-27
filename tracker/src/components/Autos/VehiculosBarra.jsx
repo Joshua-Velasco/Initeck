@@ -1,92 +1,129 @@
-import React from 'react';
-import { Search, Plus } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Search, Plus, X, Filter, Car, AlertCircle } from 'lucide-react';
 
 export default function VehiculosBarra({ searchTerm, setSearchTerm, filterStatus, setFilterStatus, totalResultados }) {
-  // Opciones de filtro alineadas con la lógica de negocio y colores de la flota
+  const inputRef = useRef(null);
+
   const opcionesFiltro = [
     { nombre: 'Todos', color: '#64748b' },
     { nombre: 'Activo', color: '#10b981' },
-    { nombre: 'Mantenimiento', color: '#f59e0b' },
-    { nombre: 'Fuera de Servicio', color: '#ef4444' }
+    { nombre: 'En Taller', color: '#f59e0b' },
+    { nombre: 'Baja', color: '#ef4444' }
   ];
 
+  const handleClear = () => {
+    setSearchTerm('');
+    inputRef.current?.focus();
+  };
+
+  const resetAll = () => {
+    setSearchTerm('');
+    setFilterStatus('Todos');
+  };
+
   return (
-    <div className="mb-4">
-      <div className="d-flex flex-column flex-xl-row justify-content-between align-items-xl-end gap-3 mb-3">
-        {/* Lado Izquierdo: Títulos y Contador */}
-        <div>
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <h2 className="fw-bold mb-0 text-uppercase tracking-wider" style={{ color: '#0f172a' }}>
-              Flota Initeck
-            </h2>
-            <span className="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3">
-              {totalResultados} {totalResultados === 1 ? 'Unidad' : 'Unidades'}
-            </span>
+    <div className="mb-4 animate__animated animate__fadeIn">
+      <div 
+        className="text-white rounded-4 p-4 mb-4 shadow-lg border-0 d-flex flex-column flex-md-row justify-content-between align-items-center animate__animated animate__fadeIn" 
+        style={{ 
+          background: "linear-gradient(135deg, #6b0f1a 0%, #b91c1c 100%)", 
+          boxShadow: "rgba(107, 15, 26, 0.3) 0px 10px 30px" 
+        }}
+      >
+        {/* LADO IZQUIERDO: TÍTULO E ICONO */}
+        <div className="d-flex align-items-center gap-3 text-center text-md-start">
+          <div className="d-none d-sm-flex align-items-center justify-content-center bg-opacity-20 rounded-4" style={{ width: '58px', height: '58px' }}>
+            <Car size={32} color="white" strokeWidth={2.2} />
           </div>
-          <p className="text-muted small mb-0">Gestión centralizada de unidades y costos operativos</p>
+          
+          <div className="d-flex flex-column">
+            <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-md-start">
+              <h1 className="fw-bold mb-0" style={{ fontSize: '1.8rem' }}>Flota Initeck</h1>
+              <span className="badge rounded-pill bg-white text-dark px-3 py-1 fw-bold" style={{ fontSize: '0.75rem' }}>
+                {totalResultados.toLocaleString()} UNIDADES
+              </span>
+            </div>
+            <p className="text-white-50 mb-0 small text-uppercase tracking-widest">
+              Sistema de Control Operativo
+            </p>
+          </div>
         </div>
 
-        {/* Lado Derecho: Buscador + Filtros + Botón */}
-        <div className="d-flex flex-wrap gap-3 align-items-center">
+        {/* LADO DERECHO: BUSCADOR Y BOTÓN NUEVO */}
+        <div className="d-flex flex-column flex-md-row gap-2 mt-3 mt-md-0 align-items-center">
           
-          {/* Barra de Búsqueda con diseño limpio */}
-          <div className="input-group input-group-sm shadow-sm" style={{ width: '280px' }}>
-            <span className="input-group-text bg-white border-end-0 text-muted">
-              <Search size={16} />
+          {/* Buscador Integrado */}
+          <div className="position-relative shadow-sm rounded-pill overflow-hidden bg-white" style={{ width: '250px' }}>
+            <span className="position-absolute top-50 start-0 translate-middle-y ps-3">
+              <Search size={18} className="text-muted" />
             </span>
             <input 
               type="text" 
-              className="form-control border-start-0 ps-0 bg-white" 
-              placeholder="Buscar por unidad, placas o motor..." 
-              value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="form-control border-0 ps-5 py-2" 
+              style={{ fontSize: '0.85rem', height: '42px', boxShadow: 'none' }}
+              placeholder="Buscar unidad..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          {/* Filtros de Estado Estilizados (Segmented Control) */}
-          <div className="d-flex gap-1 bg-white p-1 rounded-pill border shadow-sm">
-            {opcionesFiltro.map(s => (
-              <button 
-                key={s.nombre} 
-                onClick={() => setFilterStatus(s.nombre)}
-                className={`btn btn-sm rounded-pill px-3 border-0 d-flex align-items-center gap-2 transition-all ${
-                  filterStatus === s.nombre 
-                  ? 'btn-primary shadow-sm text-white' 
-                  : 'text-muted bg-transparent hover-bg-light'
-                }`}
-                style={{ 
-                  fontSize: '0.72rem', 
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {s.nombre !== 'Todos' && (
-                  <span 
-                    className="rounded-circle" 
-                    style={{ 
-                      width: '8px', 
-                      height: '8px', 
-                      backgroundColor: filterStatus === s.nombre ? 'white' : s.color,
-                      border: filterStatus === s.nombre ? 'none' : '1px solid rgba(0,0,0,0.1)'
-                    }}
-                  ></span>
-                )}
-                {s.nombre}
-              </button>
-            ))}
-          </div>
-
-          {/* Botón Nueva Unidad - Trigger de ModalAgregar */}
+          {/* Botón Nueva Unidad */}
           <button 
-            className="btn btn-dark btn-sm d-flex align-items-center gap-2 px-4 shadow-sm rounded-3 py-2" 
+            className="btn btn-light shadow-sm px-4 d-flex align-items-center gap-2 fw-bold text-dark rounded-pill" 
+            style={{ height: '42px', border: 'none' }}
             data-bs-toggle="modal" 
             data-bs-target="#modalAgregar"
-            style={{ fontWeight: '600', letterSpacing: '0.3px' }}
           >
-            <Plus size={18}/> Nueva Unidad
+            <Plus size={20} strokeWidth={3} />
+            <span>Nueva Unidad</span>
           </button>
         </div>
       </div>
+      {/* MENSAJE DE RESULTADOS */}
+      {(searchTerm || filterStatus !== 'Todos') && (
+        <div className="mt-2 animate__animated animate__fadeInUp">
+          <div className={`d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill ${totalResultados === 0 ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25' : 'bg-light text-muted border'}`}>
+            {totalResultados === 0 ? <AlertCircle size={14} /> : <Filter size={12} />}
+            <small className="fw-bold">
+              {totalResultados === 0 
+                ? `No se encontró: "${searchTerm || filterStatus}"` 
+                : `Mostrando ${totalResultados} resultados`}
+            </small>
+            <button 
+              className={`btn btn-sm p-0 text-decoration-underline ms-2 fw-bold ${totalResultados === 0 ? 'text-danger' : 'text-primary'}`} 
+              onClick={resetAll} 
+              style={{ fontSize: '0.7rem' }}
+            >
+              Restablecer filtros
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hover-scale:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        
+        @media (max-width: 768px) {
+          .scroll-x-mobile {
+            overflow-x: auto; white-space: nowrap; padding: 4px;
+            -webkit-overflow-scrolling: touch; width: 100%;
+          }
+          .scroll-x-mobile::-webkit-scrollbar { display: none; }
+          .btn-fab-mobile {
+            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+            border-radius: 50% !important; z-index: 1050; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; padding: 0 !important;
+            background-color: #6b0f1a !important;
+          }
+          .btn-fab-mobile span { display: none !important; }
+          .search-container-mobile { order: 1; width: 100% !important; }
+          .filter-group-container { order: 2; width: 100%; }
+          .w-100-mobile { width: 100%; }
+        }
+      `}</style>
     </div>
   );
 }

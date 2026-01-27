@@ -49,6 +49,7 @@ export default function ModalAgregar({ onUnidadAgregada }) {
     focos_tipo: '',
     rendimiento_gasolina: '',
     // Campos de costos (Monto y Periodo para el PHP)
+<<<<<<< HEAD
     costo_seguro_monto: 0, costo_seguro_periodo: 'anual', costo_seguro_anual: 0,
     costo_deducible_seguro_monto: 0, costo_deducible_seguro_periodo: 'anual', costo_deducible_seguro_anual: 0,
     costo_gasolina_monto: 0, costo_gasolina_periodo: 'anual', costo_gasolina_anual: 0,
@@ -60,6 +61,18 @@ export default function ModalAgregar({ onUnidadAgregada }) {
     costo_tuneup_monto: 0, costo_tuneup_periodo: 'anual', costo_tuneup_anual: 0,
     costo_frenos_monto: 0, costo_frenos_periodo: 'anual', costo_frenos_anual: 0,
     costo_lavado_monto: 0, costo_lavado_periodo: 'anual', costo_lavado_anual: 0,
+=======
+    costo_seguro_monto: 0, costo_seguro_periodo: 'anual',
+    costo_deducible_seguro_monto: 0, costo_deducible_seguro_periodo: 'anual',
+    costo_gasolina_monto: 0, costo_gasolina_periodo: 'anual',
+    costo_aceite_monto: 0, costo_aceite_periodo: 'anual',
+    costo_ecologico_monto: 0, costo_ecologico_periodo: 'anual',
+    costo_placas_monto: 0, costo_placas_periodo: 'anual',
+    costo_servicio_general_monto: 0, costo_servicio_general_periodo: 'anual',
+    costo_llantas_monto: 0, costo_llantas_periodo: 'anual',
+    costo_tuneup_monto: 0, costo_tuneup_periodo: 'anual',
+    costo_lavado_monto: 0, costo_lavado_periodo: 'anual',
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     // Checkboxes
     llanta_refaccion: 'NO', cables_corriente: 'NO', gato: 'NO', cruzeta: 'NO',
     // Fechas
@@ -128,6 +141,7 @@ export default function ModalAgregar({ onUnidadAgregada }) {
   };
 
   // Esta función ahora mapea correctamente los campos de CalcRow al formato Monto/Periodo
+<<<<<<< HEAD
   // Calcular costo anual y actualizar estado
   const handleCostCalculation = (monto, periodo, campoAnual) => {
     const num = Math.max(0, parseFloat(monto) || 0);
@@ -142,6 +156,12 @@ export default function ModalAgregar({ onUnidadAgregada }) {
     setFormData(prev => ({
       ...prev,
       [campoAnual]: anual.toFixed(2), // Guardamos el valor calculado que espera el backend
+=======
+  const handleCostCalculation = (monto, periodo, campoAnual) => {
+    const base = campoAnual.replace('_anual', '');
+    setFormData(prev => ({
+      ...prev,
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       [`${base}_monto`]: monto,
       [`${base}_periodo`]: periodo
     }));
@@ -303,8 +323,12 @@ export default function ModalAgregar({ onUnidadAgregada }) {
                         <CalcRow icon={CreditCard} label="Placas" field="costo_placas_anual" onCalculate={handleCostCalculation} />
                         <CalcRow icon={FileText} label="Servicio General" field="costo_servicio_general_anual" onCalculate={handleCostCalculation} />
                         <CalcRow icon={Disc} label="Llantas" field="costo_llantas_anual" onCalculate={handleCostCalculation} />
+<<<<<<< HEAD
                         <CalcRow icon={Zap} label="Servicio Frenos" field="costo_frenos_anual" onCalculate={handleCostCalculation} />
                         <CalcRow icon={Zap} label="Tune Up / Afinación" field="costo_tuneup_anual" onCalculate={handleCostCalculation} />
+=======
+                        <CalcRow icon={Zap} label="Servicio Frenos" field="costo_tuneup_anual" onCalculate={handleCostCalculation} />
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                         <CalcRow icon={Droplets} label="Limpieza" field="costo_lavado_anual" onCalculate={handleCostCalculation} />
                       </div>
                     </div>

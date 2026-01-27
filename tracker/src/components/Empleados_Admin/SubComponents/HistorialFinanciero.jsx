@@ -148,6 +148,7 @@ const HistorialFinanciero = ({ empleado, fechas }) => {
                         {/* Resumen de Montos (Solo si no es solo gasto) */}
                         {!esSoloGasto && (
                           <>
+<<<<<<< HEAD
                             <div className="col-12 col-sm-4 text-center border-bottom border-sm-0 border-end-sm pb-2 pb-sm-0">
                               <p className="text-muted mb-0" style={{ fontSize: '9px' }}>BRUTO</p>
                               <span className="fw-bold small">${montoBruto.toFixed(2)}</span>
@@ -157,6 +158,17 @@ const HistorialFinanciero = ({ empleado, fechas }) => {
                               <span className="fw-bold small">${(parseFloat(item.propinas) || 0).toFixed(2)}</span>
                             </div>
                             <div className="col-6 col-sm-4 text-center pt-2 pt-sm-0">
+=======
+                            <div className="col-4 text-center border-end">
+                              <p className="text-muted mb-0" style={{ fontSize: '9px' }}>BRUTO</p>
+                              <span className="fw-bold small">${montoBruto.toFixed(2)}</span>
+                            </div>
+                            <div className="col-4 text-center border-end">
+                              <p className="text-muted mb-0" style={{ fontSize: '9px' }}>PROPINAS</p>
+                              <span className="fw-bold small">${(parseFloat(item.propinas) || 0).toFixed(2)}</span>
+                            </div>
+                            <div className="col-4 text-center">
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                               <p className="text-success mb-0" style={{ fontSize: '9px' }}>A ENTREGAR</p>
                               <span className="fw-bold text-success small">${montoNeto.toFixed(2)}</span>
                             </div>
@@ -183,6 +195,7 @@ const HistorialFinanciero = ({ empleado, fechas }) => {
                                 {gasto.foto_ticket && (
                                   <div className="col-6 text-center">
                                     <label className="d-block text-muted mb-1" style={{ fontSize: '9px' }}>TICKET / RECIBO</label>
+<<<<<<< HEAD
                                     <img
                                       src={resolveImg(gasto.foto_ticket)}
                                       className="img-fluid rounded-3 border bg-white shadow-sm"
@@ -198,6 +211,8 @@ const HistorialFinanciero = ({ empleado, fechas }) => {
 
                                 {gasto.foto_tablero && (
                                   <div className="col-6 text-center">
+=======
+>>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                                     <label className="d-block text-muted mb-1" style={{ fontSize: '9px' }}>TABLERO / KM</label>
                                     <img
                                       src={resolveImg(gasto.foto_tablero)}
