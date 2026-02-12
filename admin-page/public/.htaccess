@@ -1,0 +1,26 @@
+<IfModule mod_mime.c>
+  AddType text/javascript .js
+  AddType text/css .css
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  DirectoryIndex index.html
+  
+  # Prevent rewriting for assets directory to avoid "soft 404s" (serving index.html for missing files)
+  RewriteRule ^assets/ - [L]
+
+  # Don't rewrite files or directories
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Rewrite everything else to index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Optional: Enable gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

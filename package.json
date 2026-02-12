@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "workspaces": [
+    "tracker",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "host": "npm run dev --workspace=host"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.11.0"
+  }
+}

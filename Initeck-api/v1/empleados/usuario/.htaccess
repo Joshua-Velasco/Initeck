@@ -1,0 +1,44 @@
+# 1. Aumentar límites para evitar el error 413 (Content Too Large)
+# Ajusta estos valores según la capacidad de tu servidor
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+</IfModule>
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+</IfModule>
+
+# 2. Configuración de Headers (CORS) - CENTRALIZADO AQUÍ
+<IfModule mod_headers.c>
+    SetEnvIf Origin "^http(s)?://(localhost:5173|admin\.initeck\.com\.mx)$" AccessControlAllowOrigin=$0
+    Header always set Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, x-usuario-id"
+</IfModule>
+
+# 3. Reglas de Enrutamiento (Router/Gateway)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # IMPORTANTE: Ajusta el RewriteBase si tu API está en una subcarpeta
+    # Para https://admin.initeck.com.mx/uber/Initeck-api/v1/
+    RewriteBase /uber/Initeck-api/v1/
+
+    # Si piden OPTIONS (Preflight de CORS), responder 200 y terminar
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ - [R=200,L]
+
+    # Si el archivo o carpeta existe físicamente, servirlo directamente
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Si NO existe, mandar la petición al index.php (API Gateway)
+    # Esto permite que /empleados/listar.php funcione aunque el archivo real esté en otro lado
+    RewriteRule ^ index.php [L]
+
+    # Seguridad: No permitir ver el listado de archivos
+    Options -Indexes
+</IfModule>

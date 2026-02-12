@@ -1,0 +1,22 @@
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # IMPORTANTE: Cambia esto si tu carpeta en el servidor no se llama /Initeck-api/
+    # Ejemplo: Si esta en /uber/api/, pon: RewriteBase /uber/api/
+    RewriteBase /uber/Initeck-api/
+
+    # Manejo robusto de CORS: Redirigir todas las solicitudes OPTIONS a core_cors.php
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ core_cors.php [L]
+
+    # Si es una carpeta, o el archivo no existe, enviar a index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Seguridad: Bloquear acceso a archivos sensibles
+<FilesMatch "^\.ht">
+    Require all denied
+</FilesMatch>

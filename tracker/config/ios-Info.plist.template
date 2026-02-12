@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 
+  INSTRUCCIONES DE INSTALACIÓN:
+  1. Abre Xcode
+  2. Navega a: ios/App/App/Info.plist
+  3. Agrega las siguientes claves DENTRO del tag <dict> principal
+  4. Guarda el archivo
+-->
+<plist version="1.0">
+<dict>
+    <!-- ============================================ -->
+    <!-- PERMISOS DE UBICACIÓN BACKGROUND GPS         -->
+    <!-- ============================================ -->
+    
+    <!-- Descripción cuando se solicita "Siempre Permitir" -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Initeck Flota necesita acceso continuo a tu ubicación para rastrear tu ruta en tiempo real, incluso cuando la app está en segundo plano. Esto mejora la seguridad y permite monitoreo preciso.</string>
+    
+    <!-- Descripción cuando se solicita "Mientras se usa la app" -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Initeck Flota necesita acceso a tu ubicación para mostrarte en el mapa en tiempo real.</string>
+    
+    <!-- Descripción legacy para "Siempre" (iOS antiguo) -->
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Initeck Flota necesita acceso continuo a tu ubicación para rastreo en segundo plano y mejorar la seguridad.</string>
+    
+    <!-- ============================================ -->
+    <!-- BACKGROUND MODES                              -->
+    <!-- ============================================ -->
+    
+    <!-- Habilita ejecución en background para ubicación -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+    
+    <!-- ============================================ -->
+    <!-- CONFIGURACIÓN ADICIONAL RECOMENDADA          -->
+    <!-- ============================================ -->
+    
+    <!-- Previene que el sistema termine la app por uso de ubicación -->
+    <key>UIRequiresPersistentWiFi</key>
+    <false/>
+    
+    <!-- Permite que la app se ejecute indefinidamente en background -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.initeck.flota.refresh</string>
+    </array>
+</dict>
+</plist>

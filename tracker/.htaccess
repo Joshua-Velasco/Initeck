@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+  DirectoryIndex index.html
+  RewriteEngine On
+  RewriteBase /uber/
+  
+  # Don't rewrite API requests
+  RewriteCond %{REQUEST_URI} ^/Initeck-api [OR]
+  RewriteCond %{REQUEST_URI} ^/initeck-flota
+  RewriteRule ^ - [L]
+  
+  # Don't rewrite files or directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Rewrite everything else to /uber/index.html for React Router
+  RewriteRule ^ /uber/index.html [L]
+
+  # Cache Control for Service Worker and Index
+  <FilesMatch "^(sw\.js|index\.html)$">
+      FileETag None
+      <IfModule mod_headers.c>
+          Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+          Header set Pragma "no-cache"
+          Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+      </IfModule>
+  </FilesMatch>
+</IfModule>
