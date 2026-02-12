@@ -62,6 +62,20 @@ Development focused on creating a scalable architecture that allows for independ
 
 ---
 
+## 🌳 Branching Model
+
+This project follows a professional branching strategy (inspired by GitFlow) to maintain production stability and organized development:
+
+| Branch      | Purpose                                                                 |
+| :---------- | :---------------------------------------------------------------------- |
+| `main`      | **Production.** Holds the latest stable, production-ready code.         |
+| `develop`   | **Development.** Integration branch for features and fixes.             |
+| `feature/*` | **New Features.** Specific branches for individual tasks or components. |
+| `release/*` | **Releases.** Preparation for moving code from `develop` to `main`.     |
+| `hotfix/*`  | **Urgent Fixes.** Critical bug fixes for the code currently in `main`.  |
+
+---
+
 ## 🛠 Tech Stack
 
 - **Frontend**: React 19, Vite, Tailwind CSS, Lucide Icons.
