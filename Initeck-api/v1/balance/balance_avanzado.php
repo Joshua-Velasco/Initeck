@@ -145,7 +145,7 @@ try {
         $sqlDepositos = "SELECT COALESCE(SUM(monto), 0) as total_depositos 
                          FROM nomina_transferencias 
                          WHERE empleado_id = :eid 
-                         AND DATE(fecha_ejecucion) BETWEEN :fi AND :ff";
+                         AND fecha_inicio_semana BETWEEN :fi AND :ff";
         $stmtDep = $db->prepare($sqlDepositos);
         $stmtDep->execute([
             ':eid' => $emp['empleado_id'],
@@ -219,7 +219,6 @@ try {
                 foreach ($vehiculoCostos as $campo => $costoAnual) {
                     if ($campo === 'costo_gasolina_anual')
                         continue; // EXCLUIDO REALMENTE
-                    $costo = floatval($costoAnual);
                     $costo = floatval($costoAnual);
                     if ($costo > 0) {
                         $costoPeriodo = calcularCostoPeriodo($costo, $periodo);
@@ -307,7 +306,6 @@ try {
                 foreach ($vehiculoCostos as $campo => $costoAnual) {
                     if ($campo === 'costo_gasolina_anual')
                         continue; // EXCLUIDO REALMENTE
-                    $costo = floatval($costoAnual);
                     $costo = floatval($costoAnual);
                     if ($costo > 0) {
                         $costoPeriodo = calcularCostoPeriodo($costo, $periodo);
@@ -406,7 +404,7 @@ try {
                 $costosLabels = [
                     'costo_seguro_anual' => 'Seguro',
                     'costo_deducible_seguro_anual' => 'Deducible Seguro',
-                    'costo_gasolina_anual' => 'Gasolina',
+                    // 'costo_gasolina_anual' => 'Gasolina', // EXCLUIDO
                     'costo_aceite_anual' => 'Aceite',
                     'costo_llantas_anual' => 'Llantas',
                     'costo_tuneup_anual' => 'Tune-up/Afinación',
@@ -424,6 +422,8 @@ try {
                 ];
 
                 foreach ($vehiculoCostos as $campo => $costoAnual) {
+                    if ($campo === 'costo_gasolina_anual')
+                        continue; // EXCLUIDO
                     $costo = floatval($costoAnual);
                     if ($costo > 0) {
                         $costoPeriodo = calcularCostoPeriodo($costo, $periodo);
@@ -469,7 +469,8 @@ try {
             'detalles_mantenimiento' => $detallesMantenimiento,
             'detalles_ingresos' => [],
             'distancia_recorrida_km' => 0,
-            'rendimiento_km' => 0
+            'rendimiento_km' => 0,
+            'total_depositos' => (float) ($db->query("SELECT COALESCE(SUM(monto), 0) FROM nomina_transferencias WHERE empleado_id = $eid AND fecha_inicio_semana BETWEEN '$fechaInicio' AND '$fechaFin'")->fetchColumn() ?: 0)
         ];
     }
 
@@ -490,7 +491,7 @@ try {
 
     // 3. Global Fixed Costs (Calculate DIRECTLY from ALL vehicles to ensure concordance and avoid double counting or omissions)
     $sqlTotalFixed = "SELECT 
-        SUM(costo_seguro_anual + costo_deducible_seguro_anual + costo_gasolina_anual + 
+        SUM(costo_seguro_anual + costo_deducible_seguro_anual + 
             costo_aceite_anual + costo_llantas_anual + costo_tuneup_anual + 
             costo_lavado_anual + costo_servicio_general_anual + costo_placas_anual + 
             costo_ecologico_anual) as total_anual
@@ -522,7 +523,7 @@ try {
         $costosLabels = [
             'costo_seguro_anual' => 'Seguro',
             'costo_deducible_seguro_anual' => 'Deducible Seguro',
-            'costo_gasolina_anual' => 'Gasolina',
+            // 'costo_gasolina_anual' => 'Gasolina', // EXCLUIDO
             'costo_aceite_anual' => 'Aceite',
             'costo_llantas_anual' => 'Llantas',
             'costo_tuneup_anual' => 'Tune-up/Afinación',
@@ -539,6 +540,8 @@ try {
         ];
 
         foreach ($costosLabels as $campo => $label) {
+            if ($campo === 'costo_gasolina_anual')
+                continue; // EXCLUIDO
             $costo = floatval($veh[$campo] ?? 0);
             if ($costo > 0) {
                 $costoPeriodo = calcularCostoPeriodo($costo, $periodo);

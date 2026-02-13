@@ -46,14 +46,10 @@ const TabTransferencias = ({
 }) => {
     const sigCanvas = useRef({});
 
-    // Calcular la semana pasada (lunes a domingo)
-    const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 (Dom) a 6 (Sab)
-    const diffToLastMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + 7;
-    const lastMonday = new Date(today);
-    lastMonday.setDate(today.getDate() - diffToLastMonday);
-    const lastSunday = new Date(lastMonday);
-    lastSunday.setDate(lastMonday.getDate() + 6);
+    // Obtener el rango actualmente seleccionado en el dashboard para proponerlo como periodo de pago
+    const { rawStart, rawEnd } = getRangoFechas();
+    const lastMonday = rawStart;
+    const lastSunday = rawEnd;
 
     const handleSave = async () => {
       // 1. Validaciones

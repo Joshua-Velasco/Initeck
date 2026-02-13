@@ -35,6 +35,6 @@ Initeck-api/config/database.php.local
 *.swo
 
 # Capacitor / Mobile
-tracker/android/
-tracker/ios/
+# tracker/android/
+# tracker/ios/
 # (Keep these if you want the native projects in repo, otherwise ignore)
