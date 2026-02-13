@@ -59,19 +59,11 @@ export default function TablaMantenimiento({
   };
 
   return (
-<<<<<<< HEAD
     <div className="card border-0 shadow-sm overflow-hidden bg-white animate__animated animate__fadeInUp" style={{ borderRadius: '24px' }}>
       <div className="card-header border-0 p-3 p-sm-4 d-flex flex-column gap-3" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
         <h5 className="fw-bold mb-0 text-white d-flex align-items-center gap-2 flex-wrap">
           <Activity size={28} className="opacity-75" />
           <span className="fs-4">Historial de Servicios</span>
-=======
-    <div className="card border-0 shadow-lg rounded-4 overflow-hidden bg-white" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-      <div className="card-header bg-gradient-primary border-0 p-3 p-sm-4 d-flex flex-column gap-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-        <h5 className="fw-bold mb-0 text-white d-flex align-items-center gap-2 flex-wrap">
-          <Activity size={24} className="opacity-75" />
-          <span className="fs-6 fs-sm-5">Historial de Servicios</span>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
         </h5>
         <div className="input-group w-100" style={{ maxWidth: '100%' }}>
           <span className="input-group-text bg-white bg-opacity-20 border-0 text-white">
@@ -91,7 +83,6 @@ export default function TablaMantenimiento({
       {/* Desktop Table View */}
       <div className="d-none d-md-block table-responsive" style={{ borderRadius: '0 0 1rem 1rem' }}>
         <table className="table align-middle mb-0" style={{ borderCollapse: 'separate', borderSpacing: '0' }}>
-<<<<<<< HEAD
           <thead className="bg-light text-dark text-uppercase" style={{ background: '#f8f9fa' }}>
             <tr>
               <th className="ps-4 fw-bold border-0" style={{ width: '50px', padding: '1.25rem 1rem', fontSize: '1rem' }}></th>
@@ -101,37 +92,16 @@ export default function TablaMantenimiento({
               <th className="text-center fw-bold border-0" style={{ padding: '1.25rem 1rem', fontSize: '1rem' }}>Costo Real</th>
               <th className="pe-4 text-end fw-bold border-0" style={{ padding: '1.25rem 1rem', fontSize: '1rem' }}>Fecha</th>
               <th className="text-center border-0" style={{ width: '120px', padding: '1.25rem 1rem', fontSize: '1rem' }}>Acciones</th>
-=======
-          <thead className="bg-light text-muted small text-uppercase" style={{ background: 'linear-gradient(to bottom, #f8f9fa, #e9ecef)' }}>
-            <tr>
-              <th className="ps-4 fw-semibold border-0" style={{ width: '40px', padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}></th>
-              <th className="fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Servicio / Tipo</th>
-              {!unidadSeleccionada && <th className="text-center fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Unidad</th>}
-              <th className="text-center fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Kilometraje</th>
-              <th className="text-center fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Presupuesto</th>
-              <th className="text-center fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Costo Real</th>
-              <th className="text-center fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Ahorro</th>
-              <th className="pe-4 text-end fw-semibold border-0" style={{ padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Fecha</th>
-              <th className="text-center border-0" style={{ width: '80px', padding: '1rem 0.75rem', fontSize: '0.75rem', letterSpacing: '0.5px' }}>Acciones</th>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
             </tr>
           </thead>
           <tbody>
             {registros.length > 0 ? (
               registros.map((reg) => {
-<<<<<<< HEAD
                 const costo = parseFloat(reg.costo_total || 0);
-=======
-                const presupuesto = parseFloat(reg.presupuesto || 0);
-                const costo = parseFloat(reg.costo_total || 0);
-                const margen = presupuesto - costo;
-                const esAhorro = margen >= 0;
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
                 return (
                   <React.Fragment key={reg.id}>
                     <tr
-<<<<<<< HEAD
                       className={`cursor-pointer transition-all position-relative ${expandedId === reg.id ? 'bg-primary bg-opacity-10' : 'hover-bg-light'}`}
                       onClick={() => toggleRow(reg.id)}
                       style={{ borderBottom: '1px solid #e9ecef' }}
@@ -175,60 +145,12 @@ export default function TablaMantenimiento({
                         >
                           <Trash2 size={18} />
                           <span>Eliminar</span>
-=======
-                      className={`cursor-pointer transition-all position-relative ${expandedId === reg.id ? 'bg-primary bg-opacity-5' : 'hover-bg-light'}`}
-                      onClick={() => toggleRow(reg.id)}
-                      style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}
-                    >
-                      <td className="ps-4 text-center" style={{ padding: '1.25rem 0.75rem' }}>
-                        <div className={`rounded-circle p-2 transition-all ${expandedId === reg.id
-                          ? 'text-primary'
-                          : 'bg-light text-muted'
-                          }`}>
-                          {expandedId === reg.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                        </div>
-                      </td>
-                      <td style={{ padding: '1.25rem 0.75rem' }}>
-                        <div className="fw-bold text-dark mb-1" style={{ fontSize: '0.95rem' }}>{reg.tipo}</div>
-                        <div className="text-muted small" style={{ fontSize: '0.8rem', lineHeight: '1.3' }}>{reg.descripcion?.substring(0, 40)}{reg.descripcion?.length > 40 ? '...' : ''}</div>
-                      </td>
-                      {!unidadSeleccionada && (
-                        <td className="text-center" style={{ padding: '1.25rem 0.75rem' }}>
-                          <span className="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill" style={{ fontSize: '0.8rem', fontWeight: '600' }}>{reg.unidad_nombre}</span>
-                        </td>
-                      )}
-                      <td className="text-center font-monospace small" style={{ padding: '1.25rem 0.75rem', fontSize: '0.85rem', fontWeight: '500' }}>
-                        <span className="badge bg-light text-dark px-2 py-1 rounded">
-                          {Number(reg.kilometraje_al_momento).toLocaleString()} km
-                        </span>
-                      </td>
-                      <td className="text-center" style={{ padding: '1.25rem 0.75rem', fontSize: '0.9rem', fontWeight: '500' }}>${presupuesto.toLocaleString()}</td>
-                      <td className="text-center fw-bold" style={{ padding: '1.25rem 0.75rem', color: '#667eea', fontSize: '0.95rem' }}>${costo.toLocaleString()}</td>
-                      <td className="text-center" style={{ padding: '1.25rem 0.75rem' }}>
-                        <div className={`badge rounded-pill px-3 py-2 ${esAhorro ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-danger bg-opacity-10 text-danger border border-danger'}`} style={{ fontSize: '0.8rem', fontWeight: '600' }}>
-                          {esAhorro ? <TrendingUp size={12} className="me-1" /> : <TrendingDown size={12} className="me-1" />}
-                          ${Math.abs(margen).toLocaleString()}
-                        </div>
-                      </td>
-                      <td className="pe-4 text-end" style={{ padding: '1.25rem 0.75rem' }}>
-                        <div className="small fw-bold text-muted" style={{ fontSize: '0.85rem' }}>{new Date(reg.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                      </td>
-                      <td className="text-center" style={{ padding: '1.25rem 0.75rem' }}>
-                        <button
-                          onClick={(e) => handleDeleteClick(e, reg)}
-                          className="btn btn-sm btn-outline-danger border-0 rounded-circle p-2 transition-all hover-scale"
-                          style={{ width: '36px', height: '36px' }}
-                          title="Eliminar registro"
-                        >
-                          <Trash2 size={14} />
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                         </button>
                       </td>
                     </tr>
 
                     {expandedId === reg.id && (
                       <tr>
-<<<<<<< HEAD
                         <td colSpan={unidadSeleccionada ? 7 : 8} className="p-0 border-0">
                           <div className="bg-white p-5 border-bottom border-3 border-primary" style={{ backgroundColor: '#f8f9fa' }}>
                             <div className="row g-5">
@@ -309,65 +231,6 @@ export default function TablaMantenimiento({
                                             />
                                         </div>
                                       ) : <span className="text-muted fst-italic">Sin firma registrada</span>}
-=======
-                        <td colSpan={unidadSeleccionada ? 8 : 9} className="p-0 border-0">
-                          <div className="bg-gradient-to-r from-light to-white p-4" style={{ background: 'linear-gradient(to right, #f8f9fa, #ffffff)', borderTop: '2px solid #667eea' }}>
-                            <div className="row g-4">
-                              <div className="col-md-7">
-                                <div className="bg-white p-4 rounded-4 shadow-sm h-100 border-0" style={{ boxShadow: '0 2px 15px rgba(0,0,0,0.08)' }}>
-                                  <h6 className="fw-bold mb-3 text-uppercase small d-flex align-items-center gap-2" style={{ color: '#667eea', fontSize: '0.8rem', letterSpacing: '0.5px' }}>
-                                    <Activity size={16} />
-                                    Resumen Técnico
-                                  </h6>
-                                  <div className="mb-4">
-                                    <label className="text-muted small fw-bold text-uppercase mb-2" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>Diagnóstico</label>
-                                    <div className="p-3 bg-light rounded-3 border-start border-primary border-4 text-dark" style={{ background: 'linear-gradient(to right, #e3f2fd, #ffffff)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                                      {reg.descripcion || "Sin descripción."}
-                                    </div>
-                                  </div>
-                                  <div className="row g-3">
-                                    <DetailBox icon={<User />} label="Responsable" value={reg.responsable || 'No registrado'} />
-                                    <DetailBox icon={<Calendar />} label="Fecha" value={reg.fecha} />
-                                    <DetailBox icon={<FileText />} label="Folio" value={`#${reg.id}`} />
-                                    <DetailBox icon={<Activity />} label="Estatus" value={reg.estado} />
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="col-md-5">
-                                <div className="d-flex flex-column gap-3">
-                                  <div className="bg-white p-4 rounded-4 shadow-sm border-0" style={{ boxShadow: '0 2px 15px rgba(0,0,0,0.08)' }}>
-                                    <h6 className="fw-bold mb-3 small text-uppercase d-flex align-items-center gap-2" style={{ color: '#667eea', fontSize: '0.8rem', letterSpacing: '0.5px' }}>
-                                      <ImageIcon size={16} />
-                                      Evidencia Fotográfica
-                                    </h6>
-                                    <div className="d-flex justify-content-center">
-                                      {renderImagenes(reg.evidencia_foto, '120px')}
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-white p-4 rounded-4 shadow-sm border-0" style={{ boxShadow: '0 2px 15px rgba(0,0,0,0.08)' }}>
-                                    <h6 className="fw-bold mb-3 small text-uppercase d-flex align-items-center gap-2" style={{ color: '#667eea', fontSize: '0.8rem', letterSpacing: '0.5px' }}>
-                                      <PenTool size={16} /> Firma del Empleado
-                                    </h6>
-                                    <div className="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center border" style={{ height: '140px', overflow: 'hidden', background: 'linear-gradient(to bottom, #f8f9fa, #e9ecef)' }}>
-                                      {reg.firma_empleado ? (
-                                        <img
-                                          src={getFileUrl(reg.firma_empleado)}
-                                          className="img-fluid h-100 w-100 object-fit-contain"
-                                          style={{ mixBlendMode: 'multiply' }}
-                                          alt="Firma"
-                                          onError={(e) => {
-                                            console.error("Error cargando firma:", e.target.src);
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'block';
-                                          }}
-                                        />
-                                      ) : null}
-                                      <span className="text-muted small opacity-50" style={{ display: reg.firma_empleado ? 'none' : 'block' }}>
-                                        Firma no encontrada en /uploads
-                                      </span>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                                     </div>
                                   </div>
                                 </div>
@@ -382,19 +245,11 @@ export default function TablaMantenimiento({
               })
             ) : (
               <tr>
-<<<<<<< HEAD
                 <td colSpan={unidadSeleccionada ? 7 : 8} className="text-center py-5">
                   <div className="text-muted py-5">
                     <Activity size={64} className="mb-4 opacity-25" />
                     <h4 className="fw-bold mb-2">Sin registros de mantenimiento</h4>
                     <p className="fs-5">No se encontraron servicios registrados para esta unidad.</p>
-=======
-                <td colSpan={unidadSeleccionada ? 9 : 10} className="text-center py-5">
-                  <div className="text-muted">
-                    <Activity size={48} className="mb-3 opacity-25" />
-                    <div className="fw-semibold">Sin registros de mantenimiento</div>
-                    <div className="small">No se encontraron servicios para esta unidad</div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                   </div>
                 </td>
               </tr>
@@ -404,7 +259,6 @@ export default function TablaMantenimiento({
       </div>
 
       {/* Mobile Card View */}
-<<<<<<< HEAD
       <div className="d-md-none p-3 d-flex flex-column gap-3">
         {registros.length > 0 ? (
           registros.map((reg) => {
@@ -527,127 +381,6 @@ export default function TablaMantenimiento({
             <Activity size={56} className="mb-3 opacity-25" />
             <h5 className="fw-bold">Sin registros</h5>
             <p className="text-muted">No hay información para mostrar.</p>
-=======
-      <div className="d-md-none p-3">
-        {registros.length > 0 ? (
-          <div className="row g-3">
-            {registros.map((reg) => {
-              const presupuesto = parseFloat(reg.presupuesto || 0);
-              const costo = parseFloat(reg.costo_total || 0);
-              const margen = presupuesto - costo;
-              const esAhorro = margen >= 0;
-
-              return (
-                <div key={reg.id} className="col-12">
-                  <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div className="card-body p-3">
-                      <div className="d-flex justify-content-between align-items-start mb-3">
-                        <div className="flex-grow-1">
-                          <h6 className="fw-bold text-dark mb-1">{reg.tipo}</h6>
-                          <div className="text-muted small">{new Date(reg.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
-                        </div>
-                        <button
-                          onClick={(e) => handleDeleteClick(e, reg)}
-                          className="btn btn-sm btn-outline-danger border-0 rounded-circle p-2"
-                          style={{ width: '32px', height: '32px' }}
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-
-                      {!unidadSeleccionada && (
-                        <div className="mb-2">
-                          <span className="badge bg-light text-dark px-2 py-1 rounded-pill" style={{ fontSize: '0.75rem' }}>
-                            {reg.unidad_nombre}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="row g-2 mb-3">
-                        <div className="col-6">
-                          <div className="text-muted small" style={{ fontSize: '0.7rem' }}>Kilometraje</div>
-                          <div className="fw-bold small">{Number(reg.kilometraje_al_momento).toLocaleString()} km</div>
-                        </div>
-                        <div className="col-6">
-                          <div className="text-muted small" style={{ fontSize: '0.7rem' }}>Costo Real</div>
-                          <div className="fw-bold text-primary">${costo.toLocaleString()}</div>
-                        </div>
-                      </div>
-
-                      <div className={`badge rounded-pill px-2 py-1 ${esAhorro ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-danger bg-opacity-10 text-danger border border-danger'}`} style={{ fontSize: '0.75rem' }}>
-                        {esAhorro ? <TrendingUp size={10} className="me-1" /> : <TrendingDown size={10} className="me-1" />}
-                        {esAhorro ? 'Ahorro' : 'Exceso'}: ${Math.abs(margen).toLocaleString()}
-                      </div>
-
-                      <button
-                        className="btn btn-sm btn-outline-primary w-100 mt-3 rounded-3"
-                        onClick={() => toggleRow(reg.id)}
-                      >
-                        {expandedId === reg.id ? 'Ocultar detalles' : 'Ver detalles'}
-                      </button>
-
-                      {expandedId === reg.id && (
-                        <div className="mt-3 pt-3 border-top">
-                          <div className="mb-3">
-                            <div className="text-muted small mb-1">Descripción</div>
-                            <div className="small">{reg.descripcion || 'Sin descripción'}</div>
-                          </div>
-
-                          <div className="row g-2 mb-3">
-                            <div className="col-6">
-                              <div className="text-muted small">Responsable</div>
-                              <div className="small fw-bold">{reg.responsable || 'No registrado'}</div>
-                            </div>
-                            <div className="col-6">
-                              <div className="text-muted small">Estado</div>
-                              <div className="small fw-bold">{reg.estado}</div>
-                            </div>
-                            {presupuesto > 0 && (
-                              <div className="col-6">
-                                <div className="text-muted small">Presupuesto</div>
-                                <div className="small fw-bold">${presupuesto.toLocaleString()}</div>
-                              </div>
-                            )}
-                          </div>
-
-                          {reg.evidencia_foto && (
-                            <div className="mb-3">
-                              <div className="text-muted small mb-2">Evidencia</div>
-                              <div className="d-flex justify-content-center">
-                                {renderImagenes(reg.evidencia_foto, '100px')}
-                              </div>
-                            </div>
-                          )}
-
-                          {reg.firma_empleado && (
-                            <div>
-                              <div className="text-muted small mb-2">Firma</div>
-                              <div className="bg-light rounded-3 p-2 text-center" style={{ height: '80px' }}>
-                                <img
-                                  src={getFileUrl(reg.firma_empleado)}
-                                  className="h-100 object-fit-contain"
-                                  style={{ mixBlendMode: 'multiply' }}
-                                  alt="Firma"
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-5">
-            <div className="text-muted">
-              <Activity size={48} className="mb-3 opacity-25" />
-              <div className="fw-semibold">Sin registros de mantenimiento</div>
-              <div className="small">No se encontraron servicios para esta unidad</div>
-            </div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
           </div>
         )}
       </div>
@@ -657,21 +390,12 @@ export default function TablaMantenimiento({
 
 function DetailBox({ icon, label, value }) {
   return (
-<<<<<<< HEAD
     <div className="col-md-6 col-lg-6">
       <div className="d-flex align-items-center gap-2 text-secondary mb-1">
         {React.cloneElement(icon, { size: 18, className: 'text-primary' })}
         <span className="fw-bold text-uppercase" style={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>{label}</span>
       </div>
       <div className="fw-bold text-dark fs-5">{value}</div>
-=======
-    <div className="col-6">
-      <div className="d-flex align-items-center gap-2 text-muted mb-2">
-        {React.cloneElement(icon, { size: 12, style: { color: '#667eea' } })}
-        <span className="small fw-bold text-uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}>{label}</span>
-      </div>
-      <div className="fw-bold text-dark small" style={{ fontSize: '0.85rem' }}>{value}</div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     </div>
   );
 }

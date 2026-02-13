@@ -8,15 +8,12 @@ export default function ResumenMonitorista({ empleado }) {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-<<<<<<< HEAD
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsReady(true), 500);
         return () => clearTimeout(timer);
     }, []);
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
     useEffect(() => {
         if (!empleado?.id) return;
@@ -125,7 +122,6 @@ export default function ResumenMonitorista({ empleado }) {
                         <h5 className="fw-bold mb-0">Actividad de Monitoreo (Últimos 7 días)</h5>
                     </div>
                     <div className="card-body p-4 pt-0" style={{ height: '300px' }}>
-<<<<<<< HEAD
                         {isReady && (
                             <div style={{ width: '100%', height: '100%', minWidth: 0 }}>
                                 <ResponsiveContainer width="100%" height="100%">
@@ -164,42 +160,6 @@ export default function ResumenMonitorista({ empleado }) {
                                 </ResponsiveContainer>
                             </div>
                         )}
-=======
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats.chart_data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eaecf0" />
-                                <XAxis
-                                    dataKey="fecha"
-                                    fontSize={12}
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickFormatter={(val) => {
-                                        const date = new Date(val + 'T00:00:00'); // Force local time avoid timezone shift
-                                        return date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
-                                    }}
-                                />
-                                <YAxis
-                                    fontSize={12}
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickFormatter={(val) => `${val}h`}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                                    formatter={(val) => [`${val} horas`, 'Actividad']}
-                                    labelFormatter={(val) => new Date(val + 'T00:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                />
-                                <Bar
-                                    dataKey="duracion_horas"
-                                    fill={COLORS.primary || '#0f172a'}
-                                    radius={[6, 6, 0, 0]}
-                                    barSize={32}
-                                    name="Horas Activo"
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                     </div>
                 </div>
             </div>

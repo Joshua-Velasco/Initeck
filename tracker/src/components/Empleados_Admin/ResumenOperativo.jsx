@@ -16,10 +16,7 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
 
   const [datosDiarios, setDatosDiarios] = useState({
     ingresos: 0,
-<<<<<<< HEAD
     depositos: 0, // Nueva propiedad
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     efectivo: 0,
     propinas: 0,
     gastos: 0,
@@ -48,10 +45,7 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
           ...prev,
           viajes: parseInt(data.total_viajes) || 0,
           ingresos: parseFloat(data.total_ingresos) || 0,
-<<<<<<< HEAD
           depositos: parseFloat(data.total_depositos) || 0, // Nuevo campo
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
           efectivo: parseFloat(data.total_efectivo) || 0,
           propinas: parseFloat(data.total_propinas) || 0,
           gastos: parseFloat(data.total_gastos) || 0,
@@ -63,11 +57,7 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
     } catch (err) {
       console.error('Error al obtener liquidación:', err);
       setError(err.message === "No se encontraron datos" ? null : "Error de conexión");
-<<<<<<< HEAD
       setDatosDiarios(p => ({ ...p, ingresos: 0, depositos: 0, gastos: 0, viajes: 0, neto: 0 }));
-=======
-      setDatosDiarios(p => ({ ...p, ingresos: 0, gastos: 0, viajes: 0, neto: 0 }));
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     } finally {
       setLoading(false);
     }
@@ -89,42 +79,9 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
 
   return (
     <div className="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
-<<<<<<< HEAD
       {/* Header Eliminado */}
 
       <div className="card-body p-3">
-=======
-      <div className="card-header border-0 p-4 bg-transparent d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <h5 className="fw-bold mb-0 d-flex align-items-center" style={{ color: COLORS.guinda }}>
-          <div className="p-2 rounded-3 me-3" style={{ backgroundColor: `${COLORS.guinda}15` }}>
-            <Zap size={20} fill={COLORS.guinda} stroke={COLORS.guinda} />
-          </div>
-          Resumen Operativo
-        </h5>
-        <div className="d-flex align-items-center bg-light p-1 px-3 rounded-pill border shadow-sm gap-2">
-          <Calendar size={16} className="text-muted" />
-          <div className="d-flex align-items-center gap-2">
-            <input
-              type="date"
-              className="form-control form-control-sm border-0 bg-transparent fw-bold shadow-none p-0"
-              style={{ width: '110px' }}
-              value={fechas.inicio}
-              onChange={(e) => setFechas(p => ({ ...p, inicio: e.target.value }))}
-            />
-            <span className="text-muted small">al</span>
-            <input
-              type="date"
-              className="form-control form-control-sm border-0 bg-transparent fw-bold shadow-none p-0"
-              style={{ width: '110px' }}
-              value={fechas.fin}
-              onChange={(e) => setFechas(p => ({ ...p, fin: e.target.value }))}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="card-body p-4 pt-0">
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
         {loading ? (
           <div className="text-center py-5">
             <Loader2 className="animate-spin" style={{ color: COLORS.guinda }} size={32} />
@@ -136,7 +93,6 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
             {error}
           </div>
         ) : (
-<<<<<<< HEAD
           <div className="row g-3">
             {/* Ingresos Totales */}
             <div className="col-12 col-md-4 col-xl-2">
@@ -171,39 +127,10 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
                 </div>
                 <h3 className="fw-bold mb-0 text-dark text-truncate">{f(datosDiarios.propinas)}</h3>
                  <p className="text-muted small fw-bold mb-0 text-truncate" style={{fontSize: '0.75rem'}}>EXTRAS ACUM.</p>
-=======
-          <div className="row g-4">
-            {/* Ingresos Totales */}
-            <div className="col-md-6 col-xl-3">
-              <div className="p-4 rounded-4 h-100 shadow-sm border-start border-5 border-success" style={{ background: 'linear-gradient(145deg, #ffffff, #f0fdf4)' }}>
-                <span className="badge rounded-pill bg-success bg-opacity-10 text-success mb-3 px-3">Ingresos Efectivo</span>
-                <p className="text-muted small fw-bold mb-1">VIAJES REGISTRADOS: {datosDiarios.viajes}</p>
-                <h2 className="fw-bold mb-0 text-dark">{f(datosDiarios.efectivo)}</h2>
-                <div className="mt-3 pt-3 border-top text-muted small d-flex justify-content-between">
-                  <span className="d-flex align-items-center">
-                    <TrendingUp size={14} className="me-1 text-success" /> Total Efectivo
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Propinas [NUEVO] */}
-            <div className="col-md-6 col-xl-3">
-              <div className="p-4 rounded-4 h-100 shadow-sm border-start border-5 border-warning" style={{ background: 'linear-gradient(145deg, #ffffff, #fefce8)' }}>
-                <span className="badge rounded-pill bg-warning bg-opacity-10 text-warning mb-3 px-3">Propinas</span>
-                <p className="text-muted small fw-bold mb-1">EXTRAS DEL DÍA</p>
-                <h2 className="fw-bold mb-0 text-dark">{f(datosDiarios.propinas)}</h2>
-                <div className="mt-3 pt-3 border-top text-muted small d-flex justify-content-between">
-                  <span className="d-flex align-items-center">
-                    <Coins size={14} className="me-1 text-warning" /> Total Propinas
-                  </span>
-                </div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
               </div>
             </div>
 
             {/* Gastos del Día */}
-<<<<<<< HEAD
             <div className="col-12 col-md-6 col-xl-3">
               <div className="p-3 rounded-4 h-100 shadow-sm border-start border-5 border-danger" style={{ background: 'linear-gradient(145deg, #ffffff, #fef2f2)' }}>
                 <div className="d-flex justify-content-between align-items-center mb-1">
@@ -212,21 +139,10 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
                 </div>
                 <h3 className="fw-bold mb-0 text-danger text-truncate">{f(datosDiarios.gastos)}</h3>
                 <p className="text-muted small fw-bold mb-0 text-truncate" style={{fontSize: '0.75rem'}}>EGRESOS TOTALES</p>
-=======
-            <div className="col-md-6 col-xl-3">
-              <div className="p-4 rounded-4 h-100 shadow-sm border-start border-5 border-danger" style={{ background: 'linear-gradient(145deg, #ffffff, #fef2f2)' }}>
-                <span className="badge rounded-pill bg-danger bg-opacity-10 text-danger mb-3 px-3">Gastos Totales</span>
-                <p className="text-muted small fw-bold mb-1">EGRESOS DEL DÍA</p>
-                <h2 className="fw-bold mb-0 text-danger">{f(datosDiarios.gastos)}</h2>
-                <div className="mt-3 pt-3 border-top text-muted small text-end">
-                  Operación y mantenimiento
-                </div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
               </div>
             </div>
 
             {/* Rendimiento Neto */}
-<<<<<<< HEAD
             <div className="col-12 col-md-6 col-xl-3">
               <div className="p-3 rounded-4 h-100 shadow-sm border-start border-5" style={{
                 background: 'linear-gradient(145deg, #ffffff, #f0fdf4)',
@@ -244,26 +160,6 @@ export const ResumenOperativo = ({ empleado, fechas, setFechas }) => {
                 <p className="text-muted small fw-bold mb-0 text-truncate">
                    {datosDiarios.neto >= 0 ? 'UTILIDAD' : 'PÉRDIDA'}
                 </p>
-=======
-            <div className="col-md-6 col-xl-3">
-              <div className="p-4 rounded-4 h-100 shadow-sm border-start border-5" style={{
-                background: 'linear-gradient(145deg, #ffffff, #f0fdf4)',
-                borderColor: datosDiarios.neto >= 0 ? COLORS.success : COLORS.danger
-              }}>
-                <span className={`badge rounded-pill mb-3 px-3 ${datosDiarios.neto >= 0 ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'
-                  }`}>
-                  Balance Neto
-                </span>
-                <p className="text-muted small fw-bold mb-1">
-                  EFICIENCIA: {porcentajeEficiencia}%
-                </p>
-                <h2 className={`fw-bold mb-0 ${datosDiarios.neto >= 0 ? 'text-success' : 'text-danger'}`}>
-                  {f(datosDiarios.neto)}
-                </h2>
-                <div className="mt-3 pt-3 border-top text-muted small text-end">
-                  {datosDiarios.neto >= 0 ? 'Utilidad del periodo' : 'Pérdida operativa'}
-                </div>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
               </div>
             </div>
           </div>

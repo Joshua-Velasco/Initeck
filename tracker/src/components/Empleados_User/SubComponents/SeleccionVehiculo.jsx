@@ -227,7 +227,6 @@ export default function SeleccionVehiculo({
               </div>
 
               <div className="col-12 mt-4">
-<<<<<<< HEAD
                 <label className="small fw-bold mb-2 text-uppercase text-muted">Comentarios / Reporte de Fallas (Opcional)</label>
                 <textarea
                   className="form-control rounded-4 shadow-sm border-0 bg-light"
@@ -239,8 +238,6 @@ export default function SeleccionVehiculo({
               </div>
 
               <div className="col-12 mt-4">
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <label className="small fw-bold text-uppercase text-muted">Firma de Salida</label>
                   <button onClick={clearSignature} className="btn btn-sm text-danger fw-bold d-flex align-items-center gap-1 text-decoration-none"><Eraser size={14} /> Limpiar</button>

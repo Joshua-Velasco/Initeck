@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
-=======
-import React from 'react';
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 import { ResumenOperativo } from './ResumenOperativo';
 import { GraficoRendimiento } from './GraficoRendimiento';
 import { UnidadManager } from './UnidadManager';
@@ -14,11 +10,7 @@ import ResumenMonitorista from './SubComponents/ResumenMonitorista';
 import { Shield, HardDrive, Zap } from 'lucide-react';
 import { COLORS, getRolStyle, getRolLabel } from '../../constants/theme';
 
-<<<<<<< HEAD
 export default function EmpleadoDetalle({ empleado, onUnidadChange, activeTab, fechas, setFechas }) {
-=======
-export default function EmpleadoDetalle({ empleado, onUnidadChange }) {
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   // Verificación de seguridad para evitar errores si el empleado es null
   if (!empleado) {
     return (
@@ -30,22 +22,7 @@ export default function EmpleadoDetalle({ empleado, onUnidadChange }) {
   }
 
 
-<<<<<<< HEAD
 
-=======
-  const getLocalDate = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const [fechas, setFechas] = React.useState({
-    inicio: getLocalDate(),
-    fin: getLocalDate()
-  });
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   return (
     <div className="container-fluid p-0 animate__animated animate__fadeIn">
@@ -82,7 +59,6 @@ export default function EmpleadoDetalle({ empleado, onUnidadChange }) {
             )
 
               /* CASO 3: OPERATIVOS (Admin, Operator) -> Ver Dashboard Completo */
-<<<<<<< HEAD
   /* CASO 3: OPERATIVOS (Admin, Operator) -> Ver Dashboard Completo */
               : (
                 <>
@@ -140,52 +116,6 @@ export default function EmpleadoDetalle({ empleado, onUnidadChange }) {
                        </div>
                     )}
 
-=======
-              : (
-                <>
-                  {/* Resumen Superior: Métricas clave como combustible, odómetro y unidad actual */}
-                  <div className="col-12">
-                    <ResumenOperativo
-                      empleado={empleado}
-                      fechas={fechas}
-                      setFechas={setFechas}
-                    />
-                  </div>
-
-
-                  {/* Columna Principal: Gráficos de productividad y rutas diarias */}
-                  <div className="col-12">
-                    <div className="card border-0 shadow-sm rounded-4 h-100">
-                      <div className="card-body p-4">
-                        <GraficoRendimiento
-                          empleado={empleado}
-                          fechas={fechas}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Historial Financiero: Ingresos y gastos del empleado */}
-                  <div className="col-12">
-                    <HistorialFinanciero
-                      empleado={empleado}
-                      fechas={fechas}
-                    />
-                  </div>
-
-                  {/* Historial de Inspecciones: Checklist de salida y fotos */}
-                  <div className="col-12">
-                    <HistorialInspecciones
-                      empleado={empleado}
-                    />
-                  </div>
-
-                  {/* Gráfico de Kilometraje: Comparativa de recorrido */}
-                  <div className="col-12">
-                    <GraficoKilometraje
-                      empleado={empleado}
-                    />
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                   </div>
                 </>
               )}

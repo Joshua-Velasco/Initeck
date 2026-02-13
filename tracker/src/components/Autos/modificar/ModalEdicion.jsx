@@ -93,7 +93,6 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
           circulacion: editData.foto_circulacion ? `${BASE_URL}${editData.foto_circulacion}` : null,
           unit_photos: initialPhotos.map(foto => `${BASE_URL}${foto}`)
         });
-<<<<<<< HEAD
 
         // Sincronización inicial de costos (solo al cargar)
         const camposCosto = [
@@ -131,8 +130,6 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
            setEditData(prev => ({ ...prev, ...updates }));
         }
 
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       }
       // Para nuevo auto sin ID, mantener los datos actuales sin limpiar
     } else {
@@ -144,45 +141,7 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
       revokeAllUrls();
     }
     return () => revokeAllUrls();
-<<<<<<< HEAD
   }, [editData?.id, revokeAllUrls]); // Eliminado editData de deps para evitar loop, solo ID
-=======
-  }, [editData?.id, editData, revokeAllUrls]); // Re-ejecutar cuando los datos cambien
-
-  useEffect(() => {
-    if (!editData) return;
-
-    // Campos de costo que necesitan sincronización
-    const camposCosto = [
-      'costo_seguro_anual', 'costo_deducible_seguro_anual', 'costo_gasolina_anual',
-      'costo_aceite_anual', 'costo_ecologico_anual', 'costo_placas_anual',
-      'costo_servicio_general_anual', 'costo_llantas_anual', 'costo_tuneup_anual', 'costo_lavado_anual'
-    ];
-
-    const calcularCostoAnual = (campoAnual, campoMonto, campoPeriodo) => {
-      const monto = parseFloat(editData[campoMonto]) || 0;
-      const periodo = editData[campoPeriodo] || 'anual';
-
-      let anualCalculado = monto;
-      if (periodo === 'semanal') anualCalculado = monto * 52;
-      else if (periodo === 'mensual') anualCalculado = monto * 12;
-      else if (periodo === 'cuatrimestral') anualCalculado = monto * 3;
-      else if (periodo === 'semestral') anualCalculado = monto * 2;
-
-      // Si el valor anual en editData es diferente al calculado, actualizarlo
-      if (parseFloat(editData[campoAnual]) !== anualCalculado) {
-        updateField(campoAnual, anualCalculado.toFixed(2));
-      }
-    };
-
-    camposCosto.forEach(campoAnual => {
-      const campoMonto = campoAnual.replace('_anual', '_monto');
-      const campoPeriodo = campoAnual.replace('_anual', '_periodo');
-
-      calcularCostoAnual(campoAnual, campoMonto, campoPeriodo);
-    });
-  }, [editData, updateField]);
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   if (!editData) return null;
 
@@ -299,7 +258,6 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
       formDataObj.append('fotos_restantes', JSON.stringify(fotosExistentes));
       formDataObj.append('fotos_eliminar', JSON.stringify(fotosEliminar));
 
-<<<<<<< HEAD
       // 3. Documentos individuales (Subida y Eliminación)
       // Placas
       if (docs.placas) {
@@ -321,12 +279,6 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
       } else if (!previews.circulacion && editData.foto_circulacion) {
         formDataObj.append('eliminar_foto_circulacion', 'true');
       }
-=======
-      // 3. Documentos individuales
-      if (docs.placas) formDataObj.append('foto_placas', docs.placas);
-      if (docs.ecologico) formDataObj.append('foto_ecologico', docs.ecologico);
-      if (docs.circulacion) formDataObj.append('foto_circulacion', docs.circulacion);
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
       // 4. Fotos nuevas del carrusel
       if (docs.unit_files && docs.unit_files.length > 0) {
@@ -336,15 +288,9 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
       formDataObj.set('accion', 'editar_vehiculo');
       formDataObj.set('id', editData.id);
 
-<<<<<<< HEAD
       const resultado = await guardarCambios(formDataObj);
 
       if (resultado.success) {
-=======
-      const exito = await guardarCambios(formDataObj);
-
-      if (exito) {
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
         // Cerrar modal de edición
         const modalEl = document.getElementById('modalEdicion');
         const modalInstance = bootstrap.Modal.getInstance(modalEl);
@@ -353,17 +299,10 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
         setStatusModal({
           type: 'success',
           title: '¡Sincronizado!',
-<<<<<<< HEAD
           message: resultado.message || 'Los cambios se guardaron correctamente en el sistema.'
         });
       } else {
         throw new Error(resultado.message || "La API devolvió un estado de error");
-=======
-          message: 'Los cambios se guardaron correctamente en el sistema.'
-        });
-      } else {
-        throw new Error("La API devolvió un estado de error");
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       }
 
     } catch (error) {
@@ -371,11 +310,7 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
       setStatusModal({
         type: 'error',
         title: 'Fallo al Guardar',
-<<<<<<< HEAD
         message: error.message || 'No pudimos conectar con el servidor para actualizar los datos.'
-=======
-        message: 'No pudimos conectar con el servidor para actualizar los datos.'
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       });
     } finally {
       setLoading(false);
@@ -455,12 +390,8 @@ export default function ModalEdicion({ editData, setEditData, guardarCambios }) 
                           { icon: CreditCard, label: "Placas", field: "costo_placas_anual" },
                           { icon: FileText, label: "Servicio General", field: "costo_servicio_general_anual" },
                           { icon: Disc, label: "Llantas", field: "costo_llantas_anual" },
-<<<<<<< HEAD
                           { icon: Zap, label: "Servicio Frenos", field: "costo_frenos_anual" },
                           { icon: Zap, label: "Tune Up / Afinación", field: "costo_tuneup_anual" },
-=======
-                          { icon: Zap, label: "Servicio Frenos", field: "costo_tuneup_anual" },
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                           { icon: Droplets, label: "Limpieza", field: "costo_lavado_anual" }
                         ].map(item => (
                           <CalcRowEditar

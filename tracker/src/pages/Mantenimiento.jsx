@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-<<<<<<< HEAD
 import { Wrench, Plus, Loader2, Car, BarChart3, BookOpen, AlertTriangle, Archive, Info, FileText, DollarSign } from 'lucide-react';
 
 import ModalMantenimiento from '../components/Autos/mantenimiento/ModalMantenimiento';
@@ -33,28 +32,12 @@ const CATEGORIAS_MANTO = [
   "Seguro", "Trámites (Placas/Tenencia)", "Verificación Ecológica", "Otro"
 ];
 
-=======
-import { Wrench, Plus, Loader2, Car, Settings, BarChart3, Calendar, BookOpen, CheckCircle } from 'lucide-react';
-
-import ModalMantenimiento from '../components/Autos/mantenimiento/ModalMantenimiento';
-import TablaMantenimiento from '../components/Autos/mantenimiento/TablaMantenimiento';
-import DetalleVehiculoSide from '../components/Autos/mantenimiento/DetalleVehiculoSide';
-import ModalManual from '../components/Autos/mantenimiento/ModalManual';
-import ModalBorrar from '../components/Autos/estatus/ModalBorrar';
-
-import {
-  MANTENIMIENTO_URL as API_MAINTENANCE_URL,
-  API_URL as API_VEHICULOS_URL
-} from '../config.js';
-
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 export default function Mantenimiento({ user }) {
   const [registros, setRegistros] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [unidadSeleccionadaId, setUnidadSeleccionadaId] = useState(null);
-<<<<<<< HEAD
   
   // Modals state
   const [showModalMantenimiento, setShowModalMantenimiento] = useState(false);
@@ -85,11 +68,6 @@ export default function Mantenimiento({ user }) {
         setActiveTab('resumen');
     }
   }, [activeTab, user]);
-=======
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [registroParaEliminar, setRegistroParaEliminar] = useState(null);
-  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   const fetchData = useCallback(async () => {
     try {
@@ -98,7 +76,6 @@ export default function Mantenimiento({ user }) {
         fetch(API_VEHICULOS_URL).then(r => r.ok ? r.json() : []),
         fetch(API_MAINTENANCE_URL).then(r => r.ok ? r.json() : [])
       ]);
-<<<<<<< HEAD
 
       const maintenanceData = resM.status === 'fulfilled' ? resM.value : [];
       setRegistros(maintenanceData);
@@ -120,15 +97,6 @@ export default function Mantenimiento({ user }) {
       });
       setVehiculos(dataV);
       
-=======
-      const dataV = (resV.status === 'fulfilled' ? resV.value : []).map(v => ({
-        ...v,
-        kilometraje_actual: parseInt(v.kilometraje_actual || 0),
-        manual_url: v.manual_url || v.url_manual || ''
-      }));
-      setVehiculos(dataV);
-      setRegistros(resM.status === 'fulfilled' ? resM.value : []);
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     } catch (e) {
       console.error("Error:", e);
     } finally {
@@ -138,7 +106,6 @@ export default function Mantenimiento({ user }) {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-<<<<<<< HEAD
   const vehiculoSeleccionado = useMemo(() =>
     vehiculos.find(v => String(v.id) === String(unidadSeleccionadaId)) || null
     , [vehiculos, unidadSeleccionadaId]);
@@ -157,17 +124,10 @@ export default function Mantenimiento({ user }) {
     }
   }, [vehiculoSeleccionado?.id]);
 
-=======
-  const unidadActualizada = useMemo(() =>
-    vehiculos.find(v => String(v.id) === String(unidadSeleccionadaId)) || null
-    , [vehiculos, unidadSeleccionadaId]);
-
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
   const registrosFiltrados = useMemo(() => {
     return (registros || []).filter(reg => {
       const matchUnidad = unidadSeleccionadaId ? String(reg.unidad_id) === String(unidadSeleccionadaId) : true;
       const term = searchTerm.toLowerCase();
-<<<<<<< HEAD
       return matchUnidad && (
         reg.descripcion?.toLowerCase().includes(term) || 
         reg.tipo?.toLowerCase().includes(term) ||
@@ -184,20 +144,6 @@ export default function Mantenimiento({ user }) {
       if (result.status === "success") {
         setMaintenanceToDelete(null);
         fetchData();
-=======
-      return matchUnidad && (reg.descripcion?.toLowerCase().includes(term) || reg.tipo?.toLowerCase().includes(term));
-    }).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-  }, [registros, unidadSeleccionadaId, searchTerm]);
-
-  const confirmarEliminacion = async () => {
-    if (!registroParaEliminar) return;
-    try {
-      const response = await fetch(`${API_MAINTENANCE_URL}?id=${registroParaEliminar.id}`, { method: 'DELETE' });
-      const result = await response.json();
-      if (result.status === "success") {
-        setRegistroParaEliminar(null); // Esto desmonta el modal
-        fetchData(); // Refresca la tabla
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       } else {
         alert("Error: " + (result.message || "No se pudo eliminar"));
       }
@@ -207,7 +153,6 @@ export default function Mantenimiento({ user }) {
     }
   };
 
-<<<<<<< HEAD
   const handleDeleteClick = (reg) => {
       setMaintenanceToDelete(reg);
   };
@@ -232,10 +177,6 @@ export default function Mantenimiento({ user }) {
 
   if (loading) return (
     <div className="d-flex flex-column justify-content-center align-items-center py-5" style={{ minHeight: 'calc(100vh - 100px)' }}>
-=======
-  if (loading) return (
-    <div className="vh-100 d-flex flex-column justify-content-center align-items-center" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       <div className="bg-white rounded-4 p-5 shadow-lg">
         <div className="bg-primary bg-opacity-10 rounded-circle p-4 mx-auto mb-4" style={{ width: '80px', height: '80px' }}>
           <Loader2 className="text-primary animate-spin" size={40} />
@@ -247,7 +188,6 @@ export default function Mantenimiento({ user }) {
   );
 
   return (
-<<<<<<< HEAD
     <div className="min-vh-100" style={{ backgroundColor: '#f1f5f9', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="container-fluid py-4 px-lg-5" style={{ maxWidth: '100%' }}>
         
@@ -312,68 +252,10 @@ export default function Mantenimiento({ user }) {
                   style={{
                     borderRadius: '16px',
                     transition: 'all 0.2s ease'
-=======
-    <div className="min-vh-100 bg-light" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
-      <div className="container-fluid py-4" style={{ maxWidth: '1800px' }}>
-        {/* Header Principal */}
-        <div className="bg-gradient-primary text-white rounded-4 p-4 mb-4 shadow-lg border-0" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)' }}>
-          <div className="row align-items-center">
-            <div className="col-md-6 d-flex align-items-center gap-3">
-              <div className=" bg-opacity-20 p-3 rounded-4">
-                <Wrench size={32} className="text-white" />
-              </div>
-              <div>
-                <h1 className="fw-bold mb-0 h2">Gestión de Mantenimiento</h1>
-                <p className="mb-0 opacity-75 d-flex align-items-center gap-2">
-                  <Car size={16} />
-                  Flota: {vehiculos.length} unidades
-                </p>
-              </div>
-            </div>
-            <div className="col-md-6 text-md-end mt-3 mt-md-0">
-              <button
-                className={`btn ${unidadActualizada ? 'btn-light text-primary' : 'btn-outline-light'} rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2 transition-all hover-scale`}
-                disabled={!unidadActualizada}
-                onClick={() => setIsModalOpen(true)}
-                style={{ fontSize: '0.9rem', padding: '0.75rem 1.5rem' }}
-              >
-                <Plus size={18} />
-                {unidadActualizada ? `Registrar a ${unidadActualizada.unidad_nombre}` : 'Seleccione Unidad'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="row g-4">
-          {/* Panel de Unidades */}
-          <div className="col-12 col-xl-2">
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <h5 className="fw-bold mb-0 d-flex align-items-center gap-2">
-                <Car className="text-primary" />
-                Unidades
-              </h5>
-              <span className="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1">
-                {vehiculos.length} activas
-              </span>
-            </div>
-            <div className="overflow-auto list-unidades" style={{ maxHeight: '75vh', overflowX: 'hidden' }}>
-              {vehiculos.map(v => (
-                <div
-                  key={v.id}
-                  onClick={() => setUnidadSeleccionadaId(v.id === unidadSeleccionadaId ? null : v.id)}
-                  className={`card border-0 rounded-4 mb-2 cursor-pointer transition-all hover-scale ${unidadSeleccionadaId === v.id
-                    ? 'bg-primary text-white shadow-lg border-0'
-                    : 'bg-white shadow-sm border'
-                    }`}
-                  style={{
-                    transform: unidadSeleccionadaId === v.id ? 'scale(1.02)' : 'scale(1)',
-                    boxShadow: unidadSeleccionadaId === v.id ? '0 8px 25px rgba(102, 126, 234, 0.3)' : '0 2px 8px rgba(0,0,0,0.08)'
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                   }}
                 >
                   <div className="card-body p-3">
                     <div className="d-flex justify-content-between align-items-start mb-2">
-<<<<<<< HEAD
                       <h6 className={`fw-bold mb-0 ${unidadSeleccionadaId === v.id ? 'text-white' : 'text-dark'}`} style={{ fontSize: '1.1rem' }}>{v.unidad_nombre}</h6>
                     </div>
                     <div className="d-flex justify-content-between opacity-75 align-items-center">
@@ -393,19 +275,11 @@ export default function Mantenimiento({ user }) {
                             {v.estado.toUpperCase()}
                           </span>
                       )}
-=======
-                      <h6 className="fw-bold mb-0" style={{ fontSize: '0.95rem' }}>{v.unidad_nombre}</h6>
-                    </div>
-                    <div className="d-flex justify-content-between opacity-75 small">
-                      <span style={{ fontSize: '0.8rem' }}>{v.placas}</span>
-                      <span style={{ fontSize: '0.8rem' }}>{v.kilometraje_actual?.toLocaleString()} km</span>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-<<<<<<< HEAD
           </div>
 
           {/* Panel Principal (Tabs + Contenido) */}
@@ -597,46 +471,6 @@ export default function Mantenimiento({ user }) {
           />
         )}
       </div>
-=======
-            <button
-              onClick={() => setIsManualModalOpen(true)}
-              disabled={!unidadActualizada}
-              className="btn btn-dark w-100 rounded-3 mt-3 py-2 fw-bold transition-all hover-scale"
-              style={{ fontSize: '0.85rem' }}
-            >
-              <BookOpen size={16} className="me-2" />
-              Manual de Usuario
-            </button>
-          </div>
-
-          <div className="col-12 col-xl-7">
-            <TablaMantenimiento
-              registros={registrosFiltrados}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              unidadSeleccionada={unidadActualizada}
-              onDelete={(reg) => setRegistroParaEliminar(reg)}
-            />
-          </div>
-
-          <div className="col-12 col-xl-3">
-            <DetalleVehiculoSide unidad={unidadActualizada} />
-          </div>
-        </div>
-      </div>
-
-      <ModalMantenimiento user={user} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} unidad={unidadActualizada} onSave={() => { fetchData(); setIsModalOpen(false); }} />
-      <ModalManual isOpen={isManualModalOpen} onClose={() => setIsManualModalOpen(false)} unidad={unidadActualizada} onSave={fetchData} />
-
-      {registroParaEliminar && (
-        <ModalBorrar
-          titulo="¿Eliminar registro?"
-          mensaje={`Se eliminará el registro de "${registroParaEliminar.tipo}".`}
-          onConfirmar={confirmarEliminacion}
-          onCancelar={() => setRegistroParaEliminar(null)}
-        />
-      )}
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     </div>
   );
 }

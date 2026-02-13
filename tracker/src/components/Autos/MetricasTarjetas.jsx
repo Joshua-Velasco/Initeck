@@ -17,11 +17,7 @@ const MetricasTarjetas = ({ totales }) => {
   ];
 
   return (
-<<<<<<< HEAD
     <div className="row g-2 mb-3">
-=======
-    <div className="row g-3 mb-4">
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
       {items.map((item, i) => (
         <div key={i} className="col-6 col-xl-3">
           <div 
@@ -31,7 +27,6 @@ const MetricasTarjetas = ({ totales }) => {
               transition: 'transform 0.2s'
             }}
           >
-<<<<<<< HEAD
             <div className="card-body p-2 p-md-3">
               <div className="d-flex justify-content-between align-items-center mb-1">
                 <span className={`text-uppercase fw-bold tracking-widest ${item.isMain ? 'text-secondary' : 'text-muted'}`} 
@@ -40,39 +35,20 @@ const MetricasTarjetas = ({ totales }) => {
                 </span>
                 <div className={`p-1 rounded-3 ${item.isMain ? 'bg-white bg-opacity-10' : 'bg-light'}`}>
                   <item.icon size={14} style={{ color: item.isMain ? '#fff' : item.color }} />
-=======
-            <div className="card-body p-3 p-md-4">
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <span className={`text-uppercase fw-bold tracking-widest ${item.isMain ? 'text-secondary' : 'text-muted'}`} 
-                      style={{ fontSize: '0.65rem' }}>
-                  {item.label}
-                </span>
-                <div className={`p-2 rounded-3 ${item.isMain ? 'bg-white bg-opacity-10' : 'bg-light'}`}>
-                  <item.icon size={16} style={{ color: item.isMain ? '#fff' : item.color }} />
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                 </div>
               </div>
 
               <div className="mt-1">
                 <h3 className={`fw-bolder mb-0 ${item.isMain ? 'text-warning' : 'text-dark'}`} 
                     style={{ 
-<<<<<<< HEAD
                       fontSize: item.isMain ? '1.5rem' : '1.2rem', 
-=======
-                      fontSize: item.isMain ? '1.7rem' : '1.35rem', 
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                       letterSpacing: '-0.5px' 
                     }}>
                   {item.isMain ? f(item.val) : f(item.val, 0)}
                 </h3>
                 {!item.isMain && (
-<<<<<<< HEAD
                   <span className="text-muted small" style={{ fontSize: '0.65rem' }}>
                     Calculado {new Date().getFullYear()}
-=======
-                  <span className="text-muted small" style={{ fontSize: '0.7rem' }}>
-                    Calculado 2025
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                   </span>
                 )}
               </div>

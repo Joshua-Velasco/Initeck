@@ -1,14 +1,6 @@
-<<<<<<< HEAD
 const CACHE_NAME = 'inimovil-v7';
 const urlsToCache = [
     '/manifest.json'
-=======
-const CACHE_NAME = 'inimovil-v3';
-const urlsToCache = [
-    '/uber/',
-    '/uber/index.html',
-    '/uber/manifest.json'
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 ];
 
 self.addEventListener('install', event => {
@@ -38,7 +30,6 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-<<<<<<< HEAD
     // Para peticiones de navegación (HTML), usar Network First
     if (event.request.mode === 'navigate') {
         event.respondWith(
@@ -51,8 +42,6 @@ self.addEventListener('fetch', event => {
     }
 
     // Para otros recursos, Cache First (o el comportamiento previo)
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
     event.respondWith(
         caches.match(event.request)
             .then(response => response || fetch(event.request))

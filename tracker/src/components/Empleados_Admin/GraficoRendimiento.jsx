@@ -12,15 +12,12 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
   const [periodoGrafico, setPeriodoGrafico] = useState('dia');
   const [datosGrafico, setDatosGrafico] = useState([]);
   const [cargandoGrafico, setCargandoGrafico] = useState(false);
-<<<<<<< HEAD
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsReady(true), 500);
     return () => clearTimeout(timer);
   }, []);
-=======
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
   const COLOR_GASTOS = '#ef4444'; // Rojo vibrante
   const COLOR_NETO = '#10b981';   // Verde esmeralda
@@ -36,7 +33,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
       const url = `${EMPLEADOS_RENDIMIENTO_URL}?id=${empleado.id}&periodo=${periodoGrafico}&fecha_inicio=${fechas.inicio}&fecha_fin=${fechas.fin}`;
 
       const res = await fetch(url);
-<<<<<<< HEAD
       
       let data;
       try {
@@ -50,9 +46,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
       } catch (err) {
         throw new Error("Failed to read response body");
       }
-=======
-      const data = await res.json();
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
 
       const procesados = (Array.isArray(data) ? data : []).map(item => {
 
@@ -194,7 +187,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
             <div className="p-3 bg-light rounded-4 h-100 border">
               <h6 className="fw-bold small text-muted mb-3">TENDENCIA DE UTILIDAD OPERATIVA (NETO)</h6>
               <div style={{ height: '300px' }}>
-<<<<<<< HEAD
                 {isReady && (
                   <div style={{ width: '100%', height: '100%', minWidth: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -216,25 +208,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
                     </ResponsiveContainer>
                   </div>
                 )}
-=======
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={datosGrafico} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset={off} stopColor={COLOR_NETO} stopOpacity={1} />
-                        <stop offset={off} stopColor={COLOR_GASTOS} stopOpacity={1} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                    <XAxis dataKey="label" fontSize={10} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-                    <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val}`} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '11px', paddingBottom: '10px' }} />
-                    <ReferenceLine y={0} stroke="#000" strokeOpacity={0.1} />
-                    <Area type="monotone" name="Utilidad Neta (Efectivo - Gastos)" dataKey="neto" stroke="url(#splitColor)" fill="url(#splitColor)" fillOpacity={0.6} strokeWidth={3} />
-                  </AreaChart>
-                </ResponsiveContainer>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
               </div>
             </div>
           </div>
@@ -249,7 +222,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
               <div className="p-3 bg-light rounded-4 border h-100 d-flex flex-column">
                 <h6 className="fw-bold small text-muted mb-auto">DISTRIBUCIÓN DE FLUJO</h6>
                 <div style={{ height: '260px', marginTop: 'auto', marginBottom: 'auto' }}>
-<<<<<<< HEAD
                   {isReady && (
                     <div style={{ width: '100%', height: '100%', minWidth: 0 }}>
                       <ResponsiveContainer width="100%" height="100%">
@@ -263,17 +235,6 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
                       </ResponsiveContainer>
                     </div>
                   )}
-=======
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={totalesPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={4}>
-                        {totalesPie.map((entry, index) => <Cell key={index} fill={entry.color} />)}
-                      </Pie>
-                      <Tooltip formatter={(val) => formatCurrency(val)} />
-                      <Legend verticalAlign="bottom" wrapperStyle={{ fontSize: '12px' }} />
-                    </PieChart>
-                  </ResponsiveContainer>
->>>>>>> 06abb94 (Refactor: Reestructuración de componentes, limpieza de archivos obsoletos y nuevos módulos de métricas y gestión de autos)
                 </div>
               </div>
 
