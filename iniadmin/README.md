@@ -1,16 +1,82 @@
-# React + Vite
+# IniAdmin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Apache-XAMPP-FB7A24?style=for-the-badge&logo=apache&logoColor=white"/>
+</p>
 
-Currently, two official plugins are available:
+**IniAdmin** es la interfaz administrativa complementaria del ecosistema Initeck. Provee herramientas de gestión y visualización para operaciones internas específicas que requieren un acceso separado del panel de administración principal.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 📁 Estructura del Proyecto
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+iniadmin/
+├── src/                # Código fuente React
+├── dist/               # Build de producción
+├── node_modules/
+└── README.md
+```
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Funcionalidades
+
+| Módulo | Descripción |
+|---|---|
+| 🔧 **Herramientas Admin** | Utilidades administrativas para operaciones internas |
+| 📊 **Visualización** | Vistas de datos operativos específicos |
+| 🔐 **Acceso Controlado** | Panel separado con autenticación propia |
+
+---
+
+## 🛠️ Tech Stack
+
+| Tecnología | Uso |
+|---|---|
+| **React** | Framework de UI |
+| **Vite** | Bundler y servidor de desarrollo |
+| **Vanilla CSS** | Estilos del panel |
+
+---
+
+## ⚙️ Instalación y Desarrollo
+
+```bash
+cd iniadmin
+npm install
+npm run dev       # Servidor de desarrollo → http://localhost:5173
+npm run build     # Build de producción → dist/
+```
+
+---
+
+## 🌍 Variables de Entorno
+
+Crea `.env` en la raíz:
+
+```env
+VITE_API_URL=https://tu-servidor.com/initeck-flota/Initeck-api
+```
+
+---
+
+## 🚀 Despliegue
+
+1. Ejecuta `npm run build`
+2. Sube el contenido de `dist/` al servidor web
+3. Asegúrate de que Apache tenga `mod_rewrite` habilitado si usas SPA routing
+
+---
+
+## 🔗 Proyectos Relacionados
+
+- **[Initeck API](../Initeck-api/)** — API principal del ecosistema
+- **[Admin Dashboard](../admin-page/)** — Panel principal de administración
+- **[INIBAY](../INIBAY/)** — Plataforma de gestión de contratos y pagos
+
+---
+
+<p align="center">Parte del ecosistema <strong>Initeck Fleet Management</strong></p>
