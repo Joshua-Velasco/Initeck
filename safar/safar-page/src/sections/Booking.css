@@ -1,0 +1,168 @@
+.booking {
+  padding: clamp(6rem, 15vh, 12rem) 8%;
+  background: radial-gradient(circle at 70% 30%, #1a1a1a 0%, var(--safar-black) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.booking-gold-blur {
+  position: absolute;
+  top: '20%';
+  right: '-10%';
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+  z-index: 1;
+  border-radius: 50%;
+}
+
+.booking-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: clamp(4rem, 8vw, 8rem);
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
+}
+
+.booking-content {
+  flex: 1 1 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-kicker {
+  color: var(--safar-gold);
+  letter-spacing: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.booking-title {
+  font-size: clamp(2.8rem, 8vw, 4.5rem);
+  color: var(--safar-white);
+  margin-bottom: 2.5rem;
+  line-height: 1.1;
+  font-family: var(--font-serif);
+}
+
+.booking-desc {
+  color: var(--safar-white);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  line-height: 1.8;
+  margin-bottom: 3.5rem;
+  opacity: 0.7;
+  max-width: 500px;
+}
+
+.booking-features {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  color: var(--safar-white);
+}
+
+.feature-kicker {
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  color: var(--safar-gold);
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.feature-desc {
+  font-size: 1rem;
+  opacity: 0.6;
+  line-height: 1.4;
+}
+
+.booking-card-container {
+  flex: 1 1 500px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.booking-card {
+  max-width: 400px;
+  width: 100%;
+  background: linear-gradient(135deg, rgba(25, 25, 25, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+  padding: clamp(3rem, 8vw, 5rem) 2.5rem;
+  text-align: center;
+  border-radius: 2px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  cursor: pointer;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 0 20px rgba(212, 175, 55, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-gloss {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-icon-wrapper {
+  color: var(--safar-gold);
+  margin-bottom: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.icon-bg {
+  padding: 20px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-title {
+  color: var(--safar-white);
+  letter-spacing: 10px;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  font-family: var(--font-serif);
+}
+
+.card-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--safar-gold);
+  margin: 1.5rem auto;
+}
+
+.card-cta {
+  color: var(--safar-gold);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  display: block;
+  margin-top: 1.5rem;
+}
+
+.card-note {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.7rem;
+  margin-top: 2rem;
+  letter-spacing: 1px;
+}

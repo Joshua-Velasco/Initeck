@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -u root initeckc_tracker -e \"DESCRIBE empleados; DESCRIBE usuarios;\")",
+      "Bash(mysql -u root initeckc_tracker -e \"SELECT u.id, u.usuario, u.rol, e.nombre_completo, e.estado FROM usuarios u JOIN empleados e ON e.id = u.empleado_id LIMIT 10;\")",
+      "Bash(mysql -u root --password=\"\" initeckc_tracker -e \"DESCRIBE empleados;\")",
+      "Bash(mysql:*)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"DESCRIBE empleados;\")",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"SELECT u.id, u.usuario, u.rol, e.nombre_completo, e.estado FROM usuarios u JOIN empleados e ON e.id = u.empleado_id LIMIT 10;\" 2>&1)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"SELECT id, usuario, LEFT\\(password,20\\) as pass_preview, rol FROM usuarios LIMIT 10;\" 2>&1)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"DESCRIBE usuarios;\" 2>&1)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"SELECT u.id, u.usuario, u.rol, e.nombre_completo, e.estado, e.foto_perfil FROM usuarios u INNER JOIN empleados e ON e.id = u.empleado_id;\" 2>&1)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root --password=\"\" initeckc_tracker -e \"SELECT id, nombre_completo, estado FROM empleados WHERE id IN \\(SELECT empleado_id FROM usuarios\\);\" 2>&1)",
+      "Bash(curl -s \"http://localhost:80/initeck-flota/iniadmin/api_php/auth/dev_setup.php\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost/initeck-flota/iniadmin/api_php/auth/dev_setup.php)",
+      "Bash(curl -s -X POST \"http://localhost/initeck-flota/iniadmin/api_php/auth/dev_setup.php\" -H \"Content-Type: application/json\" -d '{\"\"\"\"usuario\"\"\"\":\"\"\"\"angel\"\"\"\",\"\"\"\"new_password\"\"\"\":\"\"\"\"admin123\"\"\"\"}')",
+      "Bash(curl -s -X POST \"http://localhost/initeck-flota/iniadmin/api_php/auth/dev_setup.php\" -H \"Content-Type: application/json\" -d '{\"\"\"\"usuario\"\"\"\":\"\"\"\"joshua\"\"\"\",\"\"\"\"new_password\"\"\"\":\"\"\"\"admin123\"\"\"\"}')",
+      "Bash(curl -s -X POST \"http://localhost/initeck-flota/iniadmin/api_php/auth/dev_setup.php\" -H \"Content-Type: application/json\" -d '{\"\"\"\"usuario\"\"\"\":\"\"\"\"Filo\"\"\"\",\"\"\"\"new_password\"\"\"\":\"\"\"\"campo123\"\"\"\"}')",
+      "Bash(curl -s -X POST \"http://localhost/initeck-flota/iniadmin/api_php/auth/dev_setup.php\" -H \"Content-Type: application/json\" -d '{\"\"\"\"usuario\"\"\"\":\"\"\"\"gomez\"\"\"\",\"\"\"\"new_password\"\"\"\":\"\"\"\"soporte123\"\"\"\"}')",
+      "Bash(curl -s -X POST \"http://localhost/initeck-flota/iniadmin/api_php/auth/login.php\" -H \"Content-Type: application/json\" -d '{\"\"\"\"usuario\"\"\"\":\"\"\"\"angel\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"admin123\"\"\"\"}')",
+      "Bash(node -e \"const { Palmtree } = require\\(''''lucide-react''''\\); console.log\\(typeof Palmtree\\)\")"
+    ]
+  }
+}

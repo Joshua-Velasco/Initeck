@@ -27,7 +27,7 @@ try {
                   WHERE t.empleado_id = :empleado_id";
 
         if ($fecha_inicio && $fecha_fin) {
-            $query .= " AND t.fecha_inicio_semana BETWEEN :inicio AND :fin";
+            $query .= " AND t.fecha_inicio_semana >= :inicio AND t.fecha_inicio_semana < :fin";
         }
 
         $query .= " ORDER BY t.fecha_inicio_semana DESC, t.fecha_ejecucion DESC";
@@ -40,7 +40,7 @@ try {
                   WHERE 1=1";
 
         if ($fecha_inicio && $fecha_fin) {
-            $query .= " AND t.fecha_inicio_semana BETWEEN :inicio AND :fin";
+            $query .= " AND t.fecha_inicio_semana >= :inicio AND t.fecha_inicio_semana < :fin";
         }
 
         $query .= " ORDER BY t.fecha_inicio_semana DESC, t.fecha_ejecucion DESC LIMIT 100";
@@ -48,8 +48,10 @@ try {
     }
 
     if ($fecha_inicio && $fecha_fin) {
-        $stmt->bindParam(":inicio", $fecha_inicio);
-        $stmt->bindParam(":fin", $fecha_fin);
+        $inicioShifted = date('Y-m-d', strtotime($fecha_inicio . ' -1 day'));
+        $finShifted = date('Y-m-d', strtotime($fecha_fin . ' -1 day'));
+        $stmt->bindParam(":inicio", $inicioShifted);
+        $stmt->bindParam(":fin", $finShifted);
     }
 
     $stmt->execute();

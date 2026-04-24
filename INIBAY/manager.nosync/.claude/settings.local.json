@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota -type f \\\\\\( -name \"*.jsx\" -o -name \"*.js\" \\\\\\) -exec grep -l \"addMonths\\\\|setMonth\" {} \\\\;)",
+      "Bash(find:*)"
+    ]
+  }
+}

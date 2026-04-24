@@ -78,6 +78,7 @@ try {
                 'tipo' => $g['tipo'] ?? 'Otros',
                 'monto' => $monto,
                 'odometro' => floatval($g['odometro'] ?? 0),
+                'motivo' => $g['motivo'] ?? '',
                 'foto_ticket' => $fotoTicket,
                 'foto_tablero' => $fotoTablero
             ];
@@ -86,30 +87,31 @@ try {
 
     // 5. Cálculos Finales
     $montoEfectivo = floatval($input['monto_efectivo'] ?? 0);
-    $propinas = floatval($input['propinas'] ?? 0);
-    $viajes = intval($input['viajes'] ?? 0);
-    $netoEntregado = ($montoEfectivo + $propinas) - $totalGastos;
-    $detallesJson = json_encode($gastosProcesados);
+    $propinas      = floatval($input['propinas']       ?? 0);
+    $otrosViajes   = floatval($input['otros_viajes']   ?? 0);
+    $viajes        = intval($input['viajes']           ?? 0);
+    $netoEntregado = ($montoEfectivo + $propinas + $otrosViajes) - $totalGastos;
+    $detallesJson  = json_encode($gastosProcesados);
 
+    $fechaRegistro = date('Y-m-d');
 
-    // DETERMINAR FECHA CORRESPONDIENTE SEGÚN HORARIO (TURNO NOCTURNO)
-    require_once dirname(__DIR__) . '/utils/shift_utils.php';
-    $fechaRegistro = getLogicalDate($pdo, intval($input['empleado_id']));
+    // 6. Insertar en DB
+    $vehiculoId = isset($input['vehiculo_id']) && $input['vehiculo_id'] ? intval($input['vehiculo_id']) : null;
 
-    // 6. Insertar en DB (incluyendo vehiculo_id para asociar gastos)
-    // 6. Insertar en DB (sin vehiculo_id ya que no existe en la tabla)
     $stmt = $pdo->prepare("
-        INSERT INTO liquidaciones 
-        (empleado_id, fecha, hora, viajes, monto_efectivo, propinas, gastos_total, neto_entregado, firma_path, detalles_gastos) 
-        VALUES (?, ?, CURTIME(), ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO liquidaciones
+        (empleado_id, vehiculo_id, fecha, hora, viajes, monto_efectivo, propinas, otros_viajes, gastos_total, neto_entregado, firma_path, detalles_gastos)
+        VALUES (?, ?, ?, CURTIME(), ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->execute([
         intval($input['empleado_id']),
-        $fechaRegistro, // Usamos la fecha calculada
+        $vehiculoId,
+        $fechaRegistro,
         $viajes,
         $montoEfectivo,
         $propinas,
+        $otrosViajes,
         $totalGastos,
         $netoEntregado,
         $nombreFirma,

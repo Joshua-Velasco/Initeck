@@ -12,11 +12,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 require_once '../../config/database.php';
+require_once '../utils/firma_utils.php';
+
+$UPLOADS_DIR = dirname(__DIR__) . '/uploads';
 
 $database = new Database();
 $db = $database->getConnection();
 
-$data = json_decode(file_get_contents("php://input"));
+// Leer y validar body JSON
+$rawInput = file_get_contents("php://input");
+if (empty($rawInput)) {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "Body de la petición vacío."]);
+    exit();
+}
+
+$data = json_decode($rawInput);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "JSON inválido: " . json_last_error_msg()]);
+    exit();
+}
 
 if (
     !empty($data->empleado_id) &&
@@ -25,6 +41,26 @@ if (
     isset($data->total_pago)
 ) {
     try {
+        // Guardar firma del admin como archivo
+        $firma_admin_path = null;
+        $firma_admin_at   = null;
+
+        if (!empty($data->firma_admin)) {
+            $firmaResult = guardarFirmaArchivo(
+                $data->firma_admin,
+                'admin',
+                $data->empleado_id,
+                $UPLOADS_DIR
+            );
+            if (!$firmaResult['ok']) {
+                http_response_code(422);
+                echo json_encode(["status" => "error", "message" => "Error al guardar firma del admin: " . $firmaResult['error']]);
+                exit();
+            }
+            $firma_admin_path = $firmaResult['path'];
+            $firma_admin_at   = date('Y-m-d H:i:s');
+        }
+
         $query = "INSERT INTO nomina_tickets SET
                     empleado_id = :empleado_id,
                     periodo = :periodo,
@@ -38,36 +74,40 @@ if (
                     propinas = :propinas,
                     total_pago = :total_pago,
                     recibo_id = :recibo_id,
+                    firma_admin = :firma_admin,
+                    firma_admin_at = :firma_admin_at,
                     fecha_emision = NOW()";
 
         $stmt = $db->prepare($query);
 
-        $stmt->bindParam(":empleado_id", $data->empleado_id);
-        $stmt->bindParam(":periodo", $data->periodo);
-        $stmt->bindParam(":ingresos_brutos", $data->ingresos_brutos);
-        $stmt->bindParam(":gastos_chofer", $data->gastos_chofer);
-        $stmt->bindParam(":gastos_mantenimiento", $data->gastos_mantenimiento);
-        $stmt->bindParam(":gastos_taller", $data->gastos_taller);
-        $stmt->bindParam(":depositos", $data->depositos);
-        $stmt->bindParam(":utilidad_total", $data->utilidad_total);
-        $stmt->bindParam(":bonos_extras", $data->bonos_extras);
-        $stmt->bindParam(":propinas", $data->propinas);
-        $stmt->bindParam(":total_pago", $data->total_pago);
-        $stmt->bindParam(":recibo_id", $data->recibo_id);
+        $stmt->bindParam(":empleado_id",          $data->empleado_id);
+        $stmt->bindParam(":periodo",               $data->periodo);
+        $stmt->bindParam(":ingresos_brutos",       $data->ingresos_brutos);
+        $stmt->bindParam(":gastos_chofer",         $data->gastos_chofer);
+        $stmt->bindParam(":gastos_mantenimiento",  $data->gastos_mantenimiento);
+        $stmt->bindParam(":gastos_taller",         $data->gastos_taller);
+        $stmt->bindParam(":depositos",             $data->depositos);
+        $stmt->bindParam(":utilidad_total",        $data->utilidad_total);
+        $stmt->bindParam(":bonos_extras",          $data->bonos_extras);
+        $stmt->bindParam(":propinas",              $data->propinas);
+        $stmt->bindParam(":total_pago",            $data->total_pago);
+        $stmt->bindParam(":recibo_id",             $data->recibo_id);
+        $stmt->bindParam(":firma_admin",           $firma_admin_path);
+        $stmt->bindParam(":firma_admin_at",        $firma_admin_at);
 
         if ($stmt->execute()) {
             http_response_code(201);
-            echo json_encode(array("status" => "success", "message" => "Ticket guardado correctamente.", "id" => $db->lastInsertId()));
+            echo json_encode(["status" => "success", "message" => "Ticket guardado correctamente.", "id" => $db->lastInsertId()]);
         } else {
             http_response_code(503);
-            echo json_encode(array("status" => "error", "message" => "No se pudo guardar el ticket."));
+            echo json_encode(["status" => "error", "message" => "No se pudo guardar el ticket."]);
         }
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(array("status" => "error", "message" => $e->getMessage()));
+        echo json_encode(["status" => "error", "message" => $e->getMessage()]);
     }
 } else {
     http_response_code(400);
-    echo json_encode(array("status" => "error", "message" => "Datos incompletos."));
+    echo json_encode(["status" => "error", "message" => "Datos incompletos."]);
 }
 ?>

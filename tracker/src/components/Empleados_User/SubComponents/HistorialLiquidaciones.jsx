@@ -88,7 +88,7 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
       </div>
 
       {/* Body */}
-      <div className="p-2 p-md-4" style={{ height: '400px', overflowY: 'auto' }}>
+      <div className="p-2 p-md-4" style={{ height: '400px', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehaviorY: 'contain' }}>
         {loading ? (
           <div className="text-center py-5">
             <Loader2 className="animate-spin text-danger mx-auto mb-3" size={40} />
@@ -188,40 +188,57 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
                   {isExpanded && (
                     <div className="border-top bg-white p-4">
                       {/* Summary Row (only for liquidaciones) */}
-                      {!esSoloGasto && (
-                        <div className="row g-3 mb-4">
-                          <div className="col-4">
-                            <div className="text-center p-3 bg-light rounded-3">
-                              <p className="text-muted mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
-                                Bruto
-                              </p>
-                              <span className="fw-bold text-dark" style={{ fontSize: '18px' }}>
-                                ${montoBruto.toFixed(2)}
-                              </span>
+                      {!esSoloGasto && (() => {
+                        const otrosViajes = parseFloat(item.otros_viajes) || 0;
+                        const hasOtros = otrosViajes > 0;
+                        const colSize = hasOtros ? 'col-3' : 'col-4';
+                        return (
+                          <div className="row g-3 mb-4">
+                            <div className={colSize}>
+                              <div className="text-center p-3 bg-light rounded-3">
+                                <p className="text-muted mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
+                                  Bruto
+                                </p>
+                                <span className="fw-bold text-dark" style={{ fontSize: '18px' }}>
+                                  ${montoBruto.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className={colSize}>
+                              <div className="text-center p-3 bg-light rounded-3">
+                                <p className="text-muted mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
+                                  Propinas
+                                </p>
+                                <span className="fw-bold text-dark" style={{ fontSize: '18px' }}>
+                                  ${(parseFloat(item.propinas) || 0).toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                            {hasOtros && (
+                              <div className="col-3">
+                                <div className="text-center p-3 rounded-3" style={{ background: '#f3e8ff' }}>
+                                  <p className="mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px', color: '#7c3aed' }}>
+                                    Otros Viajes
+                                  </p>
+                                  <span className="fw-bold" style={{ fontSize: '18px', color: '#7c3aed' }}>
+                                    ${otrosViajes.toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            <div className={colSize}>
+                              <div className="text-center p-3 bg-success bg-opacity-10 rounded-3">
+                                <p className="text-success mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
+                                  Neto
+                                </p>
+                                <span className="fw-bold text-success" style={{ fontSize: '18px' }}>
+                                  ${montoNeto.toFixed(2)}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                          <div className="col-4">
-                            <div className="text-center p-3 bg-light rounded-3">
-                              <p className="text-muted mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
-                                Propinas
-                              </p>
-                              <span className="fw-bold text-dark" style={{ fontSize: '18px' }}>
-                                ${(parseFloat(item.propinas) || 0).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="col-4">
-                            <div className="text-center p-3 bg-success bg-opacity-10 rounded-3">
-                              <p className="text-success mb-1 text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
-                                Neto
-                              </p>
-                              <span className="fw-bold text-success" style={{ fontSize: '18px' }}>
-                                ${montoNeto.toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Gastos Details */}
                       {listaDetalles.length > 0 && (
@@ -238,6 +255,11 @@ const HistorialLiquidaciones = ({ user, fechas, onDateChange }) => {
                                     ${parseFloat(gasto.monto).toFixed(2)}
                                   </span>
                                 </div>
+                                {gasto.tipo === 'Otros' && gasto.motivo && (
+                                  <div className="mt-2 text-dark small fst-italic fw-medium">
+                                    Motivo: {gasto.motivo}
+                                  </div>
+                                )}
                                 {gasto.odometro > 0 && (
                                   <div className="mt-2 d-flex align-items-center gap-2 small text-muted">
                                     <Gauge size={14} />

@@ -1,0 +1,11 @@
+=================================================
+FECHA: 2026-04-06 22:46:33
+PARA: joshvela2022@gmail.com
+ASUNTO: Recuperacion de contraseña - Safar Elite
+CUERPO:
+Hola Joshua Velasco,
+
+Has solicitado una recuperación de contraseña. Tu código de seguridad (OTP) es: 854550
+Este código expirará en 15 minutos.
+=================================================
+

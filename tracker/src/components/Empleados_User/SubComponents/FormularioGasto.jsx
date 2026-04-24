@@ -64,6 +64,12 @@ export default function FormularioGasto({
       if (!fotoTablero) return Swal.fire("Falta evidencia", "Tome la foto del tablero.", "warning");
     }
 
+    if (tipoActual === 'Otros') {
+      if (!gastoData?.motivo || gastoData.motivo.trim() === '') {
+        return Swal.fire("Falta motivo", "Por favor ingrese qué fue lo que ingresó (motivo) en la categoría 'Otros'.", "warning");
+      }
+    }
+
     if (!gastoData?.evidencia) return Swal.fire("Falta evidencia", "Tome la foto del ticket.", "warning");
 
     // Verificación de la firma
@@ -100,7 +106,8 @@ export default function FormularioGasto({
       const infoGasto = [{
         tipo: tipoActual,
         monto: montoNum,
-        odometro: odoNum
+        odometro: odoNum,
+        motivo: gastoData?.motivo || ''
       }];
       formData.append('gastos', JSON.stringify(infoGasto));
 
@@ -186,6 +193,20 @@ export default function FormularioGasto({
               </label>
             </div>
           </div>
+
+          {/* MOTIVO (Solo si es Otros) */}
+          {gastoData?.tipo === 'Otros' && (
+            <div className="col-12 animate__animated animate__fadeIn">
+              <div className="form-floating shadow-sm rounded-3 overflow-hidden">
+                <input type="text" className="form-control border-0 bg-light fs-5 fw-bold"
+                  placeholder="Motivo del gato..."
+                  value={gastoData?.motivo || ''}
+                  onChange={(e) => setGastoData({ ...gastoData, motivo: e.target.value })}
+                />
+                <label className="fw-bold text-secondary small">¿QUÉ SE INGRESÓ? (MOTIVO)</label>
+              </div>
+            </div>
+          )}
 
           {/* NIVEL DE GASOLINA (Solo si es combustible) */}
           {gastoData?.tipo === 'Combustible' && (

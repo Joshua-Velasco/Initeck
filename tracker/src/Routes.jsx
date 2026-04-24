@@ -10,6 +10,8 @@ import ViajesEmpleado from './components/Empleados_User/ViajesEmpleado.jsx';
 import Balance from './pages/Balance.jsx';
 import Mantenimiento from './pages/Mantenimiento.jsx';
 import Perfil from './pages/Perfil.jsx';
+import Insumos from './pages/Insumos.jsx';
+import Entradas from './pages/Entradas.jsx';
 import MonitorFlota from './components/Empleados_Admin/MonitorFlota.jsx';
 
 /**
@@ -79,6 +81,14 @@ const AppRoutes = ({ user }) => {
       )
     },
     {
+      path: "/insumos",
+      element: (
+        <ProtectedRoute user={user} allowedRoles={['admin', 'development']}>
+          <Insumos user={user} />
+        </ProtectedRoute>
+      )
+    },
+    {
       path: "/viajes",
       element: (
         <ProtectedRoute user={user} allowedRoles={['admin', 'development', 'monitorista']}>
@@ -128,6 +138,15 @@ const AppRoutes = ({ user }) => {
       element: (
         <ProtectedRoute user={user} allowedRoles={['admin', 'operator', 'employee', 'cleaning', 'development']}>
           <Perfil user={user} />
+        </ProtectedRoute>
+      )
+    },
+
+    {
+      path: "/entradas",
+      element: (
+        <ProtectedRoute user={user} allowedRoles={['admin', 'development', 'employee', 'cleaning']}>
+          <Entradas user={user} />
         </ProtectedRoute>
       )
     },

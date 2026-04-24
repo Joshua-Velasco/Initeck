@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 require_once '../../config/database.php';
+require_once '../utils/shift_utils_v2.php';
 $database = new Database();
 $db = $database->getConnection();
 
@@ -50,7 +51,13 @@ function calcularCostoPeriodo($costoAnual, $periodo)
 }
 
 try {
+    // Unified Filters
+    $filterLiqAgg = getOperationalDayFilter($fechaInicio, $fechaFin, 'l');
+    $filterLiqDet = getOperationalDayFilter($fechaInicio, $fechaFin, 'l');
+    $filterLiqGlobal = getOperationalDayFilter($fechaInicio, $fechaFin, 'l');
+
     // 1. Employee profitability (Grouped by Employee)
+
     // We fetch SUMs of liquidaciones and we need to subtract vehicle maintenance costs.
     // Since we now have 'vehiculo_id' in liquidaciones, we can theoretically match it.
     // However, maintenance is per vehicle, not per employee directly.
@@ -58,29 +65,41 @@ try {
     // and we attribute the maintenance cost of those vehicles during that period.
 
     // Step 1.1: Standard Financials (Aggregated)
-    $sqlLiquidaciones = "SELECT 
+    $sqlLiquidaciones = "SELECT
                             l.empleado_id,
                             e.nombre_completo as empleado_nombre,
                             e.rol as empleado_rol,
-                            v.unidad_nombre as vehiculo_asignado,
+                            e.foto_perfil as foto_perfil,
+                            COALESCE(v_asig.unidad_nombre, v_viaje.unidad_nombre) as vehiculo_asignado,
                             SUM(l.viajes) as total_viajes,
                             SUM(l.monto_efectivo) as total_ingresos,
                             SUM(l.monto_efectivo) as total_efectivo,
                             SUM(COALESCE(l.propinas, 0)) as total_propinas,
+                            SUM(COALESCE(l.otros_viajes, 0)) as total_otros_viajes,
                             SUM(l.gastos_total) as gastos_operativos_chofer,
                             SUM(l.neto_entregado) as neto_entregado,
-                            e.vehiculo_id as current_vehiculo_id
+                            COALESCE(e.vehiculo_id,
+                                (SELECT vi.unidad_id FROM viajes vi
+                                 WHERE vi.empleado_id = l.empleado_id
+                                 AND vi.unidad_id IS NOT NULL
+                                 ORDER BY vi.fecha DESC LIMIT 1)
+                            ) as current_vehiculo_id
                          FROM liquidaciones l
                          LEFT JOIN empleados e ON l.empleado_id = e.id
-                         LEFT JOIN vehiculos v ON e.vehiculo_id = v.id
-                         WHERE l.fecha BETWEEN :fi AND :ff
+                         LEFT JOIN vehiculos v_asig ON e.vehiculo_id = v_asig.id
+                         LEFT JOIN viajes vi_last ON vi_last.empleado_id = l.empleado_id AND vi_last.id = (
+                             SELECT MAX(vi2.id) FROM viajes vi2 WHERE vi2.empleado_id = l.empleado_id AND vi2.unidad_id IS NOT NULL
+                         )
+                         LEFT JOIN vehiculos v_viaje ON vi_last.unidad_id = v_viaje.id
+                         WHERE " . $filterLiqAgg['where'] . "
                          GROUP BY l.empleado_id";
 
     $stmtLiq = $db->prepare($sqlLiquidaciones);
-    $stmtLiq->execute([':fi' => $fechaInicio, ':ff' => $fechaFin]);
+    $stmtLiq->execute($filterLiqAgg['params']);
     $empleadosStats = $stmtLiq->fetchAll(PDO::FETCH_ASSOC);
 
     // Step 1.1b: Detailed Liquidations (History)
+    $filterLiqDet = getOperationalDayFilter($fechaInicio, $fechaFin, 'l');
     $sqlLiqDetalles = "SELECT 
                         l.id,
                         l.empleado_id,
@@ -89,15 +108,16 @@ try {
                         l.viajes,
                         l.monto_efectivo,
                         COALESCE(l.propinas, 0) as propinas,
+                        COALESCE(l.otros_viajes, 0) as otros_viajes,
                         l.gastos_total,
                         l.neto_entregado,
                         l.firma_path,
                         l.detalles_gastos
                        FROM liquidaciones l
-                       WHERE l.fecha BETWEEN :fi AND :ff
-                       ORDER BY l.hora ASC";
+                       WHERE " . $filterLiqDet['where'] . "
+                       ORDER BY l.fecha DESC, l.hora DESC";
     $stmtLiqDet = $db->prepare($sqlLiqDetalles);
-    $stmtLiqDet->execute([':fi' => $fechaInicio, ':ff' => $fechaFin]);
+    $stmtLiqDet->execute($filterLiqDet['params']);
     $allLiqs = $stmtLiqDet->fetchAll(PDO::FETCH_ASSOC);
 
     // Group liquidations by Employee ID
@@ -108,7 +128,7 @@ try {
     }
 
     // Step 1.2: Maintenance Costs per Vehicle in range (DETAILED)
-    $sqlMant = "SELECT * FROM mantenimientos WHERE fecha BETWEEN :fi AND :ff ORDER BY fecha ASC";
+    $sqlMant = "SELECT * FROM mantenimientos WHERE fecha >= :fi AND fecha < :ff ORDER BY fecha ASC";
     $stmtMant = $db->prepare($sqlMant);
     $stmtMant->execute([':fi' => $fechaInicio, ':ff' => $fechaFin]);
     $allMants = $stmtMant->fetchAll(PDO::FETCH_ASSOC);
@@ -141,16 +161,33 @@ try {
         $emp['detalles_mantenimiento'] = $listaMantenimientos;
         $emp['detalles_ingresos'] = $liquidacionesPorEmpleado[$emp['empleado_id']] ?? [];
 
-        // NUEVO: Obtener Depósitos/Transferencias
+        // Step 1.2b: Received Cash (nomina_recibos_caja) per employee in range
+        $sqlRecibido = "SELECT COALESCE(SUM(monto), 0) as total_recibido 
+                         FROM nomina_recibos_caja 
+                         WHERE empleado_id = :eid 
+                         AND fecha BETWEEN :fi AND :ff";
+        $stmtRec = $db->prepare($sqlRecibido);
+        $stmtRec->execute([
+            ':eid' => $emp['empleado_id'],
+            ':fi' => $fechaInicio . ' 00:00:00',
+            ':ff' => $fechaFin . ' 23:59:59'
+        ]);
+        $resRec = $stmtRec->fetch(PDO::FETCH_ASSOC);
+        $emp['total_recibido_caja'] = (float) ($resRec['total_recibido'] ?? 0);
+
+        // Step 1.2c: Deposits per employee in range (labels align with Monday-Monday in DB)
+        $fechaInicioLabel = date('Y-m-d', strtotime($fechaInicio . ' -1 day'));
+        $fechaFinLabel = date('Y-m-d', strtotime($fechaFin . ' -1 day'));
+
         $sqlDepositos = "SELECT COALESCE(SUM(monto), 0) as total_depositos 
                          FROM nomina_transferencias 
                          WHERE empleado_id = :eid 
-                         AND fecha_inicio_semana BETWEEN :fi AND :ff";
+                         AND fecha_inicio_semana >= :fi AND fecha_inicio_semana < :ff";
         $stmtDep = $db->prepare($sqlDepositos);
         $stmtDep->execute([
             ':eid' => $emp['empleado_id'],
-            ':fi' => $fechaInicio,
-            ':ff' => $fechaFin
+            ':fi' => $fechaInicioLabel,
+            ':ff' => $fechaFinLabel
         ]);
         $resDep = $stmtDep->fetch(PDO::FETCH_ASSOC);
         $emp['total_depositos'] = (float) ($resDep['total_depositos'] ?? 0);
@@ -356,7 +393,7 @@ try {
     }, $empleadosStats);
 
     // Get all active employees
-    $sqlTodosEmpleados = "SELECT e.id, e.nombre_completo, e.rol, e.vehiculo_id, v.unidad_nombre
+    $sqlTodosEmpleados = "SELECT e.id, e.nombre_completo, e.rol, e.vehiculo_id, e.foto_perfil, v.unidad_nombre
                           FROM empleados e
                           LEFT JOIN vehiculos v ON e.vehiculo_id = v.id
                           WHERE e.estado = 'Activo'";
@@ -454,6 +491,7 @@ try {
             'empleado_id' => $eid,
             'empleado_nombre' => $empleado['nombre_completo'],
             'empleado_rol' => $empleado['rol'],
+            'foto_perfil' => $empleado['foto_perfil'] ?? null,
             'vehiculo_asignado' => $empleado['unidad_nombre'],
             'total_viajes' => 0,
             'total_ingresos' => 0,
@@ -470,7 +508,8 @@ try {
             'detalles_ingresos' => [],
             'distancia_recorrida_km' => 0,
             'rendimiento_km' => 0,
-            'total_depositos' => (float) ($db->query("SELECT COALESCE(SUM(monto), 0) FROM nomina_transferencias WHERE empleado_id = $eid AND fecha_inicio_semana BETWEEN '$fechaInicio' AND '$fechaFin'")->fetchColumn() ?: 0)
+            'total_recibido_caja' => (float) ($db->query("SELECT COALESCE(SUM(monto), 0) FROM nomina_recibos_caja WHERE empleado_id = " . ($eid ?: 0) . " AND fecha BETWEEN '$fechaInicio 00:00:00' AND '$fechaFin 23:59:59'")->fetchColumn() ?: 0),
+            'total_depositos' => (float) ($db->query("SELECT COALESCE(SUM(monto), 0) FROM nomina_transferencias WHERE empleado_id = " . ($eid ?: 0) . " AND fecha_inicio_semana >= '$fechaInicioLabel' AND fecha_inicio_semana < '$fechaFinLabel'")->fetchColumn() ?: 0)
         ];
     }
 
@@ -478,15 +517,18 @@ try {
     $sqlGlobalLiq = "SELECT 
                         COALESCE(SUM(l.monto_efectivo), 0) as total_ingresos,
                         COALESCE(SUM(COALESCE(l.propinas, 0)), 0) as total_propinas,
+                        COALESCE(SUM(COALESCE(l.otros_viajes, 0)), 0) as total_otros_viajes,
                         COALESCE(SUM(l.gastos_total), 0) as total_gastos
-                     FROM liquidaciones l
-                     WHERE l.fecha BETWEEN :fi AND :ff";
+                      FROM liquidaciones l
+                      WHERE " . $filterLiqGlobal['where'] . "";
     $stmtGlobal = $db->prepare($sqlGlobalLiq);
-    $stmtGlobal->execute([':fi' => $fechaInicio, ':ff' => $fechaFin]);
+    $stmtGlobal->execute($filterLiqGlobal['params']);
+
     $globalLiq = $stmtGlobal->fetch(PDO::FETCH_ASSOC);
 
-    $totalIngresos = (float) $globalLiq['total_ingresos'];
-    $totalPropinas = (float) $globalLiq['total_propinas'];
+    $totalIngresos     = (float) $globalLiq['total_ingresos'];
+    $totalPropinas     = (float) $globalLiq['total_propinas'];
+    $totalOtrosViajes  = (float) $globalLiq['total_otros_viajes'];
     $totalGastosChofer = (float) $globalLiq['total_gastos'];
 
     // 3. Global Fixed Costs (Calculate DIRECTLY from ALL vehicles to ensure concordance and avoid double counting or omissions)
@@ -593,6 +635,7 @@ try {
     $balanceGlobal = [
         'ingresos_brutos' => $totalIngresos, // Caja (Efectivo)
         'total_propinas' => $totalPropinas,
+        'total_otros_viajes' => $totalOtrosViajes,
         'gastos_operativos_chofer' => $totalGastosChofer,
         'gastos_mantenimiento_flota' => $totalMantenimiento,
         'gastos_fijos_flota' => $totalCostoOperativoFlota,

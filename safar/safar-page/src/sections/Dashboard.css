@@ -1,0 +1,1227 @@
+/* ===================================================
+   DASHBOARD — Mobile-First Uber-like Aesthetic
+   =================================================== */
+
+/* Container */
+.db-mobile-container {
+  --db-peek-h: 120px; /* height of the collapsed card peek — keep in sync with .db-card-peek content */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh; /* dynamic viewport height for mobile */
+  background: #f6f6f6;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===================================================
+   LOADING STATE
+   =================================================== */
+.db-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 1.25rem;
+  color: #333;
+}
+
+.db-loading p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.db-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e2e2;
+  border-top-color: #111;
+  border-radius: 50%;
+  animation: db-spin 0.8s linear infinite;
+}
+
+@keyframes db-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* (welcome header merged into db-top-header) */
+
+/* ===================================================
+   TAB BAR — inside unified dark header
+   =================================================== */
+.db-tab-bar {
+  display: flex;
+  background: transparent;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 0;
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* Dashboard manages its own header — hide the global navbar */
+.db-mobile-container {
+  padding-top: 0;
+}
+
+.app:has(.db-mobile-container) .navbar-wrapper {
+  display: none;
+}
+
+/* Remove root padding/max-width so dashboard + modals fill the screen edge-to-edge */
+#root:has(.db-mobile-container) {
+  padding: 0;
+  max-width: 100%;
+}
+
+/* ===================================================
+   UNIFIED TOP HEADER
+   =================================================== */
+.db-top-header {
+  background: #111;
+  flex-shrink: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Brand row: logo — greeting — logout */
+.db-top-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem 0.75rem;
+}
+
+.db-top-logo {
+  height: 20px;
+  width: auto;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.db-top-greeting {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  padding-left: 0.25rem;
+}
+
+.db-top-greeting-sub {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.db-top-greeting-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Profile Avatar button ── */
+.db-avatar-btn {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.db-avatar-btn:hover {
+  border-color: rgba(255,255,255,0.5);
+  transform: scale(1.05);
+}
+
+.db-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.db-avatar-icon {
+  width: 22px;
+  height: 22px;
+  color: rgba(255,255,255,0.7);
+}
+
+.db-top-logout-btn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: rgba(255,255,255,0.7);
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.db-top-logout-btn svg { width: 18px; height: 18px; }
+.db-top-logout-btn:hover  { background: rgba(255,255,255,0.14); color: #fff; }
+.db-top-logout-btn:active { background: rgba(255,255,255,0.2); }
+
+.db-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  letter-spacing: 0.3px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.db-tab-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.db-tab-btn.active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+/* ===================================================
+   VIAJE TAB — Full-screen map + floating bottom card
+   =================================================== */
+.db-viaje-view {
+  flex: 1;
+  position: relative;   /* key: children position absolute over map */
+  overflow: hidden;
+  --db-peek-h: 120px;
+}
+
+/* Map wrapper — covers only the map region (above the peeking card) */
+.db-map-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--db-peek-h, 120px); /* stop exactly where the peek begins */
+  z-index: 2;
+}
+
+/* Map takes full space of the wrapper */
+.db-map-area {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #e8e8e8;
+  z-index: 1;
+}
+
+/* Recenter — relative to wrapper, always inside visible map */
+.db-recenter-btn {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #222;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.db-recenter-btn:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.24);
+  transform: scale(1.07);
+}
+
+.db-recenter-btn:active {
+  transform: scale(0.94);
+}
+
+.db-map-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #888;
+}
+
+.db-map-empty-icon {
+  font-size: 3rem;
+}
+
+.db-map-empty p {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Bottom details card — bottom sheet over map */
+.db-details-card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 62vh;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+  z-index: 10;
+  overflow: hidden;
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+/* Collapsed: only peek is visible from the bottom */
+.db-details-card.collapsed {
+  transform: translateY(calc(62vh - var(--db-peek-h, 120px)));
+}
+
+/* Expanded: fully visible */
+.db-details-card.expanded {
+  transform: translateY(0);
+}
+
+/* PEEK section — always visible, drag handle */
+.db-card-peek {
+  padding: 0.75rem 1.5rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* BODY section — scrollable content below peek */
+.db-card-body {
+  height: calc(62vh - var(--db-peek-h, 120px));
+  overflow-y: auto;
+  padding: 0.25rem 1.5rem 2rem;
+  -webkit-overflow-scrolling: touch;
+}
+.db-card-body::-webkit-scrollbar { display: none; }
+
+.db-details-handle {
+  width: 44px;
+  height: 5px;
+  background: #ddd;
+  border-radius: 3px;
+  margin: 0 auto 0.875rem;
+}
+
+/* Folio + status */
+.db-trip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+.db-trip-folio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.db-folio-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #aaa;
+}
+
+.db-folio-number {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.3px;
+}
+
+/* Status chips */
+.db-status-chip {
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+
+.db-status-chip.db-status-pendiente   { background: #fff8e1; color: #e65100; }
+.db-status-chip.db-status-confirmado  { background: #e8f5e9; color: #2e7d32; }
+.db-status-chip.db-status-asignado    { background: #e3f2fd; color: #1565c0; }
+.db-status-chip.db-status-en_curso    { background: #f3e5f5; color: #6a1b9a; }
+.db-status-chip.db-status-completado  { background: #e8f5e9; color: #2e7d32; }
+
+/* Route summary */
+.db-route-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  background: #f6f6f6;
+  border-radius: 16px;
+  padding: 1.1rem;
+}
+
+.db-route-point {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.db-route-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.db-route-dot--origin { background: #111; }
+.db-route-dot--dest   { background: #b22222; }
+
+.db-route-address {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.db-route-line {
+  width: 2px;
+  height: 18px;
+  background: #ddd;
+  margin: 5px 0 5px 4px;
+}
+
+/* Trip stats row */
+.db-trip-stats {
+  display: flex;
+  align-items: center;
+  background: #f6f6f6;
+  border-radius: 16px;
+  padding: 1rem 1rem;
+  gap: 0;
+}
+
+.db-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.db-stat-divider {
+  width: 1px;
+  height: 34px;
+  background: #e0e0e0;
+}
+
+.db-stat-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: #999;
+}
+
+.db-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.db-stat-value--price {
+  color: #b22222;
+}
+
+/* Driver row */
+.db-driver-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.1rem;
+  background: #f6f6f6;
+  border-radius: 16px;
+}
+
+/* Car image container */
+.db-car-img-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  background: #e8e8e8;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.db-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db-car-img-fallback {
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+.db-car-img-fallback svg {
+  width: 30px;
+  height: 30px;
+}
+
+.db-driver-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.db-driver-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-driver-vehicle {
+  font-size: 0.8rem;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-driver-plates {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #555;
+  background: #e4e4e4;
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  margin-top: 0.1rem;
+  align-self: flex-start;
+  text-transform: uppercase;
+}
+
+.db-delete-btn {
+  background: #fff0f0;
+  border: 1px solid #ffd0d0;
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.db-delete-btn svg {
+  width: 18px;
+  height: 18px;
+  color: #b22222;
+}
+
+.db-delete-btn:hover {
+  background: #ffd0d0;
+}
+
+/* New Booking CTA */
+.db-new-booking-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.db-new-booking-btn:hover {
+  opacity: 0.85;
+}
+
+.db-new-booking-btn:active {
+  transform: scale(0.98);
+}
+
+/* No trip empty state card — also floats over map */
+.db-no-trip-card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+  padding: 2rem 1.5rem 2rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.db-no-trip-text {
+  text-align: center;
+  color: #888;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Booking wrapper inside viaje */
+.db-booking-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+}
+
+/* ===================================================
+   RESERVAS TAB
+   =================================================== */
+.db-reservas-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f6f6f6;
+}
+
+.db-reservas-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 0.875rem 0.75rem 0.75rem;
+  background: #ffffff;
+  border-bottom: 1px solid #ebebeb;
+  flex-shrink: 0;
+}
+
+/* Row 1: ‹  Título  › */
+.db-reservas-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
+
+/* Ghost arrow buttons — no border, just the icon */
+.db-cal-nav-btn {
+  background: none;
+  border: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #333;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.db-cal-nav-btn svg { width: 22px; height: 22px; }
+.db-cal-nav-btn:hover  { background: #f4f4f4; }
+.db-cal-nav-btn:active { background: #ebebeb; }
+
+/* Title + "Hoy" chip stacked/inline in the center */
+.db-reservas-title-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.db-reservas-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  letter-spacing: -0.3px;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 100%;
+}
+
+/* "Hoy" as a small red underline-style chip */
+.db-cal-today-chip {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  color: #ea4335;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+.db-cal-today-chip:hover { opacity: 0.7; }
+
+/* Row 2: toggle + nueva */
+.db-reservas-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+}
+
+.db-cal-toggle {
+  display: flex;
+  background: #f6f6f6;
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.db-cal-toggle-btn {
+  background: none;
+  border: none;
+  border-radius: 18px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: #888;
+  transition: background 0.2s, color 0.2s;
+}
+
+.db-cal-toggle-btn.active {
+  background: #111;
+  color: #fff;
+}
+
+.db-reservas-add-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.db-reservas-add-btn:hover { opacity: 0.8; }
+
+.db-reservas-calendar-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ===================================================
+   DELETE CONFIRMATION MODAL
+   =================================================== */
+.db-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.db-modal-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: db-modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes db-modal-pop {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.db-modal-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.db-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 0.75rem;
+}
+
+.db-modal-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 1.75rem;
+  line-height: 1.5;
+}
+
+.db-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.db-modal-cancel {
+  flex: 1;
+  padding: 0.875rem;
+  background: #f6f6f6;
+  border: 1px solid #e2e2e2;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.db-modal-cancel:hover { background: #ebebeb; }
+
+.db-modal-confirm {
+  flex: 1;
+  padding: 0.875rem;
+  background: #b22222;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.db-modal-confirm:hover { background: #8b0000; }
+
+/* ===================================================
+   MAP MARKERS
+   =================================================== */
+.map-marker {
+  width: 28px !important;
+  height: 28px !important;
+  background: #111;
+  border: 2.5px solid white;
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  font-family: sans-serif;
+}
+
+.map-marker.destination {
+  background: #b22222;
+}
+
+/* Override leaflet attribution to not cover cards */
+.leaflet-bottom.leaflet-right {
+  bottom: 2px;
+}
+.leaflet-control-attribution {
+  font-size: 9px !important;
+}
+
+/* ===================================================
+   CALENDAR OVERRIDES for Reservas tab (light mode)
+   =================================================== */
+.db-reservas-calendar-wrap .calendar-month-title {
+  color: #111;
+}
+
+.db-reservas-calendar-wrap .calendar-nav button {
+  background: #f6f6f6;
+  border-color: #e2e2e2;
+  color: #111;
+}
+
+.db-reservas-calendar-wrap .calendar-grid {
+  background: #e2e2e2;
+  border-color: #e2e2e2;
+}
+
+.db-reservas-calendar-wrap .calendar-day {
+  background: #fff;
+}
+
+.db-reservas-calendar-wrap .calendar-day.today {
+  background: #fafafa;
+}
+
+.db-reservas-calendar-wrap .day-name {
+  color: #888;
+}
+
+.db-reservas-calendar-wrap .day-number {
+  color: #111;
+}
+
+.db-reservas-calendar-wrap .calendar-event {
+  background: #f3f3f3;
+  border-left-color: #ccc;
+  color: #111;
+}
+
+.db-reservas-calendar-wrap .event-time {
+  color: #444;
+}
+
+.db-reservas-calendar-wrap .event-title {
+  color: #333;
+}
+
+.db-reservas-calendar-wrap .calendar-event.selected {
+  background: #fff0f0;
+  border-left-color: #b22222;
+}
+
+.db-reservas-calendar-wrap .calendar-day.today .day-number {
+  background: #111;
+}
+
+/* ===================================================
+   DESKTOP / TABLET OVERRIDES
+   =================================================== */
+@media (min-width: 768px) {
+  .db-mobile-container {
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 0 60px rgba(0,0,0,0.2);
+    height: 100dvh;
+  }
+}
+
+/* ===================================================
+   SAFE AREA (notch devices)
+   =================================================== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .db-details-card,
+  .db-no-trip-card {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ===================================================
+   PAYMENT TICKET
+   =================================================== */
+.db-payment-ticket {
+  background: #fff;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.db-ticket-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: #fafafa;
+}
+
+.db-ticket-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+
+.db-ticket-method-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.db-ticket-method-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.db-ticket-method-sub {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+/* Línea perforada entre header y rows */
+.db-ticket-perforation {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    #ddd 0,
+    #ddd 8px,
+    transparent 8px,
+    transparent 14px
+  );
+  margin: 0 1rem;
+}
+
+.db-ticket-rows {
+  padding: 0.75rem 1rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.db-ticket-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.db-ticket-row strong {
+  font-size: 0.95rem;
+  color: #111;
+}
+
+/* Badges */
+.db-ticket-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.db-ticket-badge--paid {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.db-ticket-badge--pending {
+  background: #fff8e1;
+  color: #e65100;
+}
+
+/* ===================================================
+   USER LOCATION MARKER
+   =================================================== */
+.user-location-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-marker-core {
+  width: 14px;
+  height: 14px;
+  background: #111;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+
+.user-marker-pulse {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: rgba(17, 17, 17, 0.2);
+  border-radius: 50%;
+  animation: user-marker-pulse-anim 2s infinite ease-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===================================================
+   SAVED ADDRESS HINT (EMPTY DASHBOARD)
+   =================================================== */
+.db-saved-address-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.db-saved-address-hint svg {
+  width: 18px;
+  height: 18px;
+  color: #111;
+  flex-shrink: 0;
+}
+
+.db-saved-address-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.db-saved-address-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #999;
+  font-weight: 700;
+}
+
+.db-saved-address-value {
+  font-size: 0.85rem;
+  color: #111;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ===================================================
+   MAP SKELETON LOADER
+   =================================================== */
+.db-map-skeleton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #f8f9fa;
+  background-image: 
+    linear-gradient(#e5e5e5 1px, transparent 1px),
+    linear-gradient(90deg, #e5e5e5 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center auto;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.db-skeleton-pulse-ring {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 50%;
+  animation: skel-pulse 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@keyframes skel-pulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.db-skeleton-pin {
+  width: 36px;
+  height: 36px;
+  background: #111;
+  color: #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  animation: skel-bounce 1s infinite alternate cubic-bezier(0.5, 0, 0.5, 1);
+  box-shadow: -2px 2px 10px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.db-skeleton-pin svg {
+  transform: rotate(45deg);
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes skel-bounce {
+  to { transform: rotate(-45deg) translateY(-8px) translateX(8px); }
+}
+
+.db-skeleton-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111;
+  letter-spacing: -0.2px;
+  background: rgba(255,255,255,0.9);
+  padding: 6px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}

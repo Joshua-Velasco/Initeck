@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once '../../../config/database.php';
+require_once '../utils/shift_utils.php';
+require_once '../../utils/shift_utils_v2.php';
 
 try {
     $database = new Database();
@@ -27,7 +29,7 @@ try {
 
 
     $empleado_id = $_GET['empleado_id'] ?? null;
-    
+
     // Soporte para rangos o fecha única
     if (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
         $fechaInicio = $_GET['fecha_inicio'];
@@ -36,8 +38,9 @@ try {
         $fechaInicio = $_GET['fecha'];
         $fechaFin = $_GET['fecha'];
     } else {
-        $fechaInicio = date('Y-m-d');
-        $fechaFin = date('Y-m-d');
+        $logicalDate = getLogicalDate($conn, $empleado_id);
+        $fechaInicio = $logicalDate;
+        $fechaFin = $logicalDate;
     }
 
     if (!$empleado_id) {
@@ -45,18 +48,18 @@ try {
         exit;
     }
 
-    $query = "SELECT id, fecha, hora, viajes, monto_efectivo, propinas, 
+    $filter = getOperationalDayFilter($fechaInicio, $fechaFin, 'l');
+
+    $query = "SELECT id, fecha, hora, viajes, monto_efectivo, propinas, otros_viajes,
                      gastos_total, neto_entregado, detalles_gastos, firma_path
-              FROM liquidaciones 
+              FROM liquidaciones l
               WHERE empleado_id = :emp_id 
-              AND fecha BETWEEN :inicio AND :fin
+              AND " . $filter['where'] . "
               ORDER BY fecha DESC, hora DESC";
 
     $stmt = $conn->prepare($query);
-    $stmt->bindParam(':emp_id', $empleado_id);
-    $stmt->bindParam(':inicio', $fechaInicio);
-    $stmt->bindParam(':fin', $fechaFin);
-    $stmt->execute();
+    $params = array_merge([':emp_id' => $empleado_id], $filter['params']);
+    $stmt->execute($params);
 
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -72,10 +75,14 @@ try {
 
     echo json_encode([
         "status" => "success",
-        "data" => $resultados
+        "data" => $resultados,
+        "debug" => [
+            "rango" => ["inicio" => $fechaInicio, "fin" => $fechaFin]
+        ]
     ]);
 
-} catch(PDOException $e) {
+
+} catch (PDOException $e) {
     echo json_encode(["status" => "error", "message" => "Error: " . $e->getMessage()]);
 }
 ?>

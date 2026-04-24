@@ -31,11 +31,16 @@ export const getOperationalDateRange = (dateInput = new Date(), viewType = 'week
     end.setHours(3, 59, 59, 999);
   } 
   else if (isWeek) {
-    const day = ref.getDay(); 
-    // Ajustar para que la semana empiece en Lunes (1)
-    const diff = ref.getDate() - day + (day === 0 ? -6 : 1);
-    start.setDate(diff);
+    const day = ref.getDay(); // 0: Dom, 1: Lun, 2: Mar, ...
+    
+    // Lógica Estándar: La semana comienza el Lunes.
+    // Lun(1)->0, Mar(2)->1, ..., Dom(0)->6
+    const daysToSubtract = day === 0 ? 6 : day - 1;
+    
+    start.setDate(ref.getDate() - daysToSubtract);
     start.setHours(4, 0, 0, 0);
+    
+    // 7 días exactos: Termina el siguiente Lunes a las 03:59:59
     end.setTime(start.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
   } 
   else if (isMonth) {

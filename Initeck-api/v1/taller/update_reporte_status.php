@@ -24,10 +24,16 @@ try {
         throw new Exception("Datos incompletos");
     }
 
+    $tipo = $data->tipo ?? 'inspeccion';
     $database = new Database();
     $db = $database->getConnection();
 
-    $query = "UPDATE inspecciones_vehiculos SET estado_reporte = ? WHERE id = ?";
+    if ($tipo === 'ruta') {
+        $query = "UPDATE taller_mensajes_operativos SET estado_reporte = ? WHERE id = ?";
+    } else {
+        $query = "UPDATE inspecciones_vehiculos SET estado_reporte = ? WHERE id = ?";
+    }
+
     $stmt = $db->prepare($query);
 
     if ($stmt->execute([$data->estado, $data->id])) {

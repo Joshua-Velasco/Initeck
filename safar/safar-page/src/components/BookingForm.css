@@ -1,0 +1,1452 @@
+:root {
+  --uber-black: #000000;
+  --uber-white: #ffffff;
+  --uber-gray-50: #f6f6f6;
+  --uber-gray-100: #eeeeee;
+  --uber-gray-200: #e2e2e2;
+  --uber-gray-500: #6b6b6b;
+  --uber-blue: #276ef1;
+  --safar-red: #b22222;
+  --safar-red-hover: #8b0000;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --shadow-premium: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.booking-form-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh; /* dynamic viewport height for mobile */
+  background: rgba(0,0,0,0.85); /* Slightly darker for focus */
+  color: var(--uber-black);
+  z-index: 9999; /* Ensure it's above EVERYTHING */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Wrapper for the whole Uber UI */
+/* Wrapper for the whole Uber UI */
+.uber-layout-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 600px;
+  background: var(--uber-white);
+  position: relative;
+  overflow: hidden; /* clip can be buggy with scroll containers on some browsers */
+  box-shadow: 0 0 50px rgba(0,0,0,0.5);
+}
+
+/* Mobile-Specific Overrides for Wrapper */
+@media (max-width: 991px) {
+  .uber-layout-wrapper {
+    max-width: none;
+    width: 100vw;
+  }
+}
+
+@media (max-width: 991px) {
+  .uber-layout-wrapper {
+    max-width: none;
+    width: 100vw;
+  }
+}
+
+/* Header & Inputs Overlay - Absolute at top */
+.search-header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--uber-white);
+  padding: 1rem 1.25rem 1.25rem;
+  padding-top: calc(1rem + env(safe-area-inset-top));
+  z-index: 1100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+}
+
+/* Gradiente para suavizar transición al mapa */
+.search-header-overlay::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.06), transparent);
+  pointer-events: none;
+}
+
+.search-header-overlay.minimized {
+  padding: 0.6rem 1.25rem;
+}
+
+.search-header-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: var(--uber-gray-100);
+}
+
+.search-header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+/* Uber-style Input Group */
+.uber-inputs-container {
+  display: flex;
+  position: relative;
+  background: var(--uber-gray-50);
+  border-radius: 14px;
+  padding: 0.75rem 0.875rem;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.inputs-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding-top: 2px;
+  flex-shrink: 0;
+  align-self: stretch;
+  justify-content: center;
+}
+
+.dot-origin {
+  width: 9px;
+  height: 9px;
+  background: var(--uber-black);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.line-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 18px;
+  background: var(--uber-gray-200);
+  border-radius: 1px;
+}
+
+.square-destination {
+  width: 9px;
+  height: 9px;
+  background: var(--uber-black);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.inputs-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.uber-input-wrapper {
+  position: relative;
+}
+
+/* Fila de input + botones de acción */
+.uber-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--uber-gray-200);
+}
+
+.uber-input-row:last-child,
+.uber-input-wrapper:last-child .uber-input-row {
+  border-bottom: none;
+}
+
+.uber-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--uber-black);
+}
+
+.uber-input:focus {
+  outline: none;
+}
+
+.uber-input::placeholder {
+  color: var(--uber-gray-500);
+  font-weight: 400;
+}
+
+/* Botones de acción inline */
+.input-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.action-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--uber-gray-200);
+  border-radius: 50%;
+  background: var(--uber-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uber-black);
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  flex-shrink: 0;
+}
+
+.action-icon-btn:hover {
+  background: var(--uber-gray-100);
+  border-color: var(--uber-black);
+  transform: scale(1.08);
+}
+
+.action-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.action-icon-btn.map-pin-btn {
+  border-color: var(--uber-gray-200);
+}
+
+/* Spinner para detección de ubicación */
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--uber-gray-200);
+  border-top-color: var(--uber-black);
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+/* Map Section */
+.uber-map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: #f0f0f0;
+}
+
+.main-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Suggestions List */
+.uber-suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--uber-white);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 2000; /* Higher than map (1000) and overlay (1005) */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border-radius: 0 0 12px 12px;
+}
+
+.uber-suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  gap: 1.25rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--uber-gray-50);
+  transition: background 0.2s;
+}
+
+.uber-suggestion-item:hover {
+  background: var(--uber-gray-50);
+}
+
+.suggestion-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--uber-gray-100);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.suggestion-content {
+  flex: 1;
+}
+
+.suggestion-main {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--uber-black);
+  margin-bottom: 2px;
+}
+
+.suggestion-sub {
+  font-size: 0.8rem;
+  color: var(--uber-gray-500);
+}
+
+.suggestion-distance {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--uber-gray-500);
+}
+
+/* Bottom Sheet - Absolute at bottom */
+.uber-bottom-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--uber-white);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  z-index: 1100;
+  transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable inner body — content scrolls, CTA stays fixed */
+.sheet-scroll-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  padding: 1rem 1.25rem 0.5rem;
+}
+
+/* Sticky CTA at bottom of sheet */
+.sheet-sticky-cta {
+  flex-shrink: 0;
+  padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--uber-white);
+  border-top: 1px solid var(--uber-gray-100);
+  z-index: 10;
+}
+
+.uber-bottom-sheet.entering {
+  transform: translateY(100%);
+}
+
+.uber-bottom-sheet.entered {
+  transform: translateY(0);
+}
+
+.sheet-drag-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--uber-gray-200);
+  border-radius: 2px;
+  margin: -0.5rem auto 1.5rem;
+}
+
+.sheet-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+
+/* Vehicle Cards */
+.vehicle-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.vehicle-card-uber {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: var(--uber-white);
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 1rem;
+}
+
+.vehicle-card-uber:hover {
+  background: var(--uber-gray-50);
+}
+
+.vehicle-card-uber.selected {
+  border-color: var(--uber-black);
+  background: var(--uber-gray-50);
+}
+
+.vehicle-img-wrapper {
+  width: 80px;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.vehicle-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.vehicle-details {
+  flex: 1;
+}
+
+.vehicle-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+}
+
+.vehicle-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.pax-count {
+  font-size: 0.8rem;
+  color: var(--uber-gray-500);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.eta-text {
+  font-size: 0.85rem;
+  color: var(--uber-gray-500);
+}
+
+.vehicle-price-col {
+  text-align: right;
+}
+
+.price-main {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.discount-badge {
+  font-size: 0.7rem;
+  color: var(--uber-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Actions */
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--uber-gray-50);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.main-cta-btn {
+  background: var(--uber-black);
+  color: var(--uber-white);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.main-cta-btn:hover {
+  opacity: 0.9;
+}
+
+.main-cta-btn:disabled {
+  background: var(--uber-gray-200);
+  color: var(--uber-gray-500);
+  cursor: not-allowed;
+}
+
+/* Desktop Overrides */
+@media (min-width: 992px) {
+  .booking-form-container {
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .uber-layout-wrapper {
+    max-width: 1200px; /* Wider for desktop */
+    height: 800px;
+    border-radius: 24px;
+    display: block; /* Use absolute positioning for children */
+  }
+
+  .search-header-overlay {
+    position: absolute;
+    width: 400px;
+    top: 2rem;
+    left: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    z-index: 1200;
+    padding: 1.25rem;
+  }
+
+  .search-header-overlay::after {
+    display: none;
+  }
+
+  .uber-map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+
+  .uber-bottom-sheet {
+    bottom: 2rem;
+    right: 2rem;
+    left: auto;
+    width: 420px;
+    border-radius: 16px;
+    z-index: 1200;
+    max-height: calc(100% - 4rem);
+  }
+
+  /* driver selection en desktop: panel lateral derecho full-height */
+  .uber-bottom-sheet.booking-step2-sheet {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: 420px;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* Picking Pin Styles */
+/* El bottom de este contenedor queda en el centro del mapa */
+.uber-picking-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  z-index: 1005;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Círculo superior */
+.pin-body {
+  width: 44px;
+  height: 44px;
+  background: var(--uber-black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+/* Punto blanco interior */
+.pin-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--uber-white);
+  border-radius: 50%;
+}
+
+/* Triángulo apuntando hacia abajo (el "tip" del pin) */
+.pin-tip {
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 18px solid var(--uber-black);
+  margin-top: -3px; /* se solapa ligeramente con el círculo */
+  flex-shrink: 0;
+}
+
+/* Sombra en el punto de contacto con el mapa */
+.pin-shadow {
+  width: 14px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  margin-top: 3px;
+  filter: blur(2px);
+  flex-shrink: 0;
+}
+
+/* Picking Overlay */
+.uber-picking-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1300;
+  pointer-events: none;
+}
+
+.picking-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--uber-white);
+  padding: 1rem 1.5rem;
+  padding-top: calc(1rem + env(safe-area-inset-top));
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.picking-instructions {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--uber-black);
+}
+
+.confirm-pick-btn {
+  position: absolute;
+  bottom: calc(2rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--uber-black);
+  color: var(--uber-white);
+  padding: 1.25rem 2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: calc(100% - 3rem);
+  max-width: 400px;
+}
+
+.confirm-pick-btn:hover {
+  background: #333;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.confirm-pick-btn:active {
+  transform: translateX(-50%) translateY(0) scale(0.98);
+}
+
+@media (max-width: 991px) {
+  .confirm-pick-btn {
+    bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    width: calc(100% - 2rem);
+  }
+}
+
+/* ── Trip Details Sheet ────────────────────────────────────────────────────── */
+.trip-details-sheet {
+  background: var(--uber-white);
+}
+
+/* Tabs una fecha / varios días */
+.schedule-tabs {
+  display: flex;
+  background: var(--uber-gray-50);
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 1rem;
+  gap: 3px;
+}
+
+.schedule-tab {
+  flex: 1;
+  padding: 0.5rem 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--uber-gray-500);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.schedule-tab.active {
+  background: var(--uber-white);
+  color: var(--uber-black);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+/* Fila fecha + hora (modo "una fecha") */
+.once-date-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.trip-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.trip-field-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--uber-gray-500);
+}
+
+.trip-native-input {
+  width: 100%;
+  border: 1.5px solid var(--uber-gray-200);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--uber-black);
+  background: var(--uber-white);
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.trip-native-input:focus {
+  outline: none;
+  border-color: var(--uber-black);
+}
+
+/* Hora en modo multi — aparece ANTES del calendario */
+.multi-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--uber-gray-50);
+  border: 1.5px solid var(--uber-gray-200);
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.multi-time-row .trip-field-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--uber-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: normal;
+  flex: 1;
+}
+
+.multi-time-row .trip-native-input {
+  max-width: 130px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--uber-black);
+  background: transparent;
+  text-align: right;
+}
+
+/* ── Mini Calendario ──────────────────────────────────────────────────────── */
+.multi-calendar {
+  margin-bottom: 0.25rem;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+}
+
+.cal-nav-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--uber-black);
+  letter-spacing: 0.01em;
+}
+
+.cal-nav-btn {
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid var(--uber-gray-200);
+  border-radius: 50%;
+  background: var(--uber-white);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uber-black);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cal-nav-btn:hover {
+  background: var(--uber-gray-50);
+  border-color: var(--uber-black);
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.2rem;
+}
+
+.cal-weekdays span {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--uber-gray-500);
+  text-transform: uppercase;
+  padding: 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  /* Each cell: fixed 34px circle centered inside its column */
+  row-gap: 2px;
+}
+
+.cal-day {
+  /* Perfect circle — fixed size, centered in column */
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--uber-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.cal-day:hover:not(.cal-day--past):not(.cal-day--empty) {
+  background: var(--uber-gray-100);
+}
+
+.cal-day--empty {
+  pointer-events: none;
+}
+
+.cal-day--past {
+  color: var(--uber-gray-200);
+  cursor: not-allowed;
+}
+
+.cal-day--today {
+  border: 1.5px solid var(--uber-black);
+  font-weight: 700;
+}
+
+.cal-day--selected {
+  background: var(--uber-black) !important;
+  color: var(--uber-white) !important;
+  font-weight: 700;
+}
+
+.cal-day--maxed {
+  color: var(--uber-gray-200);
+  cursor: not-allowed;
+}
+
+/* Chips de fechas seleccionadas */
+.selected-chips-wrap {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--uber-gray-100);
+}
+
+.chips-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.375rem;
+}
+
+.chips-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--uber-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chips-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--uber-gray-500);
+  background: var(--uber-gray-100);
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+
+.chips-count--max {
+  background: #fde8e8;
+  color: #b22222;
+}
+
+.selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.date-chip {
+  background: var(--uber-gray-50);
+  border: 1px solid var(--uber-gray-200);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--uber-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.date-chip:hover {
+  background: #ffe5e5;
+  border-color: #e57373;
+  color: #c00;
+}
+
+/* Error en el sheet */
+.sheet-error {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+  font-weight: 500;
+}
+
+/* ── Step driver: selección de chofer — pantalla completa ────────────────── */
+.booking-step2-sheet {
+  overflow: hidden;
+  padding: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+}
+
+/* scrollable inner area for driver selection step */
+.booking-step2-sheet .driver-step-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: calc(1.25rem + env(safe-area-inset-top)) 1.25rem 0;
+}
+
+/* Fila de estadísticas del viaje */
+.trip-summary-row {
+  display: flex;
+  align-items: center;
+  background: var(--uber-gray-50);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1rem;
+  gap: 0;
+}
+
+.trip-summary-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ts-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--uber-black);
+}
+
+.ts-label {
+  font-size: 0.68rem;
+  color: var(--uber-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.trip-summary-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--uber-gray-200);
+}
+
+/* Tarjeta de vehículo único */
+.safar-vehicle-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1.5px solid var(--uber-black);
+  border-radius: 14px;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  background: var(--uber-white);
+}
+
+.svc-img-wrap {
+  width: 72px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.svc-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.svc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.svc-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--uber-black);
+  margin-bottom: 2px;
+}
+
+.svc-desc {
+  font-size: 0.8rem;
+  color: var(--uber-gray-500);
+  margin-bottom: 6px;
+}
+
+.svc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.svc-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2d7a2d;
+  background: #edf7ed;
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+/* Label de sección de pago */
+.payment-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--uber-gray-500);
+  margin: 0 0 0.65rem;
+}
+
+/* Grid de métodos de pago */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.pm-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  border: 1.5px solid var(--uber-gray-200);
+  border-radius: 12px;
+  padding: 0.875rem;
+  background: var(--uber-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.pm-card:not(.pm-card--active):hover {
+  border-color: #888;
+  background: var(--uber-gray-50);
+}
+
+.pm-card--active {
+  border-color: var(--uber-black);
+  background: var(--uber-black);
+}
+
+.pm-card--active .pm-title,
+.pm-card--active .pm-subtitle,
+.pm-card--active .pm-icon {
+  color: var(--uber-white);
+}
+
+.pm-icon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.pm-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--uber-black);
+}
+
+.pm-subtitle {
+  font-size: 0.72rem;
+  color: var(--uber-gray-500);
+  line-height: 1.3;
+}
+
+/* Banner de depósito */
+.deposit-banner {
+  background: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.deposit-amounts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0.6rem;
+}
+
+.deposit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deposit-label {
+  font-size: 0.82rem;
+  color: #92400e;
+}
+
+.deposit-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.deposit-note {
+  font-size: 0.72rem;
+  color: #b45309;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Skeleton loader mientras carga el clientSecret de Stripe */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.stripe-loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.skeleton-field {
+  height: 44px;
+  background: var(--uber-gray-100);
+  border-radius: 8px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  width: 100%;
+}
+
+.skeleton-field--half { width: 50%; }
+.skeleton-field--short { width: 40%; }
+
+.skeleton-btn {
+  height: 52px;
+  background: var(--uber-gray-200);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* Step 3 sheet — scrollable para que el form de Stripe no se corte */
+.uber-bottom-sheet:has(.confirm-price-card) {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem;
+}
+
+/* Error inline de Stripe */
+.stripe-local-error {
+  color: #c0392b;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.75rem;
+  background: #fdf3f3;
+  border-radius: 8px;
+  border: 1px solid #f5c6c6;
+  line-height: 1.4;
+}
+
+/* Step 3: Confirm price card */
+.confirm-price-card {
+  background: var(--uber-gray-50);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.cpc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  padding: 3px 0;
+}
+
+.cpc-row--muted {
+  color: var(--uber-gray-500);
+  font-size: 0.85rem;
+}
+
+.cpc-divider {
+  height: 1px;
+  background: var(--uber-gray-200);
+  margin: 8px 0;
+}
+
+.cpc-meta {
+  font-size: 0.75rem;
+  color: var(--uber-gray-500);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--uber-gray-100);
+}
+
+/* ── Modal de estado de pago (éxito / procesando / error) ─────────────────── */
+.payment-modal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.payment-modal-content {
+  width: 100%;
+  max-width: 300px;
+  background: var(--uber-white);
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ── Success state ── */
+.success-check {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--uber-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.status-container h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--uber-black);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.success-folio {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--uber-gray-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.success-done-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--uber-black);
+  color: var(--uber-white);
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s;
+}
+
+.success-done-btn:hover {
+  opacity: 0.85;
+}
+
+/* ── Error state ── */
+.status-container.error h3 {
+  font-size: 1.1rem;
+}
+
+.status-container p {
+  font-size: 0.85rem;
+  color: var(--uber-gray-500);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Spinner procesando ── */
+.elite-spinner {
+  width: 44px;
+  height: 44px;
+  border: 2.5px solid var(--uber-gray-200);
+  border-top-color: var(--uber-black);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-container .main-cta-btn {
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Utils */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

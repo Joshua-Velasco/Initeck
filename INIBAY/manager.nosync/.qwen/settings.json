@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/INIBAY/api_php/**)"
+    ]
+  }
+}

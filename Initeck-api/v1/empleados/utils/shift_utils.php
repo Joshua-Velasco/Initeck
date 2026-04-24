@@ -1,33 +1,42 @@
 <?php
 /**
  * Determina la fecha lógica de operación basada en el horario asignado del empleado.
- * Útil para turnos nocturnos que cruzan la medianoche.
- * 
+ * Solo aplica "día anterior" si se cumplen AMBAS condiciones:
+ *   1. La hora actual es anterior a la hora de entrada del empleado.
+ *   2. La hora actual es anterior a las 04:00 AM (umbral de seguridad de madrugada).
+ * Esto evita que registros diurnos normales sean asignados al día previo.
+ *
  * @param PDO $pdo Conexión a base de datos
  * @param int $empleado_id ID del empleado
  * @return string Fecha en formato Y-m-d
  */
 function getLogicalDate($pdo, $empleado_id) {
     try {
-        $stmt = $pdo->prepare("SELECT horario_entrada, horario_salida FROM empleados WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT horario_entrada FROM empleados WHERE id = ?");
         $stmt->execute([$empleado_id]);
         $horario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         $defaultDate = date('Y-m-d');
-        
+
         if (!$horario || !$horario['horario_entrada']) {
             return $defaultDate;
         }
 
-        $entrada = $horario['horario_entrada'];
-        $horaActual = date('H:i:s');
+        // Convertir horas a segundos del día para comparación numérica exacta
+        $partsActual  = explode(':', date('H:i:s'));
+        $partsEntrada = explode(':', $horario['horario_entrada']);
 
-        // Lógica de Turno Nocturno/Madrugada
-        // Si la hora actual es menor a la hora de entrada, asumimos que 
-        // pertenece a la jornada que inició el día anterior.
-        // Ejemplo: Entrada 20:00. Hora actual 02:00. 02:00 < 20:00 -> Es día anterior.
-        // Ejemplo: Entrada 08:00. Hora actual 10:00. 10:00 < 08:00 -> Falso. Es hoy.
-        if ($horaActual < $entrada) {
+        $segsActual  = (int)($partsActual[0]  ?? 0) * 3600 + (int)($partsActual[1]  ?? 0) * 60 + (int)($partsActual[2]  ?? 0);
+        $segsEntrada = (int)($partsEntrada[0] ?? 0) * 3600 + (int)($partsEntrada[1] ?? 0) * 60 + (int)($partsEntrada[2] ?? 0);
+
+        // Umbral de madrugada: 04:00 AM = 14400 segundos
+        $umbralMadrugada = 4 * 3600;
+
+        // Solo retroceder un día si estamos en plena madrugada (antes de las 04:00)
+        // Y además antes de la hora de entrada del empleado.
+        // Ejemplo de turno nocturno válido: entrada 20:00, hora actual 01:30 → retrocede.
+        // Ejemplo de turno diurno: entrada 08:00, hora actual 10:30 → NO retrocede.
+        if ($segsActual < $umbralMadrugada && $segsActual < $segsEntrada) {
             return date('Y-m-d', strtotime('-1 day'));
         }
 

@@ -37,20 +37,33 @@ try {
 
     // 2. Escanear archivos para cada empleado
     $upload_dir = "uploads/";
-    $documentos_tipos = ['foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
-    
+    $documentos_tipos = ['foto_perfil', 'foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
+
     foreach ($empleados as &$emp) {
         if (!empty($emp['usuario'])) {
             $user_clean = preg_replace('/[^A-Za-z0-9_\-]/', '_', $emp['usuario']);
-            
+
             foreach ($documentos_tipos as $tipo) {
-                // Buscamos cualquier extensión (jpg, png, pdf, etc) que coincida con el patrón
+                // Use DB value as primary source; fall back to filesystem glob
+                $dbValue = $emp[$tipo] ?? null; // foto_perfil column may exist in DB
+                if ($dbValue && file_exists($upload_dir . $dbValue)) {
+                    // DB value is valid — use it
+                    continue;
+                }
+
+                // Fallback: scan filesystem
                 $pattern = $upload_dir . $user_clean . "_" . $tipo . ".*";
                 $files = glob($pattern);
-                
+
                 if ($files && count($files) > 0) {
-                    // Tomamos el primer archivo encontrado (el nombre físico con su extensión)
                     $emp[$tipo] = basename($files[0]);
+                    // Auto-heal: write filename back to DB so future queries have it
+                    if ($tipo === 'foto_perfil' && !empty($emp['id'])) {
+                        try {
+                            $stmtHeal = $db->prepare("UPDATE empleados SET foto_perfil = :fp WHERE id = :id AND (foto_perfil IS NULL OR foto_perfil = '')");
+                            $stmtHeal->execute([':fp' => $emp[$tipo], ':id' => $emp['id']]);
+                        } catch (Exception $e) { /* column may not exist yet */ }
+                    }
                 } else {
                     $emp[$tipo] = null;
                 }

@@ -17,11 +17,22 @@ if (!empty($data->empleado_id) && !empty($data->vehiculo_id)) {
     try {
         $db->beginTransaction();
 
-        // 1. Limpiamos cualquier empleado que tuviera esta unidad antes
-        $queryClear = "UPDATE empleados SET vehiculo_id = NULL WHERE vehiculo_id = :v_id";
-        $stmtClear = $db->prepare($queryClear);
-        $stmtClear->bindValue(':v_id', $data->vehiculo_id);
-        $stmtClear->execute();
+        // 1. Verificar que el vehículo no esté asignado a otro empleado
+        $stmtCheck = $db->prepare(
+            "SELECT id FROM empleados WHERE vehiculo_id = :v_id AND id != :e_id LIMIT 1"
+        );
+        $stmtCheck->bindValue(':v_id', $data->vehiculo_id);
+        $stmtCheck->bindValue(':e_id', $data->empleado_id);
+        $stmtCheck->execute();
+        if ($stmtCheck->fetch()) {
+            $db->rollBack();
+            http_response_code(409);
+            echo json_encode([
+                "status"  => "error",
+                "message" => "Esta unidad ya está asignada a otro empleado. Primero quítasela a ese empleado."
+            ]);
+            exit;
+        }
 
         // 2. Asignamos la unidad al empleado seleccionado
         $query = "UPDATE empleados SET vehiculo_id = :v_id WHERE id = :e_id";

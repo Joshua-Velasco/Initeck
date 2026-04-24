@@ -16,4 +16,5 @@ $stmt = $db->query("SELECT id, usuario, rol FROM usuarios");
 echo "<pre>";
 print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
 echo "</pre>";
+
 ?>

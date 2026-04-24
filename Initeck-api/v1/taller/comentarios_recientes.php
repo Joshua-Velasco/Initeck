@@ -16,8 +16,8 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
-    // Obtener los últimos 50 comentarios (Inicio o Final) que no sean nulos/vacíos
-    $sql = "SELECT 
+    // Obtener los últimos 50 comentarios (Inspecciones + Mensajes en Ruta)
+    $sql = "(SELECT 
                 i.id, 
                 i.fecha, 
                 v.unidad_nombre, 
@@ -26,13 +26,32 @@ try {
                 '' AS operador_apellido,
                 i.comentarios_inicio, 
                 i.comentarios_final,
-                i.estado_reporte
+                i.estado_reporte,
+                'inspeccion' as tipo
             FROM inspecciones_vehiculos i
             JOIN vehiculos v ON i.vehiculo_id = v.id
             JOIN empleados e ON i.empleado_id = e.id
             WHERE (i.comentarios_inicio IS NOT NULL AND i.comentarios_inicio != '') 
-               OR (i.comentarios_final IS NOT NULL AND i.comentarios_final != '')
-            ORDER BY i.fecha DESC, i.id DESC
+               OR (i.comentarios_final IS NOT NULL AND i.comentarios_final != ''))
+            
+            UNION ALL
+
+            (SELECT 
+                m.id,
+                m.fecha,
+                v.unidad_nombre,
+                v.placas,
+                e.nombre_completo AS operador,
+                '' AS operador_apellido,
+                m.mensaje AS comentarios_inicio,
+                NULL AS comentarios_final,
+                m.estado_reporte,
+                'ruta' as tipo
+            FROM taller_mensajes_operativos m
+            JOIN vehiculos v ON m.vehiculo_id = v.id
+            JOIN empleados e ON m.empleado_id = e.id)
+
+            ORDER BY fecha DESC, id DESC
             LIMIT 50";
 
     $stmt = $db->prepare($sql);

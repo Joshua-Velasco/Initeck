@@ -7,6 +7,10 @@ import PanelAcciones from './SubComponents/PanelAcciones';
 import FormularioGasto from './SubComponents/FormularioGasto';
 import FormularioLiquidacion from './SubComponents/FormularioLiquidacion';
 import CerrarJornada from './SubComponents/CerrarJornada';
+import FormularioMensajeTaller from './SubComponents/FormularioMensajeTaller';
+import SafarViajes from './SubComponents/SafarViajes';
+import MisTickets from './SubComponents/MisTickets';
+import DeudaPanel from './SubComponents/DeudaPanel';
 
 // Compartidos
 import ResumenJornada from '../Empleados_User/SubComponents/ResumenJornada';
@@ -19,20 +23,26 @@ import {
   EMPLEADO_GUARDAR_INSPECCION,
   EMPLEADO_GET_VEHICULOS,
   EMPLEADO_ACTUALIZAR_GPS,
-  EMPLEADOS_UPDATE_LOCATION_URL
+  EMPLEADOS_UPDATE_LOCATION_URL,
+  NOMINA_LISTAR_TICKETS_URL
 } from '../../config';
 
 export default function ViajesEmpleado({ user }) {
   const colorGuinda = "#800020";
+
+  // --- CINTA DE SERVICIO: uber | safar ---
+  const [servicioTab, setServicioTab] = useState('uber');
 
   const [viajeActivo, setViajeActivo] = useState(false);
   const [activeTab, setActiveTab] = useState('menu');
   const [loading, setLoading] = useState(true);
   const [miUbicacionActual, setMiUbicacionActual] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [ticketsPendientes, setTicketsPendientes] = useState(0);
+  const [todosTickets, setTodosTickets] = useState([]);
 
-  const [finanzas, setFinanzas] = useState({ monto_total: 0, propinas: 0 });
   const [gastoData, setGastoData] = useState({ tipo: '', monto: '', odometro: '', evidencia: null });
+  const [finanzas, setFinanzas] = useState({ monto_total: '', propinas: '', otros_viajes: '' });
 
   const [datosInicio, setDatosInicio] = useState({
     id_vehiculo: '',
@@ -45,6 +55,10 @@ export default function ViajesEmpleado({ user }) {
   // --- FECHAS PARA GRÁFICO ---
   const getLocalDate = () => {
     const now = new Date();
+    // Si es antes de las 4 AM, se considera el día anterior (turno nocturno)
+    if (now.getHours() < 4) {
+      now.setDate(now.getDate() - 1);
+    }
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -64,6 +78,25 @@ export default function ViajesEmpleado({ user }) {
     setModalContent({ title, message, type });
     setShowModal(true);
   };
+
+  // --- TICKETS PENDIENTES ---
+  useEffect(() => {
+    if (!user?.id) return;
+    const check = async () => {
+      try {
+        const res = await fetch(`${NOMINA_LISTAR_TICKETS_URL}?empleado_id=${user.id}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const lista = data.data || [];
+          setTicketsPendientes(lista.filter(t => !t.firmado_at).length);
+          setTodosTickets(lista);
+        }
+      } catch (e) {}
+    };
+    check();
+    const interval = setInterval(check, 60000); // refresca cada minuto
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
   // --- LOGICA DE ROLES ---
   const renderRoleBadge = (rol) => {
@@ -199,8 +232,8 @@ export default function ViajesEmpleado({ user }) {
 
   // Función para resetear los estados de formulario
   const resetFormStates = () => {
-    setFinanzas({ monto_total: 0, propinas: 0 });
     setGastoData({ tipo: '', monto: '', odometro: '', evidencia: null });
+    setFinanzas({ monto_total: '', propinas: '', otros_viajes: '' });
   };
 
   const handleActionSuccess = () => {
@@ -311,37 +344,62 @@ export default function ViajesEmpleado({ user }) {
     <div className="container-fluid px-2 py-3 px-md-4 py-md-4" style={{ backgroundColor: '#f4f4f7', minHeight: '100vh' }}>
       <div className="mx-auto" style={{ maxWidth: '1200px' }}>
 
-        {/* HEADER DE USUARIO */}
-        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 bg-white p-3 p-md-4 rounded-4 shadow-sm border-start border-5" style={{ borderColor: colorGuinda }}>
-          <div className="d-flex align-items-center gap-3 mb-3 mb-md-0">
-            <UserCircle size={48} style={{ color: colorGuinda }} />
-            <div>
-              <h3 className="fw-bold mb-0 text-dark text-uppercase" style={{ fontSize: '1.2rem' }}>{user?.nombre_completo || user?.nombre}</h3>
-              <div className="mt-1">
-                {/* Primera línea: Badges y Ubicación */}
-                <div className="d-flex align-items-center gap-2 flex-wrap mb-2">
-                  {renderRoleBadge(user?.rol)}
+        {/* HEADER COMPACTO */}
+        <div style={{
+          background: '#fff',
+          borderRadius: 16,
+          padding: '10px 16px',
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+          borderLeft: `4px solid ${colorGuinda}`,
+        }}>
+          {/* Avatar inicial */}
+          <div style={{
+            width: 38, height: 38, borderRadius: '50%',
+            background: colorGuinda, color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 16, fontWeight: 900, flexShrink: 0,
+          }}>
+            {(user?.nombre_completo || user?.nombre || '?')[0].toUpperCase()}
+          </div>
 
-                  {/* Mostrar unidad asignada si existe */}
-                  {datosInicio.unidad_nombre && !datosInicio.unidad_nombre.includes("Buscando") && (
-                    <span className="badge rounded-pill bg-danger text-white text-uppercase px-3 shadow-sm" style={{ fontSize: '10px' }}>
-                      <Car size={10} className="me-1" />
-                      {datosInicio.unidad_nombre}
-                    </span>
-                  )}
-
-                  <div className="d-flex align-items-center gap-1 text-muted" style={{ fontSize: '11px' }}>
-                    <MapPin size={12} />
-                    <span>Ciudad Juárez, MX</span>
-                  </div>
-                </div>
-
-                {/* Segunda línea: Botón Modo Activo (Wake Lock) */}
-
-              </div>
+          {/* Nombre + vehículo */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user?.nombre_completo || user?.nombre}
             </div>
+            {datosInicio.unidad_nombre && !datosInicio.unidad_nombre.includes('Buscando') && (
+              <div style={{ fontSize: 11, color: '#888', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                🚗 {datosInicio.unidad_nombre}
+              </div>
+            )}
+          </div>
+
+          {/* Tabs Uber / Safar inline */}
+          <div style={{ display: 'flex', background: '#f4f4f7', borderRadius: 10, padding: 3, gap: 2, flexShrink: 0 }}>
+            {[{ key: 'uber', label: 'Uber' }, { key: 'safar', label: 'Safar' }].map(tab => (
+              <button key={tab.key} onClick={() => setServicioTab(tab.key)} style={{
+                padding: '5px 14px', border: 'none', borderRadius: 8,
+                fontWeight: 700, fontSize: 12, cursor: 'pointer',
+                background: servicioTab === tab.key ? colorGuinda : 'transparent',
+                color: servicioTab === tab.key ? '#fff' : '#888',
+                transition: 'all 0.15s',
+              }}>{tab.label}</button>
+            ))}
           </div>
         </div>
+
+        {/* ── SECCIÓN SAFAR ── */}
+        {servicioTab === 'safar' && (
+          <SafarViajes user={user} pos={miUbicacionActual} />
+        )}
+
+        {/* ── SECCIÓN UBER (contenido existente) ── */}
+        {servicioTab === 'uber' && (
+          <>
 
         {/* RESUMEN JORNADA */}
         <ResumenJornada
@@ -362,7 +420,13 @@ export default function ViajesEmpleado({ user }) {
         ) : (
           <div className="animate__animated animate__fadeIn">
             {activeTab !== 'finalizar' && (
-              <PanelAcciones onSetTab={setActiveTab} activeTab={activeTab} colorGuinda={colorGuinda} />
+              <PanelAcciones
+                onSetTab={setActiveTab}
+                activeTab={activeTab}
+                colorGuinda={colorGuinda}
+                ticketsPendientes={ticketsPendientes}
+                userRol={user?.rol}
+              />
             )}
 
             <div className="mt-4">
@@ -373,6 +437,11 @@ export default function ViajesEmpleado({ user }) {
                     <div className="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
                       <GraficoRendimiento empleado={user} fechas={fechas} />
                     </div>
+                  </div>
+
+                  {/* Panel de Deudas */}
+                  <div className="col-12">
+                    <DeudaPanel tickets={todosTickets} />
                   </div>
 
                   {/* Historial de Liquidaciones ('Mi actividad') */}
@@ -387,6 +456,17 @@ export default function ViajesEmpleado({ user }) {
                 </div>
               )}
 
+              {activeTab === 'liquidacion' && (
+                <FormularioLiquidacion
+                  user={user}
+                  vehiculoId={datosInicio.id_vehiculo}
+                  finanzas={finanzas}
+                  setFinanzas={setFinanzas}
+                  onCancel={handleCancelAction}
+                  onConfirmar={handleActionSuccess}
+                />
+              )}
+
               {activeTab === 'gasto' && (
                 <FormularioGasto
                   user={user}
@@ -398,15 +478,17 @@ export default function ViajesEmpleado({ user }) {
                 />
               )}
 
-              {activeTab === 'liquidacion' && (
-                <FormularioLiquidacion
+              {activeTab === 'mensaje_taller' && (
+                <FormularioMensajeTaller
                   user={user}
                   vehiculoId={datosInicio.id_vehiculo}
-                  finanzas={finanzas}
-                  setFinanzas={setFinanzas}
                   onCancel={handleCancelAction}
-                  onConfirmar={handleActionSuccess}
+                  onGuardar={handleActionSuccess}
                 />
+              )}
+
+              {activeTab === 'tickets' && (
+                <MisTickets user={user} />
               )}
 
               {activeTab === 'finalizar' && (
@@ -421,10 +503,18 @@ export default function ViajesEmpleado({ user }) {
           </div>
         )}
 
+          </>
+        )}
+
         {/* MODAL PERSONALIZADO */}
         {showModal && (
-          <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}>
-            <div className="modal-dialog modal-dialog-centered">
+          <div 
+            className="modal fade show d-block" 
+            tabIndex="-1" 
+            style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}
+            onClick={() => setShowModal(false)}
+          >
+            <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
                 <div className={`modal-header border-0 ${modalContent.type === 'success' ? 'bg-success text-white' : 'bg-danger text-white'}`}>
                   <h5 className="modal-title fw-bold">{modalContent.title}</h5>

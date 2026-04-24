@@ -14,6 +14,17 @@ import { HorarioManager } from '../components/Empleados_Admin/HorarioManager';
 
 // Constantes
 import { COLORS, ESTILOS_COMPARTIDOS, getRolLabel, API_URLS } from '../constants/theme';
+import { EMPLEADOS_UPLOADS_URL } from '../config';
+
+const EmpAvatar = ({ emp, size = 40, className = '' }) => {
+  const src = emp?.foto_perfil ? `${EMPLEADOS_UPLOADS_URL}${emp.foto_perfil}` : null;
+  return src ? (
+    <img src={src} alt={emp.nombre_completo}
+      className={`rounded-circle object-fit-cover flex-shrink-0 ${className}`}
+      style={{ width: size, height: size, objectFit: 'cover' }}
+      onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+  ) : null;
+};
 
 export default function Empleados() {
   const initialFormState = useMemo(() => ({
@@ -54,8 +65,11 @@ export default function Empleados() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [activeTab, setActiveTab] = useState('general');
+  const [selectedRole, setSelectedRole] = useState('all');
   const [fechas, setFechas] = useState(() => {
     const now = new Date();
+    // Antes de las 04:00 AM el día operacional aún pertenece al día anterior
+    if (now.getHours() < 4) now.setDate(now.getDate() - 1);
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
@@ -147,10 +161,10 @@ export default function Empleados() {
     return empleados.filter(e => {
       const matchSearch = (e.nombre_completo || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (e.usuario || "").toLowerCase().includes(searchTerm.toLowerCase());
-      const matchStatus = true; // Temporalmente sin filtro de estado
-      return matchSearch && matchStatus;
+      const matchRole = selectedRole === 'all' || e.rol === selectedRole;
+      return matchSearch && matchRole;
     });
-  }, [empleados, searchTerm]);
+  }, [empleados, searchTerm, selectedRole]);
 
   const handleEliminar = async () => {
     if (!empleadoAEliminar?.id) return;
@@ -190,7 +204,7 @@ export default function Empleados() {
             <div className="text-center text-md-start text-white">
               <h2 className="fw-black mb-2 mb-md-1 d-flex align-items-center justify-content-center justify-content-md-start gap-2">
                 <Users size={24} className="d-md-none" />
-                <span className="d-none d-md-inline">Panel de Colaboradores</span>
+                <span className="d-none d-md-inline">Panel de Personal</span>
               </h2>
               <p className="opacity-75 mb-0 small text-uppercase fw-bold tracking-wider">
                 Sistema de Gestión • {empleados.length} Registros
@@ -217,6 +231,27 @@ export default function Empleados() {
           <div className={`col-12 col-lg-4 col-xl-3 h-100 flex-column ${empleadoSeleccionado ? 'd-none d-lg-flex' : 'd-flex'}`}>
             <div className="card border-0 shadow-sm rounded-4 bg-white overflow-hidden h-100 d-flex flex-column">
               <div className="card-header bg-white border-0 p-3 p-md-3 flex-shrink-0">
+                {/* Cinta de Opciones por Categoría */}
+                <div className="d-flex flex-wrap gap-1 mb-3 custom-scroll overflow-auto pb-1" style={{ whiteSpace: 'nowrap' }}>
+                  {[
+                    { id: 'all', label: 'Todos' },
+                    { id: 'admin', label: 'Admin' },
+                    { id: 'operator', label: 'Operador' },
+                    { id: 'taller', label: 'Taller' },
+                    { id: 'monitorista', label: 'Monitorista' },
+                    { id: 'cleaning', label: 'Limpieza' }
+                  ].map(role => (
+                    <button
+                      key={role.id}
+                      onClick={() => setSelectedRole(role.id)}
+                      className={`btn btn-sm rounded-pill px-3 fw-bold transition-all ${selectedRole === role.id ? 'btn-dark' : 'btn-light text-muted border-0'}`}
+                      style={{ fontSize: '11px', letterSpacing: '0.3px' }}
+                    >
+                      {role.label}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="input-group bg-light rounded-3 border-0 px-2 py-2">
                   <Search size={18} className="text-muted" />
                   <input type="text" className="form-control bg-transparent border-0 shadow-none ps-2"
@@ -235,11 +270,20 @@ export default function Empleados() {
                     {empleadosFiltrados.length > 0 ? empleadosFiltrados.map((emp) => (
                       <div key={emp.id} onClick={() => setEmpleadoSeleccionado(emp)}
                         className={`p-2 p-md-2 rounded-4 d-flex align-items-center gap-3 transition-all cursor-pointer ${empleadoSeleccionado?.id === emp.id ? 'selected-card' : 'hover-card bg-light'}`}>
-                        <div className="flex-shrink-0 bg-white rounded-circle p-1 p-md-2 shadow-sm border">
-                          <User size={16} className="d-none d-md-block" style={{ color: COLORS.guinda }} />
-                          <div className="d-block d-md-none bg-guinda rounded-circle p-1">
-                            <User size={14} className="text-white" />
-                          </div>
+                        <div className="flex-shrink-0" style={{ width: 40, height: 40 }}>
+                          {emp.foto_perfil ? (
+                            <img
+                              src={`${EMPLEADOS_UPLOADS_URL}${emp.foto_perfil}`}
+                              alt={emp.nombre_completo}
+                              className="rounded-circle shadow-sm border"
+                              style={{ width: 40, height: 40, objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <div className="rounded-circle bg-white shadow-sm border d-flex align-items-center justify-content-center"
+                              style={{ width: 40, height: 40 }}>
+                              <User size={16} style={{ color: COLORS.guinda }} />
+                            </div>
+                          )}
                         </div>
                         <div className="flex-grow-1 overflow-hidden min-w-0">
                           <h6 className="fw-bold mb-1 mb-md-0 text-truncate text-dark">{emp.nombre_completo}</h6>
@@ -329,12 +373,19 @@ export default function Empleados() {
                       <ChevronRight size={18} style={{ transform: 'rotate(180deg)' }} />
                     </button>
 
-                    <div className="bg-dark text-white p-2 p-md-3 rounded-4 shadow d-none d-md-block">
-                      <User size={20} />
-                    </div>
-                    <div className="d-block d-md-none bg-guinda rounded-circle p-2">
-                      <User size={16} className="text-white" />
-                    </div>
+                    {empleadoSeleccionado.foto_perfil ? (
+                      <img
+                        src={`${EMPLEADOS_UPLOADS_URL}${empleadoSeleccionado.foto_perfil}`}
+                        alt={empleadoSeleccionado.nombre_completo}
+                        className="rounded-4 shadow flex-shrink-0"
+                        style={{ width: 56, height: 56, objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div className="bg-dark text-white rounded-4 shadow flex-shrink-0 d-flex align-items-center justify-content-center"
+                        style={{ width: 56, height: 56 }}>
+                        <User size={24} />
+                      </div>
+                    )}
                     <div>
                       <h4 className="fw-black mb-0 text-dark d-none d-md-block">{empleadoSeleccionado.nombre_completo}</h4>
                       <h5 className="fw-black mb-0 text-dark d-block d-md-none">{empleadoSeleccionado.nombre_completo}</h5>
@@ -374,7 +425,14 @@ export default function Empleados() {
                       <span className="d-none d-md-inline">Horario</span>
                     </button>
                     <button className="btn btn-primary btn-sm rounded-3 px-3 d-flex align-items-center gap-2"
-                      onClick={() => { setFormData(empleadoSeleccionado); setShowEmpleadoModal(true); }}>
+                      onClick={() => {
+                        const emp = { ...empleadoSeleccionado };
+                        if (emp.fecha_ingreso) {
+                          emp.fecha_ingreso = emp.fecha_ingreso.split('T')[0].split(' ')[0];
+                        }
+                        setFormData(emp);
+                        setShowEmpleadoModal(true);
+                      }}>
                       <Edit3 size={16} />
                       <span className="d-none d-md-inline">Editar</span>
                     </button>

@@ -180,6 +180,28 @@ const Navbar = ({ onLogout }) => {
                 </NavLink>
               </li>
             )}
+            {["admin", "development", "employee", "cleaning"].includes(user.rol) && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link px-3"
+                  to="/entradas"
+                  onClick={closeMenu}
+                >
+                  Entradas
+                </NavLink>
+              </li>
+            )}
+            {["admin", "development"].includes(user.rol) && (
+              <li className="nav-item">
+                <NavLink
+                  className="nav-link px-3"
+                  to="/insumos"
+                  onClick={closeMenu}
+                >
+                  Gasolina
+                </NavLink>
+              </li>
+            )}
           </ul>
 
           <div className="d-flex align-items-center justify-content-center gap-3">

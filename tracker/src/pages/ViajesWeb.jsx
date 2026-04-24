@@ -230,7 +230,7 @@ export default function ViajesWeb({ user }) {
               empleados={empleados}
               idSeleccionado={seleccionado?.id}
               colorGuinda={colorGuinda}
-              enableUserTracking={false}
+              enableUserTracking={true}
             />
           </div>
 

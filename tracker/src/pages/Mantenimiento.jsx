@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Wrench, Plus, Loader2, Car, BarChart3, BookOpen, AlertTriangle, Archive, Info, FileText, DollarSign } from 'lucide-react';
+import { Wrench, Plus, Loader2, Car, BarChart3, BookOpen, AlertTriangle, Archive, Info, FileText, DollarSign, ShoppingBag } from 'lucide-react';
 
 import ModalMantenimiento from '../components/Autos/mantenimiento/ModalMantenimiento';
 import TablaMantenimiento from '../components/Autos/mantenimiento/TablaMantenimiento';
@@ -15,6 +15,7 @@ import TarjetaInformacion from '../components/Autos/mantenimiento/TarjetaInforma
 import TarjetaCiclo from '../components/Autos/mantenimiento/TarjetaCiclo';
 import TarjetaEquipamiento from '../components/Autos/mantenimiento/TarjetaEquipamiento';
 import NotasVehiculo from '../components/Autos/mantenimiento/NotasVehiculo';
+import GastosPiezasTaller from '../components/Autos/mantenimiento/GastosPiezasTaller';
 
 import {
   MANTENIMIENTO_URL as API_MAINTENANCE_URL,
@@ -77,10 +78,20 @@ export default function Mantenimiento({ user }) {
         fetch(API_MAINTENANCE_URL).then(r => r.ok ? r.json() : [])
       ]);
 
-      const maintenanceData = resM.status === 'fulfilled' ? resM.value : [];
+      let maintenanceData = resM.status === 'fulfilled' ? resM.value : [];
+      if (!Array.isArray(maintenanceData)) {
+         maintenanceData = maintenanceData.data || maintenanceData.mantenimientos || [];
+         if (!Array.isArray(maintenanceData)) maintenanceData = [];
+      }
       setRegistros(maintenanceData);
 
-      const dataV = (resV.status === 'fulfilled' ? resV.value : []).map(v => {
+      let vehiculosData = resV.status === 'fulfilled' ? resV.value : [];
+      if (!Array.isArray(vehiculosData)) {
+         vehiculosData = vehiculosData.data || vehiculosData.vehiculos || [];
+         if (!Array.isArray(vehiculosData)) vehiculosData = [];
+      }
+
+      const dataV = vehiculosData.map(v => {
         // Calculate last maintenance date
         const unitMaintenance = maintenanceData
             .filter(m => String(m.unidad_id) === String(v.id))
@@ -316,6 +327,7 @@ export default function Mantenimiento({ user }) {
                       { id: 'equipamiento', label: 'Equipamiento', icon: <Wrench size={18}/>, requiresUnit: true },
                       { id: 'alertas', label: 'Alertas', icon: <AlertTriangle size={18}/>, requiresUnit: false }, // Tab Added
                       { id: 'notas', label: 'Notas', icon: <FileText size={18}/>, requiresUnit: false },
+                      { id: 'gastos_piezas', label: 'Gastos / Piezas', icon: <ShoppingBag size={18}/>, requiresUnit: false },
                       { id: 'inventario', label: 'Inventario Taller', icon: <Archive size={18}/>, requiresUnit: false },
                     ].map(tab => {
                         // Filter logic
@@ -430,6 +442,15 @@ export default function Mantenimiento({ user }) {
                         <div className="row justify-content-center">
                            <div className="col-12">
                               <InventarioTaller />
+                           </div>
+                        </div>
+                    )}
+
+                    {/* 7. GASTOS DE PIEZAS */}
+                    {activeTab === 'gastos_piezas' && (
+                        <div className="row justify-content-center">
+                           <div className="col-12">
+                              <GastosPiezasTaller unidadId={unidadSeleccionadaId} vehiculos={vehiculos} />
                            </div>
                         </div>
                     )}

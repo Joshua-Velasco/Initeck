@@ -36,6 +36,7 @@ const GPS_PERMISSIONS = `
 		<string>location</string>
 		<string>fetch</string>
 		<string>processing</string>
+		<string>audio</string>
 	</array>
 	
 	<key>BGTaskSchedulerPermittedIdentifiers</key>

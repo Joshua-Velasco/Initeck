@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import SignatureCanvas from 'react-signature-canvas';
 import TabTabla from './TabTabla';
@@ -7,21 +7,46 @@ import {
   Calendar, CheckCircle, TrendingUp, TrendingDown,
   DollarSign, Users, Car, Filter, Download, ChevronLeft, Search, X, Star, Save,
   LayoutDashboard, Table, User, Wrench, ChevronRight, History, Clock,
-  ChevronDown, ChevronUp, Image as ImageIcon, Activity, CreditCard
+  ChevronDown, ChevronUp, Image as ImageIcon, Activity, CreditCard, FileText, Zap
 } from 'lucide-react';
+import ReciboOperadorModal from './SubComponents/ReciboOperadorModal';
+import HistorialRecibosModal from './SubComponents/HistorialRecibosModal';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, ComposedChart, Line
+  PieChart, Pie, Cell, Legend, ComposedChart, Line, Scatter
 } from 'recharts';
 import {
-  BALANCE_AVANZADO_URL, COLORS, UPLOADS_URL,
+  BALANCE_AVANZADO_URL, COLORS, UPLOADS_URL, EMPLEADOS_UPLOADS_URL,
   NOMINA_GUARDAR_TICKET_URL, NOMINA_LISTAR_TICKETS_URL,
   NOMINA_GUARDAR_TRANSFERENCIA_URL, NOMINA_LISTAR_TRANSFERENCIAS_URL
 } from '../../config';
+
+const EmpAvatar = ({ emp, size = 32, textSize = 12, className = '' }) => {
+  const src = emp?.foto_perfil ? `${EMPLEADOS_UPLOADS_URL}${emp.foto_perfil}` : null;
+  const initials = (emp?.empleado_nombre || emp?.nombre_completo || '?').charAt(0).toUpperCase();
+  if (src) {
+    return (
+      <img src={src} alt={initials}
+        className={`rounded-circle flex-shrink-0 object-fit-cover ${className}`}
+        style={{ width: size, height: size, objectFit: 'cover' }}
+        onError={e => {
+          e.target.style.display = 'none';
+          if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+        }}
+      />
+    );
+  }
+  return (
+    <div className={`rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 ${className}`}
+      style={{ width: size, height: size, fontSize: textSize, background: '#1e293b', color: '#fff' }}>
+      {initials}
+    </div>
+  );
+};
 import { useDate } from '../../modules/shell/DateProvider';
 import { getOperationalDateRange, formatDateForApi } from '../../utils/dateUtils';
 
-const DashboardFinanciero = () => {
+const DashboardFinanciero = ({ user }) => {
   const { date: fechaReferencia, setDate: setFechaReferencia, view: modo, setView: setModo } = useDate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,6 +68,29 @@ const DashboardFinanciero = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [statusTransfer, setStatusTransfer] = useState({ show: false, type: 'loading', message: '' });
   const [globalTransferTotal, setGlobalTransferTotal] = useState(0);
+  const [showReciboModal, setShowReciboModal] = useState(false);
+  const [selectedEmpleadoRecibo, setSelectedEmpleadoRecibo] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedEmpleadoHistory, setSelectedEmpleadoHistory] = useState(null);
+  const [showAdminSig, setShowAdminSig] = useState(false);
+  const sigAdminRef = useRef(null);
+
+  // Resetear firma de admin al cambiar de empleado
+  useEffect(() => { setShowAdminSig(false); }, [selectedEmpleado?.empleado_id]);
+
+  // Hook para resetear pestaña al seleccionar soporte o admin inactivo
+  useEffect(() => {
+    if (selectedEmpleado) {
+      const role = (selectedEmpleado.empleado_rol || '').toLowerCase();
+      const hasIncome = Number(selectedEmpleado.total_ingresos || 0) > 0;
+      const isSupport = ['monitorista', 'taller', 'limpieza', 'desarrollador'].includes(role);
+      const isInactiveAdmin = (role === 'admin' && !hasIncome);
+      
+      if (isSupport || isInactiveAdmin) {
+        setActiveTab('nomina');
+      }
+    }
+  }, [selectedEmpleado]);
 
   const StatusModal = ({ status, onClose }) => {
     if (!status.show) return null;
@@ -127,18 +175,22 @@ const DashboardFinanciero = () => {
           gastos_chofer: ticketData.gastosChofer,
           gastos_mantenimiento: ticketData.gastosMantenimiento,
           gastos_taller: ticketData.gastosTaller,
+          depositos: ticketData.depositos,
           utilidad_total: ticketData.utilidadTotal,
           bonos_extras: ticketData.bonosExtras,
           propinas: ticketData.propinas,
           total_pago: ticketData.totalPago,
-          recibo_id: ticketData.reciboId
+          recibo_id: ticketData.reciboId,
+          firma_admin: ticketData.firma_admin || null
         })
       });
       const result = await res.json();
       if (result.status === 'success') {
-        fetchNominaTickets(ticketData.empleadoId);
+        await fetchNominaTickets(ticketData.empleadoId);
+        return true;
       } else {
           alert("Error al guardar ticket: " + (result.message || "Desconocido"));
+          return false;
       }
     } catch (error) {
       console.error("Error saving ticket:", error);
@@ -345,7 +397,11 @@ const DashboardFinanciero = () => {
     const options = { day: 'numeric', month: 'short' };
     if (modo === 'dia') return <span className="fw-bold text-white small">{rawStart.toLocaleDateString('es-MX', options)}</span>;
     if (modo === 'anio') return <span className="fw-bold text-white small">{rawStart.getFullYear()}</span>;
-    return <span className="fw-bold text-white small">{rawStart.toLocaleDateString('es-MX', options)} - {rawEnd.toLocaleDateString('es-MX', options)}</span>;
+    
+    const labelStart = new Date(rawStart);
+    const labelEnd = new Date(rawEnd);
+    
+    return <span className="fw-bold text-white small">{labelStart.toLocaleDateString('es-MX', options)} - {labelEnd.toLocaleDateString('es-MX', options)}</span>;
   };
 
   // --- SUB-COMPONENTES INTERNOS ---
@@ -484,33 +540,48 @@ const DashboardFinanciero = () => {
       { name: 'Utilidad Neta', value: Number(utilidadNetaCalculada) || 0, color: '#3b82f6' }
     ];
 
-    // 4b. Data para Velas Japonesas (Ingresos vs Costos + Tendencia Rendimiento)
-    const dataVelas = filteredEmployees
-      .filter(e => e.empleado_id && Number(e.total_ingresos) > 0)
+    // 4b. Data para Matriz de Eficiencia (Gasolina vs Ingreso) - RANKING
+    const dataMatriz = filteredEmployees
+      .filter(e => (Number(e.total_ingresos) > 0 || Number(e.gastos_operativos_chofer) > 0)) // Filtro más inclusivo
       .map(emp => {
         const ingresosCaja = Number(emp.total_ingresos) || 0;
         const propinas = Number(emp.total_propinas) || 0;
         const depositos = Number(emp.total_depositos) || 0;
         const ingresosTotales = ingresosCaja + propinas + depositos;
-        const costosTotales = (Number(emp.costo_mantenimiento_vehiculo) || 0) + (Number(emp.gastos_operativos_chofer) || 0);
-        const rendimientoKm = Number(emp.rendimiento_km) || 0;
+        
+        // Calcular combustible específico
+        const fuel = (emp.detalles_ingresos || []).reduce((sum, liq) => {
+          try {
+            let detalles = [];
+            try {
+              detalles = JSON.parse(liq.detalles_gastos || '[]');
+              if (typeof detalles === 'string') detalles = JSON.parse(detalles);
+            } catch(e) { detalles = []; }
+            return sum + (Array.isArray(detalles) 
+              ? detalles.reduce((s, g) => {
+                  const tipo = (g.tipo || '').toLowerCase();
+                  return keywords.some(k => tipo.includes(k)) ? s + (Number(g.monto) || 0) : s;
+                }, 0)
+              : 0);
+          } catch (e) { return sum; }
+        }, 0);
+
+        const ratio = fuel > 0 ? (ingresosTotales / fuel) : 0;
         
         return {
-          name: (emp.empleado_nombre || emp.vehiculo_asignado).split(' ')[0], // Corto para gráfica
-          fullName: emp.empleado_nombre || emp.vehiculo_asignado,
-          // Cuerpo de la vela: [desde, hasta]
-          rango: [costosTotales, ingresosTotales],
+          name: (emp.empleado_nombre || emp.vehiculo_asignado || 'S/N').split(' ')[0], // Nombre corto para eje X
+          fullName: emp.empleado_nombre || emp.vehiculo_asignado || 'Unidad Desconocida',
+          gasolina: fuel,
           ingresos: ingresosTotales,
-          ingresosCaja,
-          propinas,
-          depositos,
-          costos: costosTotales,
-          rendimiento: rendimientoKm,
-          color: ingresosTotales >= costosTotales ? '#10b981' : '#ef4444'
+          ratio: parseFloat(ratio.toFixed(2)),
+          // Color basado en el factor de retorno
+          color: ratio >= 7 ? '#10b981' : (ratio <= 3 ? '#ef4444' : '#f59e0b')
         };
       })
-      .sort((a, b) => b.ingresos - a.ingresos)
-      .slice(0, 15);
+      .filter(d => d.ingresos > 0 || d.gasolina > 0) // Asegurar que hay actividad
+      .sort((a, b) => b.ratio - a.ratio); // ORDENAR POR EFICIENCIA
+
+
 
     const dataYield = filteredEmployees
       .filter(e => e.empleado_id && Number(e.total_ingresos) > 0) // Solo usuarios asignados y con ingresos
@@ -523,57 +594,41 @@ const DashboardFinanciero = () => {
         distancia: Number(e.distancia_recorrida_km) || 0
       }));
 
-    const CustomTooltipVelas = ({ active, payload }) => {
+    const CustomTooltipMatriz = ({ active, payload }) => {
       if (active && payload && payload.length) {
         const d = payload[0].payload;
-        const utilidad = d.ingresos - d.costos;
-        const esPositivo = utilidad >= 0;
-        
         return (
-          <div className="bg-white p-3 border-0 shadow-lg rounded-4" style={{ minWidth: '220px', border: `1px solid ${d.color}20` }}>
+          <div className="bg-white p-3 border-0 shadow-lg rounded-4" style={{ minWidth: '240px' }}>
             <p className="fw-bold mb-2 border-bottom pb-2" style={{ color: '#0f172a', fontSize: '0.95rem' }}>{d.fullName}</p>
             
             <div className="d-flex justify-content-between mb-1">
-              <span className="text-muted small">Caja (Efectivo):</span>
-              <span className="fw-bold small">{f(d.ingresosCaja)}</span>
+              <span className="text-muted small">Ingresos Totales:</span>
+              <span className="fw-bold small text-success">{f(d.ingresos)}</span>
             </div>
 
             <div className="d-flex justify-content-between mb-1">
-              <span className="text-muted small">Depósitos:</span>
-              <span className="fw-bold small text-primary">{f(d.depositos)}</span>
-            </div>
-
-            <div className="d-flex justify-content-between mb-1">
-              <span className="text-muted small">Propinas:</span>
-              <span className="fw-bold small text-warning">{f(d.propinas)}</span>
+              <span className="text-muted small">Gasto Combustible:</span>
+              <span className="fw-bold small text-danger">{f(d.gasolina)}</span>
             </div>
             
-            <div className="d-flex justify-content-between mb-1">
-              <span className="text-muted small">Costos Operativos:</span>
-              <span className="fw-bold small text-danger">{f(d.costos)}</span>
-            </div>
-            
-            <div className="d-flex justify-content-between mb-2 pt-1 border-top">
-              <span className="text-muted small fw-bold">Utilidad Neta:</span>
-              <span className={`fw-bold small ${esPositivo ? 'text-success' : 'text-danger'}`}>
-                {esPositivo ? '+' : ''}{f(utilidad)}
-              </span>
-            </div>
-            
-            <div className="bg-light p-2 rounded-3 d-flex justify-content-between align-items-center mt-1">
+            <div className="bg-light p-2 rounded-3 d-flex justify-content-between align-items-center mt-2 border-start border-3 border-primary">
               <div className="d-flex align-items-center gap-1">
-                <Activity size={14} className="text-primary" />
-                <span className="text-muted small">Eficiencia:</span>
+                <Zap size={14} className="text-primary" />
+                <span className="text-muted small fw-bold">Factor de Retorno:</span>
               </div>
-              <span className="fw-bold text-primary" style={{ fontSize: '0.85rem' }}>
-                ${d.rendimiento.toFixed(2)}/Km
+              <span className="fw-bold text-primary" style={{ fontSize: '0.9rem' }}>
+                ${d.ratio.toFixed(2)} por cada $1 de gas
               </span>
             </div>
+            <p className="small text-muted mt-2 mb-0" style={{fontSize: '10px'}}>
+               *A mayor factor, más rentable es la unidad.
+            </p>
           </div>
         );
       }
       return null;
     };
+
 
     return (
       <div className="animate__animated animate__fadeIn">
@@ -665,48 +720,59 @@ const DashboardFinanciero = () => {
 
         <div className="row g-4 mt-1">
            <div className="col-12">
-             <div className="card border-0 shadow-sm rounded-4 p-4">
-                <h6 className="fw-bold mb-4 d-flex align-items-center gap-2" style={{ fontSize: '1.1rem' }}>
-                   <div className="p-2 rounded-3 bg-primary bg-opacity-10 text-primary"><Activity size={22}/></div>
-                   Performance Financiero: Velas de Rentabilidad vs Eficiencia ($/Km)
+             <div className="card border-0 shadow-sm rounded-4 p-4">                <h6 className="fw-bold mb-4 d-flex align-items-center gap-2" style={{ fontSize: '1.1rem' }}>
+                   <div className="p-2 rounded-3 bg-primary bg-opacity-10 text-primary"><Zap size={22}/></div>
+                   Ranking de Eficiencia: Retorno por cada $1 de Gasolina
                 </h6>
-                <div style={{ width: '100%', height: 500, minHeight: 500, minWidth: 0 }}>
+                <div style={{ width: '100%', height: 450, minHeight: 450, minWidth: 0 }}>
                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={dataVelas} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                      <BarChart data={dataMatriz} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                         <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                         <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} unit=" $/Km" />
-                         <ReTooltip content={<CustomTooltipVelas />} />
-                         <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                         <XAxis 
+                            dataKey="name" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fontSize: 11, fill: '#64748b' }} 
+                            interval={0}
+                            angle={-45}
+                            textAnchor="end"
+                         />
+                         <YAxis 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fontSize: 12, fill: '#64748b' }}
+                            label={{ value: 'Pesos generados por $1 gas', angle: -90, position: 'insideLeft', fontSize: 12, offset: 0 }}
+                         />
+                         <ReTooltip content={<CustomTooltipMatriz />} cursor={{ fill: '#f8fafc' }} />
                          
-                         {/* Cuerpo de la vela usando Bar con rango [costos, ingresos] */}
-                         <Bar yAxisId="left" dataKey="rango" name="Utilidad vs Gastos ($)" barSize={25}>
-                            {dataVelas.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.8} stroke={entry.color} strokeWidth={2} />
+                         <Bar dataKey="ratio" name="Factor de Retorno" radius={[4, 4, 0, 0]} barSize={35}>
+                            {dataMatriz.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                          </Bar>
-
-                         {/* Línea de tendencia de rendimiento ($/Km) */}
-                         <Line yAxisId="right" type="monotone" dataKey="rendimiento" name="Eficiencia ($/Km)" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
-                      </ComposedChart>
+                      </BarChart>
                    </ResponsiveContainer>
                 </div>
-                <div className="mt-3 d-flex gap-4 justify-content-center">
+
+                <div className="mt-4 p-3 bg-light rounded-4 d-flex flex-wrap gap-4 justify-content-center border">
+                   <div className="small fw-bold text-muted text-uppercase mb-2 w-100 text-center" style={{letterSpacing: '1px'}}>Guía de Lectura Rápida</div>
                    <div className="d-flex align-items-center gap-2 small text-muted">
-                      <div style={{width: 12, height: 12, backgroundColor: '#10b981', borderRadius: 2}}></div> Utilidad Positiva
+                      <div className="p-1 px-2 rounded bg-success text-white fw-bold" style={{fontSize: '10px'}}>ALTA EFICIENCIA</div>
+                      <span>Puntos verdes (Ingreso alto con poco gasto)</span>
                    </div>
                    <div className="d-flex align-items-center gap-2 small text-muted">
-                      <div style={{width: 12, height: 12, backgroundColor: '#ef4444', borderRadius: 2}}></div> Operación en Pérdida
+                      <div className="p-1 px-2 rounded bg-warning text-white fw-bold" style={{fontSize: '10px'}}>PROMEDIO</div>
+                      <span>Puntos amarillos (Balance equilibrado)</span>
                    </div>
                    <div className="d-flex align-items-center gap-2 small text-muted">
-                      <div style={{width: 12, height: 3, backgroundColor: '#3b82f6'}}></div> Eficiencia (MXN/Km)
+                      <div className="p-1 px-2 rounded bg-danger text-white fw-bold" style={{fontSize: '10px'}}>REVISAR</div>
+                      <span>Puntos rojos (Bajo retorno por gasolina)</span>
                    </div>
                 </div>
              </div>
            </div>
-        </div>
-      </div>
+         </div>
+       </div>
     );
   };
 
@@ -1130,16 +1196,30 @@ const DashboardFinanciero = () => {
         </div>
       </div>
 
-      <div className={`flex-grow-1 pe-1 custom-scrollbar ${['detalle', 'autos', 'tabla', 'transferencias'].includes(activeMainTab) ? 'overflow-hidden' : 'overflow-auto'}`} style={{ minHeight: 0 }}>
+      <div className={`flex-grow-1 pe-1 custom-scrollbar ${['detalle', 'autos', 'transferencias'].includes(activeMainTab) ? 'overflow-hidden' : 'overflow-auto'}`} style={{ minHeight: 0 }}>
         {loading ? (
         <div className="text-center py-5">
            <div className="spinner-border text-primary" role="status"></div>
            <p className="mt-2 text-muted fw-bold small">Calculando balances...</p>
         </div>
       ) : data ? (
-        <div className={`animate__animated animate__fadeIn ${['detalle', 'autos', 'tabla', 'transferencias'].includes(activeMainTab) ? 'h-100' : ''}`}>
+        <div className={`animate__animated animate__fadeIn ${['detalle', 'autos', 'transferencias'].includes(activeMainTab) ? 'h-100' : ''}`}>
           {activeMainTab === 'general' && <TabGeneral data={data} />}
-          {activeMainTab === 'tabla' && <TabTabla data={data} onExport={handleExportExcel} />}
+          {activeMainTab === 'tabla' && (
+            <TabTabla 
+                data={data} 
+                onExport={handleExportExcel} 
+                onOpenRecibo={(emp) => {
+                    setSelectedEmpleadoRecibo(emp);
+                    setShowReciboModal(true);
+                }}
+                onOpenHistory={(emp) => {
+                    setSelectedEmpleadoHistory(emp);
+                    setShowHistoryModal(true);
+                }}
+                hideFinancials={user && (user.rol === 'admin' || user.rol === 'staff') ? false : true}
+            />
+          )}
           {activeMainTab === 'transferencias' && (
               <DashboardTransferencias
                 data={data}
@@ -1189,8 +1269,6 @@ const DashboardFinanciero = () => {
                                 }
                              });
                              return uniqueEmps
-                               .filter(e => !['monitorista', 'taller'].includes((e.empleado_rol || '').toLowerCase()))
-                               .filter(e => e.vehiculo_asignado) // Filter: Only show employees with assigned vehicle
                                .filter(e => {
                                   if (!filtroFecha) return true;
                                   return (e.empleado_nombre || "").toLowerCase().includes(filtroFecha.toLowerCase());
@@ -1199,12 +1277,10 @@ const DashboardFinanciero = () => {
                                  <div 
                                    key={`${emp.empleado_id}-${index}`} 
                                    onClick={() => setSelectedEmpleado(emp)}
-                                   className={`p-3 rounded-4 d-flex align-items-center gap-3 transition-all cursor-pointer ${selectedEmpleado?.empleado_id === emp.empleado_id ? 'bg-primary text-white shadow-lg scale-98' : 'bg-light hover-bg-white border border-transparent'}`}
+                                   className={`p-3 rounded-4 d-flex align-items-center gap-3 transition-all ${selectedEmpleado?.empleado_id === emp.empleado_id ? 'bg-primary text-white shadow-lg scale-98' : 'bg-light hover-bg-white border border-transparent'}`}
                                    style={{ transform: selectedEmpleado?.empleado_id === emp.empleado_id ? 'scale(0.98)' : 'scale(1)', flexShrink: 0 }}
                                  >
-                                   <div className={`flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center shadow-sm ${selectedEmpleado?.empleado_id === emp.empleado_id ? 'bg-white text-primary' : 'bg-dark text-white'}`} style={{ width: '32px', height: '32px', fontSize: '12px', fontWeight: '800' }}>
-                                      <User size={14}/>
-                                   </div>
+                                   <EmpAvatar emp={emp} size={32} textSize={12} />
                                    <div className="flex-grow-1 overflow-hidden">
                                       <h6 className={`mb-0 fw-bold text-truncate ${selectedEmpleado?.empleado_id === emp.empleado_id ? 'text-white' : 'text-dark'}`} style={{ fontSize: '0.85rem' }}>
                                          {emp.empleado_nombre}
@@ -1230,9 +1306,10 @@ const DashboardFinanciero = () => {
                          <div className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100 d-flex flex-column">
                             <div className="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center border-bottom flex-shrink-0">
                                 <div className="d-flex align-items-center gap-3">
-                                   <div className="bg-dark text-white p-3 rounded-4 shadow-sm">
-                                      {selectedEmpleado.empleado_id ? <User size={24}/> : <Car size={24}/>}
-                                   </div>
+                                   {selectedEmpleado.empleado_id
+                                     ? <EmpAvatar emp={selectedEmpleado} size={52} textSize={18} />
+                                     : <div className="bg-dark text-white p-3 rounded-4 shadow-sm"><Car size={24}/></div>
+                                   }
                                    <div>
                                        <h4 className="fw-extrabold mb-1 text-dark">{selectedEmpleado.empleado_nombre || selectedEmpleado.vehiculo_asignado}</h4>
                                        <div className="d-flex align-items-center gap-2">
@@ -1242,12 +1319,20 @@ const DashboardFinanciero = () => {
                                        </div>
                                    </div>
                                 </div>
-                                <button onClick={() => setSelectedEmpleado(null)} className="btn btn-light rounded-circle p-2 shadow-sm border">
+                                 <button onClick={() => setSelectedEmpleado(null)} className="btn btn-light rounded-circle p-2 shadow-sm border">
                                     <X size={20} />
-                                </button>
+                                 </button>
                             </div>
                             <div className="card-body p-4 pt-4 overflow-auto custom-scrollbar flex-grow-1">
                                 {(() => {
+                                    const role = (selectedEmpleado.empleado_rol || '').toLowerCase();
+                                    const hasIncome = Number(selectedEmpleado.total_ingresos || 0) > 0;
+                                    const soporteRoles = ['monitorista', 'taller', 'limpieza', 'desarrollador', 'admin'];
+                                    
+                                    // Vista simplificada solo para roles de soporte (sin liquidaciones)
+                                    const isSupport = ['monitorista', 'taller', 'limpieza', 'desarrollador'].includes(role);
+                                    const isSimplified = isSupport;
+
                                     const totalGastosChofer = (selectedEmpleado.detalles_ingresos || []).reduce((sum, liq) => sum + (Number(liq.gastos_total) || 0), 0);
                                     const totalMtto = (selectedEmpleado.detalles_mantenimiento || []).reduce((sum, m) => sum + (Number(m.costo_total) || 0), 0);
                                     
@@ -1257,69 +1342,77 @@ const DashboardFinanciero = () => {
                                     const utilidad = Number(selectedEmpleado.total_ingresos || 0) + Number(selectedEmpleado.total_depositos || 0) - totalGastosChofer - totalMtto - totalFijos;
 
                                     return (
-                                        <div className="row g-4 mb-4">
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-success small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Ingresos</span>
-                                                    <h4 className="fw-extrabold text-success mb-0">{f(selectedEmpleado.total_ingresos)}</h4>
+                                        <>
+                                        {!isSimplified && (
+                                            <div className="row g-4 mb-4">
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-success small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Ingresos</span>
+                                                        <h4 className="fw-extrabold text-success mb-0">{f(selectedEmpleado.total_ingresos)}</h4>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-primary small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Depósitos</span>
+                                                        <h4 className="fw-extrabold text-primary mb-0">{f(selectedEmpleado.total_depositos || 0)}</h4>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-danger bg-opacity-10 border border-danger border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-danger small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Gastos Chofer</span>
+                                                        <h4 className="fw-extrabold text-danger mb-0">{f(totalGastosChofer)}</h4>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-warning bg-opacity-10 border border-warning border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-warning small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Mantenimiento</span>
+                                                        <h4 className="fw-extrabold text-warning mb-0">{f(totalFijos)}</h4>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-info small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Taller</span>
+                                                        <h4 className="fw-extrabold text-info mb-0">{f(totalMtto)}</h4>
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-6 col-lg">
+                                                    <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
+                                                        <span className="d-block text-primary small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Utilidad</span>
+                                                        <h4 className="fw-extrabold text-primary mb-0">{f(utilidad)}</h4>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-primary small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Depósitos</span>
-                                                    <h4 className="fw-extrabold text-primary mb-0">{f(selectedEmpleado.total_depositos || 0)}</h4>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-danger bg-opacity-10 border border-danger border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-danger small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Gastos Chofer</span>
-                                                    <h4 className="fw-extrabold text-danger mb-0">{f(totalGastosChofer)}</h4>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-warning bg-opacity-10 border border-warning border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-warning small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Mantenimiento</span>
-                                                    <h4 className="fw-extrabold text-warning mb-0">{f(totalFijos)}</h4>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-info small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Taller</span>
-                                                    <h4 className="fw-extrabold text-info mb-0">{f(totalMtto)}</h4>
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-sm-6 col-lg">
-                                                <div className="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-10 text-center h-100 d-flex flex-column justify-content-center shadow-sm">
-                                                    <span className="d-block text-primary small fw-bold text-uppercase mb-2" style={{fontSize:'12px', letterSpacing: '1px'}}>Utilidad</span>
-                                                    <h4 className="fw-extrabold text-primary mb-0">{f(utilidad)}</h4>
-                                                </div>
-                                            </div>
+                                        )}
+
+                                        <div className="d-flex border-bottom mb-3">
+                                           {!isSimplified && (
+                                               <>
+                                                <button 
+                                                   className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'ingresos' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
+                                                   onClick={() => setActiveTab('ingresos')}
+                                                >Ingresos</button>
+                                                <button 
+                                                   className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'gastos' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
+                                                   onClick={() => setActiveTab('gastos')}
+                                                >Gastos</button>
+                                                <button 
+                                                   className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'mantenimiento' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
+                                                   onClick={() => setActiveTab('mantenimiento')}
+                                                >Costos Fijos</button>
+                                                  <button 
+                                                     className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'taller' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
+                                                     onClick={() => setActiveTab('taller')}
+                                                  >Taller</button>
+                                               </>
+                                           )}
+                                            <button 
+                                               className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'nomina' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
+                                               onClick={() => setActiveTab('nomina')}
+                                            >{isSimplified ? 'Historial de Nómina / Pagos' : 'Nómina'}</button>
                                         </div>
+                                        </>
                                     );
                                 })()}
-
-                                <div className="d-flex border-bottom mb-3">
-                                   <button 
-                                      className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'ingresos' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
-                                      onClick={() => setActiveTab('ingresos')}
-                                   >Ingresos</button>
-                                   <button 
-                                      className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'gastos' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
-                                      onClick={() => setActiveTab('gastos')}
-                                   >Gastos</button>
-                                   <button 
-                                      className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'mantenimiento' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
-                                      onClick={() => setActiveTab('mantenimiento')}
-                                   >Costos Fijos</button>
-                                     <button 
-                                        className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'taller' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
-                                        onClick={() => setActiveTab('taller')}
-                                     >Taller</button>
-                                    <button 
-                                       className={`btn btn-sm pb-2 px-3 fw-bold ${activeTab === 'nomina' ? 'text-primary border-bottom border-primary border-2' : 'text-secondary opacity-50'}`}
-                                       onClick={() => setActiveTab('nomina')}
-                                    >Nómina</button>
-                                </div>
 
                                 {activeTab === 'ingresos' && (
                                    <div className="table-responsive">
@@ -1412,6 +1505,11 @@ const DashboardFinanciero = () => {
                                                                                    <span className="text-muted fw-medium">{g.tipo || 'Gasto'}</span>
                                                                                    <span className="fw-bold text-danger">{f(g.monto)}</span>
                                                                                 </div>
+                                                                                {g.tipo === 'Otros' && g.motivo && (
+                                                                                   <div className="text-dark small fst-italic mb-1">
+                                                                                      Motivo: {g.motivo}
+                                                                                   </div>
+                                                                                )}
                                                                                 {(g.foto_ticket || g.foto_tablero) && (
                                                                                    <div className="d-flex gap-2 mt-1">
                                                                                       {g.foto_ticket && (
@@ -1712,9 +1810,13 @@ const DashboardFinanciero = () => {
                                                 )}
                                              </div>
                                           </div>
-                                       ) : (
+                                       ) : (() => {
+                                          const rolDetalle = (selectedEmpleado.empleado_rol || '').toLowerCase();
+                                          const tieneActividadDetalle = Number(selectedEmpleado.total_ingresos) > 0 || Number(selectedEmpleado.total_viajes) > 0;
+                                          const isSoporteDetalle = ['monitorista', 'taller', 'limpieza', 'desarrollador', 'admin'].includes(rolDetalle) && !tieneActividadDetalle;
+                                          return (
                                           <div className="row g-4">
-                                             <div className="col-12 col-md-5">
+                                             <div className={`col-12 ${isSoporteDetalle ? 'col-md-12' : 'col-md-5'}`}>
                                                 <div className="card border-0 shadow-sm rounded-4 p-4 bg-light bg-opacity-50 h-100">
                                                    <h6 className="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
                                                       <div className="p-2 rounded-3 bg-white text-primary shadow-sm"><Table size={16}/></div>
@@ -1756,119 +1858,159 @@ const DashboardFinanciero = () => {
                                                 </div>
                                              </div>
 
-                                             <div className="col-12 col-md-7">
-                                                <div className="ticket-view animate__animated animate__fadeInRight">
-                                                   <div className="bg-white border shadow-lg rounded-2 p-4 position-relative overflow-hidden" style={{ minHeight: '450px', borderStyle: 'dashed', borderWidth: '1px' }}>
-                                                      {/* Estética de Ticket */}
-                                                      <div className="text-center mb-4 pb-3 border-bottom border-dashed border-secondary border-opacity-25">
-                                                         <h5 className="fw-900 mb-1 text-dark" style={{letterSpacing: '2px', fontWeight: '900'}}>PAGO DE NÓMINA</h5>
-                                                         <div className="small text-muted font-monospace text-uppercase fw-bold" style={{fontSize: '10px'}}>
-                                                            {(() => {
-                                                               const { inicio, fin } = getRangoFechas();
-                                                               return `${inicio} — ${fin}`;
-                                                            })()}
-                                                         </div>
-                                                      </div>
-
-                                                      {/* Cuerpo del Ticket */}
-                                                      <div className="font-monospace small d-flex flex-column gap-3 text-dark px-2">
-                                                         <div className="d-flex justify-content-between align-items-center">
-                                                            <span className="opacity-75">INGRESOS BRUTOS:</span>
-                                                            <span className="fw-bold">{f(selectedEmpleado.total_ingresos)}</span>
-                                                         </div>
-                                                         
-                                                         <div className="d-flex flex-column gap-1 opacity-75">
-                                                            <div className="d-flex justify-content-between text-danger">
-                                                               <span>(-) GASTOS CHOFER:</span>
-                                                               <span>{f((selectedEmpleado.detalles_ingresos || []).reduce((sum, liq) => sum + (Number(liq.gastos_total) || 0), 0))}</span>
+                                             {!isSoporteDetalle && (
+                                                <div className="col-12 col-md-7">
+                                                   <div className="ticket-view animate__animated animate__fadeInRight">
+                                                      <div className="bg-white border shadow-lg rounded-2 p-4 position-relative overflow-hidden" style={{ minHeight: '450px', borderStyle: 'dashed', borderWidth: '1px' }}>
+                                                         {/* Estética de Ticket */}
+                                                         <div className="text-center mb-4 pb-3 border-bottom border-dashed border-secondary border-opacity-25">
+                                                            <h5 className="fw-900 mb-1 text-dark" style={{letterSpacing: '2px', fontWeight: '900'}}>PAGO DE NÓMINA</h5>
+                                                            <div className="small text-muted font-monospace text-uppercase fw-bold" style={{fontSize: '10px'}}>
+                                                               {(() => {
+                                                                  const { inicio, fin } = getRangoFechas();
+                                                                  return `${inicio} — ${fin}`;
+                                                               })()}
                                                             </div>
-                                                            <div className="d-flex justify-content-between text-danger">
-                                                               <span>(-) GASTOS MANTENIMIENTO (FIJOS):</span>
-                                                               <span>{f((selectedEmpleado.detalles_costos_operativos || []).reduce((sum, c) => sum + (Number(c.costo_total) || 0), 0))}</span>
-                                                            </div>
-                                                            <div className="d-flex justify-content-between text-danger">
-                                                               <span>(-) GASTOS TALLER:</span>
-                                                               <span>{f((selectedEmpleado.detalles_mantenimiento || []).reduce((sum, m) => sum + (Number(m.costo_total) || 0), 0))}</span>
-                                                            </div>
-                                                            <div className="d-flex justify-content-between text-primary">
-                                                               <span>(+) DEPOSITOS:</span>
-                                                               <span>{f(selectedEmpleado.total_depositos || 0)}</span>
-                                                            </div>
-                                                         </div>
-                                                         
-                                                         <div className="border-top border-dashed my-2 pt-2 d-flex justify-content-between align-items-center text-primary">
-                                                            <span className="fw-bold text-uppercase">UTILIDAD TOTAL:</span>
-                                                            <span className={`fw-bold ${Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0) < 0 ? 'text-danger' : ''}`} style={{fontSize: '16px'}}>
-                                                               {f(Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0))}
-                                                            </span>
                                                          </div>
 
-                                                         <div className="bg-light p-3 rounded-3 d-flex flex-column gap-2 border">
-                                                            {Number(bonosNomina) > 0 && (
-                                                               <div className="d-flex justify-content-between align-items-center text-success">
-                                                                  <span className="fw-bold">BONOS Y EXTRAS:</span>
-                                                                  <span className="fw-bold">{f(bonosNomina)}</span>
+                                                         {/* Cuerpo del Ticket */}
+                                                         <div className="font-monospace small d-flex flex-column gap-3 text-dark px-2">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                               <span className="opacity-75">INGRESOS BRUTOS:</span>
+                                                               <span className="fw-bold">{f(selectedEmpleado.total_ingresos)}</span>
+                                                            </div>
+                                                            
+                                                            <div className="d-flex flex-column gap-1 opacity-75">
+                                                               <div className="d-flex justify-content-between text-danger">
+                                                                  <span>(-) GASTOS CHOFER:</span>
+                                                                  <span>{f((selectedEmpleado.detalles_ingresos || []).reduce((sum, liq) => sum + (Number(liq.gastos_total) || 0), 0))}</span>
                                                                </div>
-                                                            )}
-                                                            <div className="d-flex justify-content-between align-items-center text-warning fw-bold">
-                                                               <span>(+) PROPINAS:</span>
-                                                               <span>{f(selectedEmpleado.total_propinas || 0)}</span>
+                                                               <div className="d-flex justify-content-between text-danger">
+                                                                  <span>(-) GASTOS MANTENIMIENTO (FIJOS):</span>
+                                                                  <span>{f((selectedEmpleado.detalles_costos_operativos || []).reduce((sum, c) => sum + (Number(c.costo_total) || 0), 0))}</span>
+                                                               </div>
+                                                               <div className="d-flex justify-content-between text-danger">
+                                                                  <span>(-) GASTOS TALLER:</span>
+                                                                  <span>{f((selectedEmpleado.detalles_mantenimiento || []).reduce((sum, m) => sum + (Number(m.costo_total) || 0), 0))}</span>
+                                                               </div>
+                                                               <div className="d-flex justify-content-between text-primary">
+                                                                  <span>(+) DEPOSITOS:</span>
+                                                                  <span>{f(selectedEmpleado.total_depositos || 0)}</span>
+                                                               </div>
+                                                            </div>
+                                                            
+                                                            <div className="border-top border-dashed my-2 pt-2 d-flex justify-content-between align-items-center text-primary">
+                                                               <span className="fw-bold text-uppercase">UTILIDAD TOTAL:</span>
+                                                               <span className={`fw-bold ${Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0) < 0 ? 'text-danger' : ''}`} style={{fontSize: '16px'}}>
+                                                                  {f(Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0))}
+                                                               </span>
+                                                            </div>
+
+                                                            <div className="bg-light p-3 rounded-3 d-flex flex-column gap-2 border">
+                                                               {Number(bonosNomina) > 0 && (
+                                                                  <div className="d-flex justify-content-between align-items-center text-success">
+                                                                     <span className="fw-bold">BONOS Y EXTRAS:</span>
+                                                                     <span className="fw-bold">{f(bonosNomina)}</span>
+                                                                  </div>
+                                                               )}
+                                                               <div className="d-flex justify-content-between align-items-center text-warning fw-bold">
+                                                                  <span>(+) PROPINAS:</span>
+                                                                  <span>{f(selectedEmpleado.total_propinas || 0)}</span>
+                                                               </div>
+                                                            </div>
+
+                                                            <div className="border-top border-2 border-dark my-2 pt-3 d-flex justify-content-between align-items-center">
+                                                               <span className="fw-900 text-uppercase" style={{fontSize: '14px', fontWeight: '900'}}>TOTAL DE PAGO:</span>
+                                                               <h3 className={`fw-900 mb-0 ${(((Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0)) * comisionNomina) / 100) + (Number(bonosNomina) || 0) < 0 ? 'text-danger' : 'text-dark'}`} style={{fontWeight: '900'}}>
+                                                                  {f((((Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0)) * comisionNomina) / 100) + (Number(bonosNomina) || 0))}
+                                                               </h3>
                                                             </div>
                                                          </div>
 
-                                                         <div className="border-top border-2 border-dark my-2 pt-3 d-flex justify-content-between align-items-center">
-                                                            <span className="fw-900 text-uppercase" style={{fontSize: '14px', fontWeight: '900'}}>TOTAL DE PAGO:</span>
-                                                            <h3 className={`fw-900 mb-0 ${(((Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0)) * comisionNomina) / 100) + (Number(bonosNomina) || 0) < 0 ? 'text-danger' : 'text-dark'}`} style={{fontWeight: '900'}}>
-                                                               {f((((Number(selectedEmpleado.utilidad_real || 0) + Number(selectedEmpleado.total_depositos || 0)) * comisionNomina) / 100) + (Number(bonosNomina) || 0))}
-                                                            </h3>
-                                                         </div>
-                                                      </div>
-
-                                                      {/* Botón de Emitir */}
-                                                      <button 
-                                                         className="btn btn-dark w-100 mt-4 py-3 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg"
-                                                         onClick={() => {
+                                                         {/* Botón de Emitir / Firma Admin */}
+                                                         {(() => {
                                                             const { inicio, fin } = getRangoFechas();
+                                                            const periodoActual = `${inicio} — ${fin}`;
+                                                            const empId = String(selectedEmpleado.empleado_id || selectedEmpleado.vehiculo_asignado);
+
                                                             const ingresosBrutos = Number(selectedEmpleado.total_ingresos) || 0;
-                                                            const gastosChofer = (selectedEmpleado.detalles_ingresos || []).reduce((sum, liq) => sum + (Number(liq.gastos_total) || 0), 0);
-                                                            const gastosMant = (selectedEmpleado.detalles_costos_operativos || []).reduce((sum, c) => sum + (Number(c.costo_total) || 0), 0);
-                                                            const gastosTaller = (selectedEmpleado.detalles_mantenimiento || []).reduce((sum, m) => sum + (Number(m.costo_total) || 0), 0);
-                                                            const utilidadTotal = (Number(selectedEmpleado.utilidad_real) || 0) + (Number(selectedEmpleado.total_depositos) || 0);
-                                                            const propinas = Number(selectedEmpleado.total_propinas) || 0;
-                                                            const totalPago = ((utilidadTotal * comisionNomina) / 100) + (Number(bonosNomina) || 0);
+                                                            const gastosChofer   = (selectedEmpleado.detalles_ingresos || []).reduce((s, l) => s + (Number(l.gastos_total) || 0), 0);
+                                                            const gastosMant     = (selectedEmpleado.detalles_costos_operativos || []).reduce((s, c) => s + (Number(c.costo_total) || 0), 0);
+                                                            const gastosTaller   = (selectedEmpleado.detalles_mantenimiento || []).reduce((s, m) => s + (Number(m.costo_total) || 0), 0);
+                                                            const utilidadTotal  = (Number(selectedEmpleado.utilidad_real) || 0) + (Number(selectedEmpleado.total_depositos) || 0);
+                                                            const propinas       = Number(selectedEmpleado.total_propinas) || 0;
+                                                            const totalPago      = ((utilidadTotal * comisionNomina) / 100) + (Number(bonosNomina) || 0);
 
-                                                            handleSaveTicket({
-                                                               empleadoId: selectedEmpleado.empleado_id || selectedEmpleado.vehiculo_asignado,
-                                                               periodo: `${inicio} — ${fin}`,
-                                                               ingresosBrutos,
-                                                               gastosChofer,
-                                                               gastosMantenimiento: gastosMant,
-                                                                gastosTaller,
-                                                                depositos: Number(selectedEmpleado.total_depositos) || 0,
-                                                                utilidadTotal,
-                                                               bonosExtras: Number(bonosNomina) || 0,
-                                                               propinas,
-                                                               totalPago,
-                                                               reciboId: Math.random().toString(36).substr(2, 9).toUpperCase()
-                                                            });
-                                                            setShowHistory(true);
-                                                         }}
-                                                      >
-                                                         <CheckCircle size={20}/>
-                                                         Emitir y Guardar en Historial
-                                                      </button>
+                                                            const ticketBase = {
+                                                               empleadoId: empId, periodo: periodoActual,
+                                                               ingresosBrutos, gastosChofer,
+                                                               gastosMantenimiento: gastosMant, gastosTaller,
+                                                               depositos: Number(selectedEmpleado.total_depositos) || 0,
+                                                               utilidadTotal, bonosExtras: Number(bonosNomina) || 0,
+                                                               propinas, totalPago,
+                                                               reciboId: 'CC-' + Date.now().toString(36).toUpperCase()
+                                                            };
 
-                                                      {/* Pie de Ticket */}
-                                                      <div className="mt-4 text-center opacity-40">
-                                                         <div className="mb-2" style={{borderTop: '1px dashed #000'}}></div>
-                                                         <small className="font-monospace d-block" style={{fontSize: '9px'}}>SISTEMA DE GESTIÓN INITEK — {new Date().toLocaleString()}</small>
-                                                         <small className="font-monospace" style={{fontSize: '8px'}}>ID RECIBO: {Math.random().toString(36).substr(2, 9).toUpperCase()}</small>
+                                                            if (showAdminSig) return (
+                                                               <div className="mt-4 rounded-3 p-3" style={{background:'#f8fafc', border:'1.5px solid #e2e8f0'}}>
+                                                                  <p className="fw-bold mb-2 d-flex align-items-center gap-2" style={{fontSize:13, color:'#0f172a'}}>
+                                                                     <span style={{fontSize:16}}>✍️</span> Firma del Administrador
+                                                                  </p>
+                                                                  <p className="text-muted mb-2" style={{fontSize:11}}>Firma para autorizar este corte de caja</p>
+                                                                  <div className="rounded-3 overflow-hidden mb-3 bg-white" style={{border:'1.5px solid #cbd5e1', height:130}}>
+                                                                     <SignatureCanvas ref={sigAdminRef} penColor="#0f172a"
+                                                                        canvasProps={{style:{width:'100%',height:'100%'}}} />
+                                                                  </div>
+                                                                  <div className="d-flex gap-2">
+                                                                     <button className="btn btn-sm rounded-pill px-3 flex-grow-1"
+                                                                        style={{background:'#f1f5f9',color:'#475569',border:'none',fontSize:12}}
+                                                                        onClick={() => sigAdminRef.current?.clear()}>
+                                                                        Limpiar
+                                                                     </button>
+                                                                     <button className="btn btn-sm rounded-pill px-3 flex-grow-1"
+                                                                        style={{background:'#f1f5f9',color:'#475569',border:'none',fontSize:12}}
+                                                                        onClick={() => setShowAdminSig(false)}>
+                                                                        Cancelar
+                                                                     </button>
+                                                                     <button className="btn btn-sm rounded-pill px-3 fw-bold flex-grow-1 d-flex align-items-center justify-content-center gap-1"
+                                                                        style={{background:'#0f172a',color:'#fff',border:'none',fontSize:12}}
+                                                                        onClick={async () => {
+                                                                           if (!sigAdminRef.current || sigAdminRef.current.isEmpty()) {
+                                                                              alert('Debes firmar antes de emitir el corte.');
+                                                                              return;
+                                                                           }
+                                                                           const firma_admin = sigAdminRef.current.getCanvas().toDataURL('image/png');
+                                                                           const ok = await handleSaveTicket({ ...ticketBase, firma_admin });
+                                                                           if (ok) { setShowAdminSig(false); setShowHistory(true); }
+                                                                        }}>
+                                                                        <CheckCircle size={13}/> Confirmar y Emitir
+                                                                     </button>
+                                                                  </div>
+                                                               </div>
+                                                            );
+
+                                                            return (
+                                                               <button className="btn btn-dark w-100 mt-4 py-3 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-lg"
+                                                                  onClick={() => setShowAdminSig(true)}>
+                                                                  <FileText size={18}/> Generar Corte de Caja
+                                                               </button>
+                                                            );
+                                                         })()}
+
+                                                         {/* Pie de Ticket */}
+                                                         <div className="mt-4 text-center opacity-40">
+                                                            <div className="mb-2" style={{borderTop: '1px dashed #000'}}></div>
+                                                            <small className="font-monospace d-block" style={{fontSize: '9px'}}>SISTEMA DE GESTIÓN INITEK — {new Date().toLocaleString()}</small>
+                                                            <small className="font-monospace" style={{fontSize: '8px'}}>ID RECIBO: {Math.random().toString(36).substr(2, 9).toUpperCase()}</small>
+                                                         </div>
                                                       </div>
                                                    </div>
                                                 </div>
-                                             </div>
+                                             )}
                                           </div>
-                                       )}
+                                          );
+                                       })()
+                                       }
                                     </div>
                                  )}
                             </div>
@@ -1894,12 +2036,25 @@ const DashboardFinanciero = () => {
       ) : (
         <div className="text-center py-5 text-muted">No se pudo cargar la información.</div>
       )}
+      </div>
 
       <StatusModal 
         status={statusTransfer} 
         onClose={() => setStatusTransfer({ ...statusTransfer, show: false })} 
       />
-    </div>
+
+      <ReciboOperadorModal 
+          isOpen={showReciboModal}
+          onClose={() => setShowReciboModal(false)}
+          empleado={selectedEmpleadoRecibo}
+          adminId={data?.admin_id || 1}
+          onSaveSuccess={() => fetchData()}
+      />
+      <HistorialRecibosModal 
+          isOpen={showHistoryModal}
+          onClose={() => setShowHistoryModal(false)}
+          empleado={selectedEmpleadoHistory}
+      />
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');

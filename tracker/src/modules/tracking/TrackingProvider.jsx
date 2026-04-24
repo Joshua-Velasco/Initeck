@@ -27,7 +27,8 @@ export const TrackingProvider = ({ children }) => {
           platform,
           isNativePlatform,
           actuallyNative,
-          willUseNativeGPS: actuallyNative
+          willUseNativeGPS: actuallyNative,
+          isCatalyst: platform === 'ios' && actuallyNative && window.navigator.userAgent.includes('Macintosh')
         });
         
         setIsNative(actuallyNative);

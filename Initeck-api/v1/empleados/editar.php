@@ -17,20 +17,22 @@ if (!empty($_POST['id'])) {
         $id = $_POST['id'];
 
         // 1. Actualizar Tabla Empleados
-        $q1 = "UPDATE empleados SET 
-                nombre_completo = :nom, 
-                telefono = :tel, 
-                estado = :est, 
-                rol = :rol 
+        $q1 = "UPDATE empleados SET
+                nombre_completo = :nom,
+                telefono = :tel,
+                estado = :est,
+                rol = :rol,
+                fecha_ingreso = :fecha
                WHERE id = :id";
-        
+
         $stmt1 = $db->prepare($q1);
         $stmt1->execute([
-            ':nom' => $_POST['nombre_completo'],
-            ':tel' => $_POST['telefono'] ?? null,
-            ':est' => $_POST['estado'],
-            ':rol' => $_POST['rol'],
-            ':id'  => $id
+            ':nom'   => $_POST['nombre_completo'],
+            ':tel'   => $_POST['telefono'] ?? null,
+            ':est'   => $_POST['estado'],
+            ':rol'   => $_POST['rol'],
+            ':fecha' => $_POST['fecha_ingreso'] ?? date('Y-m-d'),
+            ':id'    => $id
         ]);
 
         // 2. Actualizar Tabla Usuarios
@@ -52,19 +54,28 @@ if (!empty($_POST['id'])) {
         }
         $stmt2->execute($params2);
 
-        // 3. Gestión de Archivos (Misma lógica: Guardar en carpeta local)
-        $upload_dir = "../uploads/"; // Ajusta esta ruta a tu carpeta v1/uploads/
+        // 3. Gestión de Archivos — misma carpeta que crear.php y listar.php
+        $upload_dir = "uploads/";
         if (!file_exists($upload_dir)) { mkdir($upload_dir, 0777, true); }
 
-        $documentos = ['foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
+        $documentos = ['foto_perfil', 'foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
         $usuario_clean = preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['usuario']);
 
         foreach ($documentos as $doc) {
             if (isset($_FILES[$doc]) && $_FILES[$doc]['error'] === UPLOAD_ERR_OK) {
                 $ext = pathinfo($_FILES[$doc]['name'], PATHINFO_EXTENSION);
-                // Si se sube una nueva, se sobrescribe la anterior gracias al nombre fijo
                 $file_name = $usuario_clean . "_" . $doc . "." . $ext;
-                move_uploaded_file($_FILES[$doc]['tmp_name'], $upload_dir . $file_name);
+                // Remove any old file with a different extension before saving new one
+                foreach (glob($upload_dir . $usuario_clean . "_" . $doc . ".*") as $old) {
+                    if (basename($old) !== $file_name) @unlink($old);
+                }
+                if (move_uploaded_file($_FILES[$doc]['tmp_name'], $upload_dir . $file_name)) {
+                    // Update DB column when foto_perfil is uploaded
+                    if ($doc === 'foto_perfil') {
+                        $stmtFoto = $db->prepare("UPDATE empleados SET foto_perfil = :fp WHERE id = :id");
+                        $stmtFoto->execute([':fp' => $file_name, ':id' => $id]);
+                    }
+                }
             }
         }
 

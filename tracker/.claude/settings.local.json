@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Volumes/Dev/XAMPP_External/xamppfiles/logs/**)",
+      "Bash(mysql:*)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DESCRIBE nomina_tickets;\" 2>/dev/null)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"ALTER TABLE nomina_tickets ADD COLUMN depositos decimal\\(15,2\\) NOT NULL DEFAULT 0 AFTER gastos_taller;\")",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DESCRIBE nomina_tickets;\")",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"SELECT id, empleado_id, usuario, LEFT\\(password,20\\) as pass_preview, rol, requiere_cambio FROM usuarios;\" 2>/dev/null)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DESCRIBE usuarios;\" 2>/dev/null)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"SELECT usuario, LENGTH\\(password\\) as len, password FROM usuarios;\" 2>/dev/null)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/php -r \"\n\\\\$hash = '\\\\$2y\\\\$10\\\\$4JLZILK1DntdvTnqemppeeuEdknYE1onEGVdfkUSbR3Opu57VjRqG';\n\\\\$passwords = ['joshua','123456','admin','initeck','Joshua','password','admin123','Joshua123','initeck123'];\nforeach\\(\\\\$passwords as \\\\$p\\) {\n  if\\(password_verify\\(\\\\$p, \\\\$hash\\)\\) echo 'MATCH: '.\\\\$p.PHP_EOL;\n}\necho 'Done'.PHP_EOL;\n\")",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/php -r \"\n\\\\$users = [\n  'joshua@initeck.com' => '\\\\$2y\\\\$10\\\\$JKjEWXKDB/uQD6a4MnHeb.F5ROspx3.FhnHoJxSwr5WZA2KJsVS9e',\n  'angel' => '\\\\$2y\\\\$10\\\\$jX4jLwih1HuORsW4vfnPheHqzWrJ8KTA/CTTRIRgSRKZmLuD8iGhO',\n  'joshua' => '\\\\$2y\\\\$10\\\\$4JLZILK1DntdvTnqemppeeuEdknYE1onEGVdfkUSbR3Opu57VjRqG',\n];\n\\\\$passwords = ['admin','admin123','123456','initeck','initeck123','password','Joshua','Angel','123','1234','12345'];\nforeach\\(\\\\$users as \\\\$user => \\\\$hash\\) {\n  foreach\\(\\\\$passwords as \\\\$p\\) {\n    if\\(password_verify\\(\\\\$p, \\\\$hash\\)\\) echo \\\\$user.' → '.\\\\$p.PHP_EOL;\n  }\n}\necho 'Done'.PHP_EOL;\n\")",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \":*)",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DESCRIBE liquidaciones;\" 2>/dev/null)",
+      "Bash(grep -n \"CREATE TABLE \\\\`empleados\\\\`\\\\|CREATE TABLE \\\\`liquidaciones\\\\`\\\\|CREATE TABLE \\\\`nomina_recibos_caja\\\\`\" /Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/tracker/initeckc_tracker.sql)",
+      "Bash(grep:*)",
+      "Bash(sed -n '64,85p' \"/Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/tracker/initeckc_tracker \\(1\\).sql\")",
+      "Bash(sed -n '353,390p' \"/Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/tracker/initeckc_tracker \\(1\\).sql\")",
+      "Bash(sed -n '2257,2310p' \"/Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/tracker/initeckc_tracker \\(1\\).sql\")",
+      "Bash(xargs ls:*)",
+      "Bash(/dev/null echo:*)",
+      "Bash(curl:*)",
+      "Bash(/Applications/XAMPP/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DELETE FROM nomina_tickets WHERE id=5 AND tipo='corte_caja';\" 2>&1)",
+      "Bash(python3 -m json.tool)",
+      "Read(//Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/**)"
+    ]
+  }
+}

@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-// Establecer Zona Horaria para todo el sistema (Ciudad Juárez / El Paso)
-date_default_timezone_set('America/Denver');
+// Establecer Zona Horaria para todo el sistema (México / Centro)
+date_default_timezone_set('America/Mexico_City');
 
 class Database
 {
@@ -78,7 +78,7 @@ class Database
             if ($isLocal) {
                 // --- CONFIGURACIÓN LOCAL (XAMPP / WAMP) ---
                 $this->host = "127.0.0.1";  // Usar IP en lugar de localhost
-                $this->db_name = "tracker";
+                $this->db_name = "initeckc_tracker";
                 $this->username = "root";
                 $this->password = "";           // Cadena vacía, NO null
                 error_log("Config automática: LOCAL - root@127.0.0.1");

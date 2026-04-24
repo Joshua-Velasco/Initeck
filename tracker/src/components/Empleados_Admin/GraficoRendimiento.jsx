@@ -104,17 +104,18 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
     ].filter(d => d.value > 0);
   }, [datosGrafico]);
 
-  const gradientOffset = () => {
-    const dataMax = Math.max(...datosGrafico.map((i) => i.neto));
-    const dataMin = Math.min(...datosGrafico.map((i) => i.neto));
+  const off = useMemo(() => {
+    if (!datosGrafico || datosGrafico.length === 0) return 0;
+    const values = datosGrafico.map(i => i.neto);
+    const dataMax = Math.max(...values);
+    const dataMin = Math.min(...values);
 
     if (dataMax <= 0) return 0;
     if (dataMin >= 0) return 1;
 
-    return dataMax / (dataMax - dataMin);
-  };
-
-  const off = gradientOffset();
+    const range = dataMax - dataMin;
+    return range === 0 ? 0 : dataMax / range;
+  }, [datosGrafico]);
 
   const formatCurrency = (val) => `$${new Intl.NumberFormat('es-MX').format(val)}`;
 
@@ -150,20 +151,12 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
     return null;
   };
 
-  if (datosGrafico.length === 0 && !cargandoGrafico) {
-    return (
-      <div className="card border-0 shadow-sm p-5 rounded-4 bg-white text-center">
-        <p className="text-muted small mb-0">Sin datos de rendimiento para este periodo.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="card border-0 shadow-sm p-3 p-md-4 rounded-4 bg-white h-100">
+    <div key={`rendimiento-container-${empleado?.id}`} className="card border-0 shadow-sm p-3 p-md-4 rounded-4 bg-white h-100">
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
         <div>
           <h6 className="fw-bold text-uppercase mb-1" style={{ letterSpacing: '1px', color: '#444', fontSize: '0.85rem' }}>Análisis de Rendimiento</h6>
-          <span className="badge bg-light text-muted border fw-normal">ID: {empleado?.id}</span>
+          <span className="badge bg-light text-muted border fw-normal">ID: <span>{empleado?.id || '---'}</span></span>
         </div>
         <select
           className="form-select form-select-sm w-auto border-0 bg-light fw-bold shadow-none"
@@ -177,18 +170,22 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
       </div>
 
       {cargandoGrafico ? (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
-          <div className="spinner-border text-guinda opacity-50" />
+        <div key="loading-state" className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+          <div className="spinner-border text-primary opacity-50" />
+        </div>
+      ) : datosGrafico.length === 0 ? (
+        <div key="empty-state" className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+          <p className="text-muted small mb-0">Sin datos de rendimiento para este periodo.</p>
         </div>
       ) : (
-        <div className="row g-4">
+        <div key="content-state" className="row g-4">
           {/* GRÁFICA PRINCIPAL: NETO DESCARTANDO PROPINAS */}
           <div className="col-lg-8">
             <div className="p-3 bg-light rounded-4 h-100 border">
               <h6 className="fw-bold small text-muted mb-3">TENDENCIA DE UTILIDAD OPERATIVA (NETO)</h6>
               <div style={{ height: '300px' }}>
-                {isReady && (
-                  <div style={{ width: '100%', height: '100%', minWidth: 0 }}>
+                {isReady && datosGrafico.length > 0 && (
+                  <div key="chart-area" style={{ width: '100%', height: '100%', minWidth: 0 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={datosGrafico} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                         <defs>
@@ -222,8 +219,8 @@ export const GraficoRendimiento = ({ empleado, fechas }) => {
               <div className="p-3 bg-light rounded-4 border h-100 d-flex flex-column">
                 <h6 className="fw-bold small text-muted mb-auto">DISTRIBUCIÓN DE FLUJO</h6>
                 <div style={{ height: '260px', marginTop: 'auto', marginBottom: 'auto' }}>
-                  {isReady && (
-                    <div style={{ width: '100%', height: '100%', minWidth: 0 }}>
+                  {isReady && totalesPie.length > 0 && (
+                    <div key="chart-pie" style={{ width: '100%', height: '100%', minWidth: 0 }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie data={totalesPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={4}>

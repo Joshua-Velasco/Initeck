@@ -22,14 +22,24 @@ $metodo = $_SERVER['REQUEST_METHOD'];
 // --- MÉTODO GET: Listar Mantenimientos ---
 if ($metodo === 'GET') {
     try {
-        $sql = "SELECT m.*, v.unidad_nombre, v.placas, v.unidad_medida 
+        $sql = "SELECT m.*, v.unidad_nombre, v.placas, v.unidad_medida
                 FROM mantenimientos m
                 LEFT JOIN vehiculos v ON m.unidad_id = v.id";
 
         $params = [];
+        $where  = [];
+
+        if (isset($_GET['vehiculo_id']) || isset($_GET['unidad_id'])) {
+            $vid = intval($_GET['vehiculo_id'] ?? $_GET['unidad_id']);
+            $where[]  = "m.unidad_id = ?";
+            $params[] = $vid;
+        }
         if (isset($_GET['responsable'])) {
-            $sql .= " WHERE m.responsable LIKE ?";
+            $where[]  = "m.responsable LIKE ?";
             $params[] = "%" . $_GET['responsable'] . "%";
+        }
+        if (!empty($where)) {
+            $sql .= " WHERE " . implode(" AND ", $where);
         }
 
         $sql .= " ORDER BY m.fecha DESC";

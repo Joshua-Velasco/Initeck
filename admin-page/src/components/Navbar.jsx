@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LayoutGrid, Car, Building2, Menu, X } from 'lucide-react';
+import { LayoutGrid, Car, Building2, Menu, X, Plane, Tv } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -9,6 +9,8 @@ const Navbar = () => {
     { name: 'Inicio', url: 'https://admin.initeck.com.mx/', icon: <LayoutGrid size={18} /> },
     { name: 'Uber Initeck', url: 'https://admin.initeck.com.mx/uber', icon: <Car size={18} /> },
     { name: 'Initeck', url: 'https://admin.initeck.com.mx/Initeck', icon: <Building2 size={18} /> },
+    { name: 'Safar', url: 'https://safar.initeck.com.mx/', icon: <Plane size={18} /> },
+    { name: 'Streaming', url: 'https://streaming.initeck.com.mx/', icon: <Tv size={18} /> },
   ];
 
   return (

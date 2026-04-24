@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Wrench, Plus, Trash2, Edit, Save, X } from 'lucide-react';
-import { TALLER_INVENTARIO_URL, UPLOADS_BASE_URL } from '../../../config';
+import { TALLER_INVENTARIO_URL, BASE_API } from '../../../config';
 import ModalBorrar from '../estatus/ModalBorrar';
 
 export default function InventarioTaller() {
@@ -121,7 +121,7 @@ export default function InventarioTaller() {
               <div className="card h-100 border-0 shadow-sm overflow-hidden hover-lift transition-all" style={{ borderRadius: '24px' }}>
                 <div className="bg-light d-flex align-items-center justify-content-center p-4 position-relative" style={{ height: '220px' }}>
                   {h.foto_url ?
-                    <img src={`${UPLOADS_BASE_URL}taller/uploads/${h.foto_url}`} alt={h.nombre} className="img-fluid rounded-3 h-100 object-fit-contain shadow-sm" /> :
+                    <img src={`${BASE_API}taller/uploads/${h.foto_url}`} alt={h.nombre} className="img-fluid rounded-3 h-100 object-fit-contain shadow-sm" /> :
                     <Wrench size={64} className="text-secondary opacity-10" />
                   }
                   <div className="position-absolute top-0 end-0 p-3">

@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Josefin+Sans:wght@300;400;600;700&display=swap");
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+
+:root {
+  /* SAFAR Brand Colors — Silver / Platinum Edition */
+  --safar-sand: #e8eaec;
+  --safar-gold: #9ea8b8;         /* Primary silver / platinum */
+  --safar-gold-bright: #c8d0da;  /* Light silver highlight */
+  --safar-copper: #6e7a8a;       /* Darker silver / slate */
+  --safar-black: #0d0d0d;        /* Deep black */
+  --safar-ivory: #f2f3f5;        /* Near-white neutral */
+  --safar-white: #ffffff;
+  --safar-silver: #d0d6de;       /* Bright metallic silver */
+  
+  --font-serif: 'Josefin Sans', sans-serif;
+  --font-sans: 'Inter', sans-serif;
+  
+  --transition-luxury: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--safar-black);
+  color: var(--safar-white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Common Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(10px);
+  transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.hover-lift {
+  transition: var(--transition-luxury);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(158, 168, 184, 0.1);
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    to right,
+    var(--safar-copper) 20%,
+    var(--safar-silver) 40%,
+    var(--safar-silver) 60%,
+    var(--safar-copper) 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+@keyframes silkSheen {
+  0% { transform: translate(-100%, -100%) rotate(45deg); opacity: 0; }
+  20% { opacity: 0.3; }
+  50% { opacity: 0.1; }
+  80% { opacity: 0.3; }
+  100% { transform: translate(100%, 100%) rotate(45deg); opacity: 0; }
+}
+
+@keyframes pulse-soft {
+  0% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+  100% { opacity: 0.3; transform: scale(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}

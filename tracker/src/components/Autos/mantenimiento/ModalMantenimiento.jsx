@@ -425,22 +425,24 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                             {tiposMantenimiento.map(t => <option key={t} value={t}>{t}</option>)}
                           </select>
                         </div>
-                        <div className="col-md-6">
-                          <label className="form-label small text-muted fw-semibold mb-2">Categoría (Rubro Presupuestal)</label>
-                          <select
-                            className="form-select border-0 bg-light rounded-4 shadow-sm"
-                            value={formData.categoria_presupuesto || ''}
-                            onChange={(e) => setFormData({ ...formData, categoria_presupuesto: e.target.value })}
-                            required
-                            style={{ fontSize: '0.95rem', padding: '0.75rem 1rem' }}
-                          >
-                             {CATEGORIAS_PRESUPUESTO.map(c => (
-                                <option key={c.label} value={c.field || ''}>
-                                    {c.label}
-                                </option>
-                             ))}
-                          </select>
-                        </div>
+                        {user?.rol === 'admin' && (
+                          <div className="col-md-6">
+                            <label className="form-label small text-muted fw-semibold mb-2">Categoría (Rubro Presupuestal)</label>
+                            <select
+                              className="form-select border-0 bg-light rounded-4 shadow-sm"
+                              value={formData.categoria_presupuesto || ''}
+                              onChange={(e) => setFormData({ ...formData, categoria_presupuesto: e.target.value })}
+                              required
+                              style={{ fontSize: '0.95rem', padding: '0.75rem 1rem' }}
+                            >
+                               {CATEGORIAS_PRESUPUESTO.map(c => (
+                                  <option key={c.label} value={c.field || ''}>
+                                      {c.label}
+                                  </option>
+                               ))}
+                            </select>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="row g-4 mt-1">
@@ -564,42 +566,45 @@ export default function ModalMantenimiento({ user, isOpen, onClose, unidad, onSa
                     </div>
 
                     <div className="row g-4">
-                      <div className="col-md-6">
-                        <label className="form-label small text-muted fw-semibold mb-2">Presupuesto Restante</label>
-                        <div className="input-group">
-                          <span className="input-group-text bg-light border-0 rounded-start-4">
-                            <DollarSign size={18} className="text-muted" />
-                          </span>
-                          <input
-                            type="text"
-                            className="form-control border-0 bg-light rounded-end-4"
-                            value={
-                                presupuestoInfo.restante != null 
-                                ? presupuestoInfo.restante.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
-                                : "0.00"
-                            } 
-                            readOnly
-                            placeholder="Sin presupuesto asignado"
-                            style={{ 
-                                fontSize: '0.95rem', 
-                                padding: '0.75rem 1rem', 
-                                cursor: 'not-allowed',
-                                color: (presupuestoInfo.restante < 0) ? 'var(--bs-danger)' : 'var(--bs-success)',
-                                fontWeight: 'bold'
-                            }}
-                          />
-                        </div>
-                        {presupuestoInfo.anual > 0 && (
-                          <div className="mt-1 small d-flex justify-content-between text-muted" style={{ fontSize: '0.75rem' }}>
-                            <span>Anual: ${presupuestoInfo.anual.toLocaleString()}</span>
-                            <span>Gastado: ${presupuestoInfo.gastado.toLocaleString()}</span>
-                            <span>
-                               Actual: ${cleanFloat(formData.costo_total).toLocaleString()}
+                      {user?.rol === 'admin' && (
+                        <div className="col-md-6">
+                          <label className="form-label small text-muted fw-semibold mb-2">Presupuesto Restante</label>
+                          <div className="input-group">
+                            <span className="input-group-text bg-light border-0 rounded-start-4">
+                              <DollarSign size={18} className="text-muted" />
                             </span>
+                            <input
+                              type="text"
+                              className="form-control border-0 bg-light rounded-end-4"
+                              value={
+                                  presupuestoInfo.restante != null 
+                                  ? presupuestoInfo.restante.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                                  : "0.00"
+                              } 
+                              readOnly
+                              placeholder="Sin presupuesto asignado"
+                              style={{ 
+                                  fontSize: '0.95rem', 
+                                  padding: '0.75rem 1rem', 
+                                  cursor: 'not-allowed',
+                                  color: (presupuestoInfo.restante < 0) ? 'var(--bs-danger)' : 'var(--bs-success)',
+                                  fontWeight: 'bold'
+                              }}
+                            />
                           </div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
+                          {presupuestoInfo.anual > 0 && (
+                            <div className="mt-1 small d-flex justify-content-between text-muted" style={{ fontSize: '0.75rem' }}>
+                              <span>Anual: ${presupuestoInfo.anual.toLocaleString()}</span>
+                              <span>Gastado: ${presupuestoInfo.gastado.toLocaleString()}</span>
+                              <span>
+                                 Actual: ${cleanFloat(formData.costo_total).toLocaleString()}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className={`col-md-${user?.rol === 'admin' ? '6' : '12'}`}>
                         <label className="form-label small text-muted fw-semibold mb-2">Costo Total</label>
                         <div className="input-group">
                           <span className="input-group-text bg-light border-0 rounded-start-4">

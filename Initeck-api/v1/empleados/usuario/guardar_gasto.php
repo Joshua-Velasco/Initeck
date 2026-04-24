@@ -77,6 +77,7 @@ try {
                 'tipo' => $g['tipo'] ?? 'Otros',
                 'monto' => $monto,
                 'odometro' => floatval($g['odometro'] ?? 0),
+                'motivo' => $g['motivo'] ?? '',
                 'foto_ticket' => $nombreTicket,
                 'foto_tablero' => $nombreTablero
             ];

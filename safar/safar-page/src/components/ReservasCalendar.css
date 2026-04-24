@@ -1,0 +1,340 @@
+/* =====================================================
+   ReservasCalendar — Day & Week/Agenda views
+   Mobile-first redesign
+   ===================================================== */
+
+.rc-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  color: #111;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════
+   SHARED: gutter & hour lines
+══════════════════════════════════════════════════ */
+.rc-gutter {
+  width: 52px;
+  flex-shrink: 0;
+}
+
+.rc-gutter-hour {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.rc-gutter-label {
+  font-size: 0.72rem;
+  color: #bbb;
+  font-weight: 500;
+  transform: translateY(-9px);
+  display: block;
+  white-space: nowrap;
+}
+
+.rc-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #f0f0f0;
+}
+
+/* ══════════════════════════════════════════════════
+   NOW LINE
+══════════════════════════════════════════════════ */
+.rc-now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.rc-now-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ea4335;
+  flex-shrink: 0;
+}
+
+.rc-now-bar {
+  flex: 1;
+  height: 2px;
+  background: #ea4335;
+}
+
+/* ══════════════════════════════════════════════════
+   EVENT BLOCKS (day view)
+══════════════════════════════════════════════════ */
+.rc-event-block {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  border-left: 4px solid;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.rc-event-block:active { filter: brightness(0.93); transform: scale(0.99); }
+.rc-event-block.selected { box-shadow: 0 3px 12px rgba(0,0,0,0.15); filter: brightness(0.95); }
+
+.rc-event-time {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rc-event-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.rc-event-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: capitalize;
+}
+
+.rc-empty-day {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.88rem;
+  color: #ccc;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════
+   DAY VIEW
+══════════════════════════════════════════════════ */
+.rc-day-view {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rc-day-view::-webkit-scrollbar { width: 3px; }
+.rc-day-view::-webkit-scrollbar-thumb { background: #e8e8e8; border-radius: 3px; }
+
+.rc-timeline {
+  display: flex;
+  min-height: 100%;
+}
+
+.rc-events-col {
+  flex: 1;
+  position: relative;
+  min-height: 100%;
+  border-left: 1px solid #f0f0f0;
+}
+
+/* ══════════════════════════════════════════════════
+   WEEK VIEW — Agenda style
+══════════════════════════════════════════════════ */
+.rc-week-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Day selector pill strip ── */
+.rc-day-selector {
+  display: flex;
+  gap: 4px;
+  padding: 0.875rem 1rem 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.rc-day-selector::-webkit-scrollbar { display: none; }
+
+.rc-day-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 46px;
+  padding: 0.5rem 0.3rem 0.6rem;
+  border-radius: 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.rc-day-pill:active { background: #f0f0f0; }
+
+.rc-pill-dow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rc-pill-num {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #333;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+/* Today pill — red number */
+.rc-day-pill.today-pill .rc-pill-dow { color: #ea4335; }
+.rc-day-pill.today-pill .rc-pill-num { color: #ea4335; }
+
+/* Selected pill — black fill */
+.rc-day-pill.selected-pill { background: #111; }
+.rc-day-pill.selected-pill .rc-pill-dow { color: rgba(255,255,255,0.6); }
+.rc-day-pill.selected-pill .rc-pill-num { color: #fff; }
+
+/* Trip indicator dot */
+.rc-pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f59e0b;
+  position: absolute;
+  bottom: 6px;
+}
+
+.rc-day-pill.selected-pill .rc-pill-dot { background: rgba(255,255,255,0.7); }
+.rc-day-pill.today-pill:not(.selected-pill) .rc-pill-dot { background: #ea4335; }
+
+/* ── Agenda list ── */
+.rc-agenda-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem 1.1rem 2.5rem;
+}
+
+.rc-agenda-list::-webkit-scrollbar { display: none; }
+
+/* Day section */
+.rc-agenda-day {
+  margin-bottom: 1.5rem;
+}
+
+.rc-agenda-day-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: capitalize;
+  letter-spacing: 0.4px;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.rc-agenda-day-label.today-label { color: #ea4335; }
+
+/* Agenda trip card */
+.rc-agenda-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border-left: 4px solid;
+  margin-bottom: 0.625rem;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.rc-agenda-card:active { filter: brightness(0.95); transform: scale(0.99); }
+.rc-agenda-card.selected { box-shadow: 0 3px 12px rgba(0,0,0,0.12); filter: brightness(0.96); }
+
+.rc-agenda-time {
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 48px;
+}
+
+.rc-agenda-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.rc-agenda-folio {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.rc-agenda-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.rc-agenda-arrow {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #ccc;
+}
+
+/* Empty week state */
+.rc-agenda-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  color: #ccc;
+}
+
+.rc-agenda-empty-icon { font-size: 2.5rem; }
+
+.rc-agenda-empty p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  color: #bbb;
+}

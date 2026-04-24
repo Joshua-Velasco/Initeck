@@ -17,6 +17,8 @@ export const ROLES = {
   development: { color: '#212529', label: 'Desarrollo' },
   operator: { color: '#0d6efd', label: 'Operador' },
   cleaning: { color: '#0dcaf0', label: 'Limpieza' },
+  monitorista: { color: '#6610f2', label: 'Monitorista' },
+  taller: { color: '#fd7e14', label: 'Taller' },
   employee: { color: '#6c757d', label: 'Empleado' }
 };
 
@@ -42,6 +44,7 @@ export const initialFormState = {
   usuario: '',
   password: '',
   rol: 'employee',
+  foto_perfil: null,
   foto_ine: null,
   foto_curp: null,
   foto_rfc: null,

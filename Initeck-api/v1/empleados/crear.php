@@ -49,20 +49,25 @@ if (!empty($_POST['nombre_completo']) && !empty($_POST['usuario'])) {
             mkdir($upload_dir, 0777, true);
         }
 
-        $documentos = ['foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
-        $usuario_clean = preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['usuario']); // Limpiar nombre de usuario
+        $documentos = ['foto_perfil', 'foto_ine', 'foto_curp', 'foto_rfc', 'foto_licencia'];
+        $usuario_clean = preg_replace('/[^A-Za-z0-9_\-]/', '_', $_POST['usuario']);
+        $savedFiles = [];
 
         foreach ($documentos as $doc) {
             if (isset($_FILES[$doc]) && $_FILES[$doc]['error'] === UPLOAD_ERR_OK) {
                 $ext = pathinfo($_FILES[$doc]['name'], PATHINFO_EXTENSION);
-                
-                // Nombre del archivo: usuario_tipo.ext (ej: juan_perez_foto_ine.jpg)
                 $file_name = $usuario_clean . "_" . $doc . "." . $ext;
                 $target_path = $upload_dir . $file_name;
-                
-                // Mover archivo (si ya existe uno, se sobrescribirá)
-                move_uploaded_file($_FILES[$doc]['tmp_name'], $target_path);
+                if (move_uploaded_file($_FILES[$doc]['tmp_name'], $target_path)) {
+                    $savedFiles[$doc] = $file_name;
+                }
             }
+        }
+
+        // Save foto_perfil filename to DB
+        if (!empty($savedFiles['foto_perfil'])) {
+            $stmtFoto = $db->prepare("UPDATE empleados SET foto_perfil = :fp WHERE id = :id");
+            $stmtFoto->execute([':fp' => $savedFiles['foto_perfil'], ':id' => $new_id]);
         }
 
         $db->commit();

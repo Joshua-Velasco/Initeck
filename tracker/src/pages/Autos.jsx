@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Loader2, Car, ListFilter, Calendar, Trash2,
-  SearchX, EyeOff, Eye, Lock, ShieldAlert, Info, BarChart3
+  SearchX, EyeOff, Eye, Lock, ShieldAlert, Info, BarChart3, DollarSign
 } from 'lucide-react';
 
 // --- IMPORTACIÓN DE COMPONENTES ---
@@ -12,16 +12,20 @@ import ModalEstado from '../components/Autos/estatus/ModalEstado';
 import VehiculosBarra from '../components/Autos/VehiculosBarra';
 import VehiculosInfo from '../components/Autos/VehiculosInfo';
 import MetricasTarjetas from '../components/Autos/MetricasTarjetas';
+import GraficoPresupuesto from '../components/Autos/mantenimiento/GraficoPresupuesto';
 import CalendarioPagos from '../components/Autos/CalendarioPagos';
 import CarruselVehiculo from '../components/Autos/CarruselVehiculo';
 import TargetaAuto from '../components/Autos/TargetaAuto';
+import VehicleFinance from '../components/Autos/VehicleFinance';
 
 import {
   API_URL,
   MODIFICAR_URL,
   ELIMINAR_URL,
   ANADIR_URL,
-  GASTOS_COMBUSTIBLE_URL
+  GASTOS_COMBUSTIBLE_URL,
+  MANTENIMIENTO_URL,
+  TALLER_GASTOS_PIEZAS_URL
 } from '../config.js';
 
 const COLORS = {
@@ -61,6 +65,8 @@ export default function Autos({ user }) {
     mensaje: ''
   });
   const [gastosCombustible, setGastosCombustible] = useState({ total: 0, gastos: [] });
+  const [mantenimientos, setMantenimientos] = useState([]);
+  const [gastosPiezasTotal, setGastosPiezasTotal] = useState(0);
 
   const lateralScrollStyle = { maxHeight: 'calc(100vh - 180px)', display: 'flex', flexDirection: 'column' };
 
@@ -136,6 +142,36 @@ export default function Autos({ user }) {
     }
   }, [vehiculoSeleccionado?.id]);
 
+  // Fetch mantenimientos cuando cambia el vehículo seleccionado
+  useEffect(() => {
+    if (!vehiculoSeleccionado?.id) { setMantenimientos([]); return; }
+    fetch(`${MANTENIMIENTO_URL}?vehiculo_id=${vehiculoSeleccionado.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        const list = Array.isArray(data) ? data
+          : Array.isArray(data?.data) ? data.data
+          : Array.isArray(data?.mantenimientos) ? data.mantenimientos
+          : [];
+        setMantenimientos(list);
+      })
+      .catch(() => setMantenimientos([]));
+  }, [vehiculoSeleccionado?.id]);
+
+  // Fetch gastos de piezas/taller cuando cambia el vehículo seleccionado
+  useEffect(() => {
+    if (!vehiculoSeleccionado?.id) { setGastosPiezasTotal(0); return; }
+    const currentYear = new Date().getFullYear();
+    fetch(`${TALLER_GASTOS_PIEZAS_URL}?unidad_id=${vehiculoSeleccionado.id}&vehiculo_id=${vehiculoSeleccionado.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          const delAño = data.filter(g => g.fecha && parseInt(String(g.fecha).split('-')[0], 10) === currentYear);
+          setGastosPiezasTotal(delAño.reduce((s, g) => s + parseFloat(g.costo_total || 0), 0));
+        }
+      })
+      .catch(() => setGastosPiezasTotal(0));
+  }, [vehiculoSeleccionado?.id]);
+
   // Filtrado de vehículos
   const filteredVehicles = useMemo(() => {
     return vehiculos.filter(v => {
@@ -148,24 +184,66 @@ export default function Autos({ user }) {
 
   // Métricas
   const metricasTotales = useMemo(() => {
-    if (!vehiculoSeleccionado) return { diario: 0, semanal: 0, mensual: 0, anual: 0 };
+    if (!vehiculoSeleccionado) return { diario: 0, semanal: 0, mensual: 0, proyectado: 0, realizado: 0, pendiente: 0 };
     const v = vehiculoSeleccionado;
-    const campos = [
-      'costo_seguro_anual',
-      'costo_deducible_seguro_anual',
-      'costo_gasolina_anual',
-      'costo_aceite_anual',
-      'costo_ecologico_anual',
-      'costo_placas_anual',
-      'costo_servicio_general_anual',
-      'costo_llantas_anual',
-      'costo_tuneup_anual',
-      'costo_frenos_anual',
-      'costo_lavado_anual'
+    
+    // Mapeo de campos de costo vs sus campos de fecha de pago (sin gasolina)
+    const configuracionGastos = [
+      { costo: 'costo_seguro_anual',            fecha: 'fecha_pago_seguro' },
+      { costo: 'costo_deducible_seguro_anual',  fecha: null },
+      { costo: 'costo_aceite_anual',            fecha: null },
+      { costo: 'costo_ecologico_anual',         fecha: 'fecha_pago_ecologico' },
+      { costo: 'costo_placas_anual',            fecha: 'fecha_pago_placas' },
+      { costo: 'costo_servicio_general_anual',  fecha: 'fecha_proximo_mantenimiento' },
+      { costo: 'costo_llantas_anual',           fecha: null },
+      { costo: 'costo_tuneup_anual',            fecha: null },
+      { costo: 'costo_frenos_anual',            fecha: null },
+      { costo: 'costo_lavado_anual',            fecha: null }
     ];
-    const anual = campos.reduce((acc, c) => acc + (parseFloat(v[c]) || 0), 0);
-    return { anual, mensual: anual / 12, semanal: anual / 52, diario: anual / 365 };
-  }, [vehiculoSeleccionado]);
+
+    let proyectado = 0;
+    let realizado = 0;
+
+    configuracionGastos.forEach(g => {
+      const monto = parseFloat(v[g.costo]) || 0;
+      proyectado += monto;
+      if (g.fecha && v[g.fecha] && v[g.fecha] !== '0000-00-00') {
+        realizado += monto;
+      }
+    });
+
+    const pendiente = proyectado - realizado;
+
+    // Gastado real: misma lógica que GraficoPresupuesto (Métricas tab)
+    const currentYear = new Date().getFullYear();
+    const tallerGastado = mantenimientos
+      .filter(m => new Date(m.fecha).getFullYear() === currentYear)
+      .reduce((s, m) => s + parseFloat(m.costo_total || 0), 0);
+
+    const finanzaFija = [
+      { dateField: 'fecha_pago_placas',    limitField: 'costo_placas_anual' },
+      { dateField: 'fecha_pago_seguro',    limitField: 'costo_seguro_anual' },
+      { dateField: 'fecha_pago_ecologico', limitField: 'costo_ecologico_anual' },
+    ].reduce((sum, { dateField, limitField }) => {
+      const fecha = v[dateField];
+      if (!fecha || fecha === '0000-00-00') return sum;
+      if (parseInt(String(fecha).split('-')[0], 10) !== currentYear) return sum;
+      return sum + (parseFloat(v[limitField]) || 0);
+    }, 0);
+
+    const gastadoReal = tallerGastado + parseFloat(gastosCombustible.total || 0) + gastosPiezasTotal + finanzaFija;
+
+    return {
+      anual: proyectado,
+      proyectado,
+      realizado,
+      pendiente,
+      gastadoReal,
+      mensual: proyectado / 12,
+      semanal: proyectado / 52,
+      diario: proyectado / 365
+    };
+  }, [vehiculoSeleccionado, mantenimientos, gastosCombustible.total, gastosPiezasTotal]);
 
   const handleGuardarCambios = async (formData) => {
     try {
@@ -378,6 +456,7 @@ export default function Autos({ user }) {
                       {[
                         { id: 'general', label: 'General', icon: <Info size={18}/> },
                         { id: 'metricas', label: 'Métricas', icon: <BarChart3 size={18}/> },
+                        { id: 'finanzas', label: 'Finanzas', icon: <DollarSign size={18}/> },
                       ].map(tab => {
                         // Filtrar tab de métricas si no es admin/development
                         if (tab.id === 'metricas' && !['admin', 'development'].includes(user?.rol)) return null;
@@ -439,16 +518,24 @@ export default function Autos({ user }) {
 
                       {/* TAB MÉTRICAS */}
                       {activeTab === 'metricas' && (
-                        <div className="row g-3">
-                          <div className="col-12">
-                            <div className="bg-white rounded-4 shadow-sm p-4 position-relative overflow-hidden" style={{ minHeight: '400px' }}>
-                              <h5 className="fw-bold text-secondary mb-4 text-uppercase small">Analítica de Costos</h5>
-                              {mostrarGraficos ? <VehiculosInfo seleccionado={vehiculoSeleccionado} colors={COLORS} gastosCombustible={gastosCombustible} /> : <Loader2 className="animate-spin text-primary opacity-20" />}
-                              {ocultarInfoSensible && <OverlayPrivacidad />}
-                            </div>
-                          </div>
+                        <div className="animate__animated animate__fadeIn position-relative">
+                          {ocultarInfoSensible && <OverlayPrivacidad />}
+                          <GraficoPresupuesto
+                            vehiculo={vehiculoSeleccionado}
+                            mantenimientos={mantenimientos}
+                          />
                         </div>
                       )}
+
+                        {/* TAB FINANZAS */}
+                        {activeTab === 'finanzas' && (
+                          <div className="animate__animated animate__fadeIn">
+                            <VehicleFinance 
+                              vehiculo={vehiculoSeleccionado} 
+                              handleGuardarCambios={handleGuardarCambios} 
+                            />
+                          </div>
+                        )}
 
                     </div>
                   </>

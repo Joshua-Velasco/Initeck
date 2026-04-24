@@ -94,16 +94,16 @@ export default function NotasVehiculo({ unidad }) {
     }
   };
 
-  const toggleEstadoReporte = async (id, nuevoEstado) => {
+  const toggleEstadoReporte = async (id, nuevoEstado, tipo) => {
       try {
           const res = await fetch(`${BASE_API}taller/update_reporte_status.php`, {
               method: 'POST',
-              body: JSON.stringify({ id, estado: nuevoEstado })
+              body: JSON.stringify({ id, estado: nuevoEstado, tipo })
           });
           
           if (res.ok) {
               setComentariosOperadores(prev => 
-                  prev.map(c => c.id === id ? { ...c, estado_reporte: nuevoEstado } : c)
+                  prev.map(c => c.id === id && c.tipo === tipo ? { ...c, estado_reporte: nuevoEstado } : c)
               );
           }
       } catch (error) {
@@ -252,15 +252,20 @@ export default function NotasVehiculo({ unidad }) {
                                             <span className="badge bg-dark text-white rounded-pill fw-bold" style={{fontSize: '0.7rem'}}>
                                                 {com.unidad_nombre}
                                             </span>
+                                            {com.tipo === 'ruta' && (
+                                                <span className="badge bg-primary text-white rounded-pill fw-bold animate__animated animate__pulse animate__infinite" style={{fontSize: '0.65rem'}}>
+                                                    EN RUTA
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="d-flex align-items-center gap-2 ms-auto ms-sm-0">
                                             <small className="text-muted fw-bold" style={{fontSize: '0.7rem'}}>
-                                                {new Date(com.fecha).toLocaleDateString()}
+                                                {new Date(com.fecha).toLocaleDateString()} {com.tipo === 'ruta' && new Date(com.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                             </small>
                                             
                                             {/* Botón de Completar */}
                                             <button 
-                                                onClick={() => toggleEstadoReporte(com.id, isCompleted ? 'Pendiente' : 'Completado')}
+                                                onClick={() => toggleEstadoReporte(com.id, isCompleted ? 'Pendiente' : 'Completado', com.tipo)}
                                                 className={`btn btn-sm rounded-pill px-2 py-0 fw-bold d-flex align-items-center gap-1 ${isCompleted ? 'btn-outline-secondary' : 'btn-outline-success'}`}
                                                 style={{fontSize: '0.65rem'}}
                                                 title={isCompleted ? "Marcar como pendiente" : "Marcar como completado"}
@@ -274,22 +279,34 @@ export default function NotasVehiculo({ unidad }) {
                                     </div>
                                     
                                     <div style={{ textDecoration: isCompleted ? 'line-through' : 'none', opacity: isCompleted ? 0.8 : 1 }}>
-                                        {com.comentarios_inicio && (
-                                            <div className={`mb-2 p-2 rounded-3 border-start border-4 border-warning ${isCompleted ? 'bg-transparent' : 'bg-light'}`}>
-                                                <div className="d-flex align-items-center gap-1 text-warning mb-1">
-                                                    <span className="badge bg-warning text-dark" style={{fontSize: '0.6rem'}}>SALIDA</span>
+                                        {com.tipo === 'ruta' ? (
+                                            <div className={`p-3 rounded-4 border-start border-4 border-primary ${isCompleted ? 'bg-transparent' : 'bg-primary bg-opacity-10'}`}>
+                                                <div className="d-flex align-items-center gap-2 text-primary mb-2">
+                                                    <MessageSquare size={14} />
+                                                    <span className="fw-bold small text-uppercase" style={{letterSpacing: '0.5px'}}>Mensaje Directo</span>
                                                 </div>
-                                                <p className="mb-0 small text-dark">{com.comentarios_inicio}</p>
+                                                <p className="mb-0 fw-medium text-dark" style={{fontSize: '0.95rem'}}>{com.comentarios_inicio}</p>
                                             </div>
-                                        )}
+                                        ) : (
+                                            <>
+                                                {com.comentarios_inicio && (
+                                                    <div className={`mb-2 p-2 rounded-3 border-start border-4 border-warning ${isCompleted ? 'bg-transparent' : 'bg-light'}`}>
+                                                        <div className="d-flex align-items-center gap-1 text-warning mb-1">
+                                                            <span className="badge bg-warning text-dark" style={{fontSize: '0.6rem'}}>SALIDA</span>
+                                                        </div>
+                                                        <p className="mb-0 small text-dark">{com.comentarios_inicio}</p>
+                                                    </div>
+                                                )}
 
-                                        {com.comentarios_final && (
-                                            <div className={`p-2 rounded-3 border-start border-4 border-success ${isCompleted ? 'bg-transparent' : 'bg-light'}`}>
-                                                <div className="d-flex align-items-center gap-1 text-success mb-1">
-                                                    <span className="badge bg-success text-white" style={{fontSize: '0.6rem'}}>CIERRE</span>
-                                                </div>
-                                                <p className="mb-0 small text-dark">{com.comentarios_final}</p>
-                                            </div>
+                                                {com.comentarios_final && (
+                                                    <div className={`p-2 rounded-3 border-start border-4 border-success ${isCompleted ? 'bg-transparent' : 'bg-light'}`}>
+                                                        <div className="d-flex align-items-center gap-1 text-success mb-1">
+                                                            <span className="badge bg-success text-white" style={{fontSize: '0.6rem'}}>CIERRE</span>
+                                                        </div>
+                                                        <p className="mb-0 small text-dark">{com.comentarios_final}</p>
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>

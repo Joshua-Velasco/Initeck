@@ -172,6 +172,12 @@ const HistorialFinanciero = ({ empleado, fechas }) => {
                                 Evidencia: {gasto.tipo} ${parseFloat(gasto.monto).toFixed(2)}
                               </h6>
 
+                              {gasto.tipo === 'Otros' && gasto.motivo && (
+                                <div className="mb-2 small text-dark fw-medium fst-italic">
+                                  Motivo: {gasto.motivo}
+                                </div>
+                              )}
+
                               {gasto.odometro > 0 && (
                                 <div className="mb-2 small d-flex align-items-center text-muted">
                                   <Gauge size={14} className="me-1" />

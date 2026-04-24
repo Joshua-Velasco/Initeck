@@ -1,19 +1,21 @@
 import React from 'react';
-import { Clock, TrendingUp, Calendar, DollarSign } from 'lucide-react';
+import { Clock, TrendingUp, Calendar, DollarSign, CheckCircle, AlertCircle, PiggyBank } from 'lucide-react';
 
 const MetricasTarjetas = ({ totales }) => {
-  const f = (val, dec = 0) => 
-    new Intl.NumberFormat('es-MX', { 
-      style: 'currency', 
-      currency: 'MXN', 
-      maximumFractionDigits: dec 
+  const f = (val, dec = 0) =>
+    new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: dec
     }).format(val || 0);
 
+  const restante = (totales.proyectado || 0) - (totales.gastadoReal || 0);
+
   const items = [
-    { label: 'Proporción Diaria', val: totales.diario, icon: Clock, color: '#6366f1' },
-    { label: 'Costo Semanal', val: totales.semanal, icon: TrendingUp, color: '#3b82f6' },
-    { label: 'Costo Mensual', val: totales.mensual, icon: Calendar, color: '#10b981' },
-    { label: 'GASTO TOTAL ANUAL', val: totales.anual, icon: DollarSign, color: '#000000', isMain: true }
+    { label: 'PAGO ANUAL',            val: totales.proyectado, icon: DollarSign, color: '#000000', isMain: true },
+    { label: 'PAGO POR SEMANA',       val: totales.semanal,    icon: Clock,      color: '#8b5cf6' },
+    { label: 'PAGO POR MES',          val: totales.mensual,    icon: Calendar,   color: '#3b82f6' },
+    { label: 'PRESUPUESTO RESTANTE',  val: restante,           icon: PiggyBank,  color: restante >= 0 ? '#10b981' : '#ef4444' },
   ];
 
   return (

@@ -24,6 +24,44 @@ const dataURLtoFile = (dataurl, filename) => {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new File([u8arr], filename, { type: mime });
+  return new File([u8arr], filename, { type: mime });
+};
+
+// Local implementation of trimCanvas to avoid dependency issues
+const trimCanvas = (c) => {
+  const ctx = c.getContext('2d');
+  const copy = document.createElement('canvas').getContext('2d');
+  const pixels = ctx.getImageData(0, 0, c.width, c.height);
+  const l = pixels.data.length;
+  let i, x, y;
+  const bound = { top: null, left: null, right: null, bottom: null };
+
+  for (i = 0; i < l; i += 4) {
+    if (pixels.data[i + 3] !== 0) {
+      x = (i / 4) % c.width;
+      y = ~~((i / 4) / c.width);
+
+      if (bound.top === null) bound.top = y;
+      if (bound.left === null) bound.left = x;
+      else if (x < bound.left) bound.left = x;
+      if (bound.right === null) bound.right = x;
+      else if (bound.right < x) bound.right = x;
+      if (bound.bottom === null) bound.bottom = y;
+      else if (bound.bottom < y) bound.bottom = y;
+    }
+  }
+    
+  if (bound.top === null) return null; // Empty canvas
+
+  const trimHeight = bound.bottom - bound.top + 1;
+  const trimWidth = bound.right - bound.left + 1;
+  const trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+
+  copy.canvas.width = trimWidth;
+  copy.canvas.height = trimHeight;
+  copy.putImageData(trimmed, 0, 0);
+
+  return copy.canvas;
 };
 
 const TabTransferencias = ({ 
@@ -48,8 +86,13 @@ const TabTransferencias = ({
 
     // Obtener el rango actualmente seleccionado en el dashboard para proponerlo como periodo de pago
     const { rawStart, rawEnd } = getRangoFechas();
-    const lastMonday = rawStart;
-    const lastSunday = rawEnd;
+    
+    // ETIQUETAS VISUALES: Mostramos Lunes a Lunes (restando 1 día a la lógica interna de Martes a Martes)
+    const lastMonday = new Date(rawStart);
+    lastMonday.setDate(lastMonday.getDate() - 1);
+    
+    const lastSunday = new Date(rawEnd);
+    lastSunday.setDate(lastSunday.getDate() - 1);
 
     const handleSave = async () => {
       // 1. Validaciones
@@ -66,7 +109,14 @@ const TabTransferencias = ({
       setStatusTransfer({ show: true, type: 'loading', message: 'Procesando transferencia...' });
 
       try {
-        const signatureDataUrl = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png');
+        const rawCanvas = sigCanvas.current.getCanvas();
+        const trimmedCanvas = trimCanvas(rawCanvas);
+        
+        if (!trimmedCanvas) {
+             throw new Error("La firma está vacía.");
+        }
+
+        const signatureDataUrl = trimmedCanvas.toDataURL('image/png');
         const signatureFile = dataURLtoFile(signatureDataUrl, 'firma_admin.png');
 
         const formData = new FormData();
@@ -94,7 +144,9 @@ const TabTransferencias = ({
         if (result.status === 'success') {
           setStatusTransfer({ show: true, type: 'success', message: 'Transferencia registrada correctamente.' });
           setMontoTransferencia('');
-          sigCanvas.current.clear();
+          if (sigCanvas.current) {
+            sigCanvas.current.clear();
+          }
           
           // Actualizar historial localmente
           const newTransfer = {
@@ -370,11 +422,11 @@ const TabTransferencias = ({
                     <div className="bg-white rounded-4 shadow-sm border p-4 h-100 border-start border-success border-4">
                       <div className="d-flex align-items-center gap-3">
                         <div className="p-3 rounded-4 bg-success bg-opacity-10 text-success">
-                          <TrendingUp size={24} />
+                          <DollarSign size={24} />
                         </div>
                         <div>
-                          <h6 className="text-muted small fw-bold mb-1 text-uppercase">Promedio Depósito</h6>
-                          <h4 className="fw-extrabold mb-0">{f(transferHistory.length > 0 ? transferHistory.reduce((acc, t) => acc + parseFloat(t.monto), 0) / transferHistory.length : 0)}</h4>
+                          <h6 className="text-muted small fw-bold mb-1 text-uppercase">Efectivo en Caja</h6>
+                          <h4 className="fw-extrabold mb-0">{f(data?.global?.ingresos_brutos || 0)}</h4>
                         </div>
                       </div>
                     </div>

@@ -23,6 +23,11 @@ const BASE_API = isLocal
 // Exportar BASE_API para uso en otros módulos
 export { BASE_API };
 
+// SAFAR API
+export const SAFAR_API_URL = isLocal
+  ? "/initeck-flota/safar/api/"
+  : `https://safar.initeck.com.mx/api/`;
+
 // Función utilitaria para construir URLs dinámicas
 export const buildApiUrl = (endpoint) => {
   return `${BASE_API}${endpoint}`;
@@ -49,6 +54,7 @@ export const MODIFICAR_URL = buildApiUrl("vehiculos/vehiculosModificar.php");
 export const ELIMINAR_URL = buildApiUrl("vehiculos/vehiculosEliminar.php");
 export const VEHICULO_LISTAR_URL = buildApiUrl("vehiculos/listar.php");
 export const GASTOS_COMBUSTIBLE_URL = buildApiUrl("vehiculos/gastos_combustible.php");
+export const INSUMOS_GLOBAL_URL = buildApiUrl("vehiculos/insumos_global.php");
 export const BALANCE_URL = buildApiUrl("balance/balance.php");
 export const BALANCE_AVANZADO_URL = buildApiUrl("balance/balance_avanzado.php");
 
@@ -58,6 +64,7 @@ export const LIQUIDACIONES_URL = buildApiUrl("empleados/usuario/finalizar_jornad
 // URLs de empleados y gestión
 export const EMPLEADO_LISTAR_URL = buildApiUrl("empleados/listar.php");
 export const EMPLEADO_ASIGNAR_UNIDAD_URL = buildApiUrl("empleados/asignar_unidad.php");
+export const EMPLEADO_QUITAR_UNIDAD_URL  = buildApiUrl("empleados/quitar_unidad.php");
 export const EMPLEADOS_UBICACION_URL = buildApiUrl("empleados/ubicacion_tiempo_real.php");
 export const EMPLEADOS_EVENTOS_URL = buildApiUrl("empleados/eventos_recientes.php");
 export const EMPLEADOS_LIQUIDACIONES_URL = buildApiUrl("empleados/liquidaciones_tiempo_real.php");
@@ -78,12 +85,22 @@ export const TALLER_EQUIPAMIENTO_URL = buildApiUrl("taller/equipamiento.php");
 export const TALLER_STATUS_URL = buildApiUrl("taller/update_status.php");
 export const TALLER_NOTAS_URL = buildApiUrl("vehiculos/notas.php");
 export const TALLER_COMENTARIOS_URL = buildApiUrl("taller/comentarios_recientes.php");
+export const TALLER_GASTOS_PIEZAS_URL = buildApiUrl("taller/gastos_piezas.php");
+export const TALLER_GUARDAR_MENSAJE_URL = buildApiUrl("taller/guardar_mensaje.php");
 
 // URLs de NÓMINA
 export const NOMINA_GUARDAR_TICKET_URL = buildApiUrl("nomina/guardar_ticket.php");
 export const NOMINA_LISTAR_TICKETS_URL = buildApiUrl("nomina/listar_tickets.php");
 export const NOMINA_GUARDAR_TRANSFERENCIA_URL = buildApiUrl("nomina/guardar_transferencia.php");
 export const NOMINA_LISTAR_TRANSFERENCIAS_URL = buildApiUrl("nomina/listar_transferencias.php");
+export const NOMINA_GUARDAR_RECIBO_CAJA_URL = buildApiUrl("nomina/guardar_recibo_caja.php");
+export const NOMINA_LISTAR_RECIBOS_CAJA_URL = buildApiUrl("nomina/listar_recibos_caja.php");
+export const NOMINA_FIRMAR_TICKET_URL = buildApiUrl("nomina/firmar_ticket.php");
+
+// URLs de CORTE DE CAJA
+export const CORTE_CAJA_GUARDAR_URL      = buildApiUrl("nomina/corte_caja_guardar.php");
+export const CORTE_CAJA_BALANCE_URL      = buildApiUrl("nomina/balance_semana.php");
+export const CORTE_CAJA_LISTAR_ADMIN_URL = buildApiUrl("nomina/listar_cortes_admin.php");
 
 // URLs de usuario y operaciones
 export const USUARIO_LOGIN_URL = buildApiUrl("empleados/usuario/login.php");
@@ -140,15 +157,15 @@ export const EMPLEADO_OBTENER_ODOMETRO = `${EMPLEADO_API_BASE}/obtener_odometro.
 // Uploads URLs por módulo
 export const UPLOADS_BASE_URL = isLocal
   ? "http://localhost/initeck-flota/Initeck-api/v1/uploads/"
-  : `https://admin.initeck.com.mx/uber/Initeck-api/v1/uploads/`;
+  : `https://admin.initeck.com.mx/initeck-flota/Initeck-api/v1/uploads/`;
 
 export const VEHICULOS_UPLOADS_URL = isLocal
   ? "http://localhost/initeck-flota/Initeck-api/v1/vehiculos/uploads/"
-  : `https://admin.initeck.com.mx/uber/Initeck-api/v1/vehiculos/uploads/`;
+  : `https://admin.initeck.com.mx/initeck-flota/Initeck-api/v1/vehiculos/uploads/`;
 
 export const EMPLEADOS_UPLOADS_URL = isLocal
   ? "http://localhost/initeck-flota/Initeck-api/v1/empleados/uploads/"
-  : `https://admin.initeck.com.mx/uber/Initeck-api/v1/empleados/uploads/`;
+  : `https://admin.initeck.com.mx/initeck-flota/Initeck-api/v1/empleados/uploads/`;
 
 
 console.log(`🚀 API Configuración:`, {

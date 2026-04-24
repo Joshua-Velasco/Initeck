@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 require_once '../../config/database.php';
+require_once '../utils/shift_utils_v2.php';
 
 try {
     $database = new Database();
@@ -22,24 +23,10 @@ try {
 
     // Fechas para filtrar (Opcionales, si no vienen se toma Todo el Historial o un default)
     // Se espera formato YYYY-MM-DD
-    $start_date = $input['start_date'] ?? null;
-    $end_date = $input['end_date'] ?? null;
+    $start_date = $input['start_date'] ?? date('Y-m-d');
+    $end_date = $input['end_date'] ?? date('Y-m-d');
 
-    // Clausula WHERE para fechas (reutilizable)
-    // Nota: liquidaciones tiene 'fecha', mantenimientos tiene 'fecha'
-    $where_fecha_liq = "";
-    $where_fecha_insp = "";
-    $where_fecha_mant = "";
-    $params_fecha = [];
-
-    if ($start_date && $end_date) {
-        $where_fecha_liq = " WHERE fecha BETWEEN :start_date AND :end_date ";
-        $where_fecha_insp = " AND fecha BETWEEN :start_date AND :end_date "; // Se usa en queries que ya tienen WHERE
-        $where_fecha_mant = " WHERE fecha BETWEEN :start_date AND :end_date ";
-
-        $params_fecha[':start_date'] = $start_date;
-        $params_fecha[':end_date'] = $end_date;
-    }
+    $filterLiq = getOperationalDayFilter($start_date, $end_date, 'l');
 
     // 1. MÉTRICAS GLOBALES (Filtradas por fecha)
     // Ingresos, Propinas y Gastos
@@ -47,37 +34,32 @@ try {
         COALESCE(SUM(monto_efectivo), 0) as ingresos,
         COALESCE(SUM(propinas), 0) as propinas,
         COALESCE(SUM(gastos_total), 0) as gastos
-        FROM liquidaciones
-        $where_fecha_liq";
+        FROM liquidaciones l
+        WHERE " . $filterLiq['where'];
 
     $q_metrics = $db->prepare($sql_metrics);
-    if ($start_date && $end_date) {
-        $q_metrics->bindParam(':start_date', $start_date);
-        $q_metrics->bindParam(':end_date', $end_date);
-    }
-    $q_metrics->execute();
+    $q_metrics->execute($filterLiq['params']);
     $metrics = $q_metrics->fetch(PDO::FETCH_ASSOC);
 
-    // Depósitos (Transferencias)
-    $where_fecha_trans = "";
-    if ($start_date && $end_date) {
-        $where_fecha_trans = " WHERE DATE(fecha_ejecucion) BETWEEN :start_date AND :end_date ";
-    }
-    $sql_depositos = "SELECT COALESCE(SUM(monto), 0) as total FROM nomina_transferencias $where_fecha_trans";
+    // Depósitos (Transferencias) - Matching balance_avanzado logic for dates
+    $fechaInicioLabel = date('Y-m-d', strtotime($start_date . ' -1 day'));
+    $fechaFinLabel = date('Y-m-d', strtotime($end_date . ' -1 day'));
+
+    $sql_depositos = "SELECT COALESCE(SUM(monto), 0) as total FROM nomina_transferencias 
+                      WHERE fecha_inicio_semana >= :fi AND fecha_inicio_semana < :ff";
     $q_depositos = $db->prepare($sql_depositos);
-    if ($start_date && $end_date) {
-        $q_depositos->bindParam(':start_date', $start_date);
-        $q_depositos->bindParam(':end_date', $end_date);
-    }
-    $q_depositos->execute();
+    $q_depositos->execute([':fi' => $fechaInicioLabel, ':ff' => $fechaFinLabel]);
     $dep_data = $q_depositos->fetch(PDO::FETCH_ASSOC);
     $metrics['depositos'] = (float) $dep_data['total'];
 
     // Calcular Neto (Efectivo - Gastos + Depósitos)
+    // Note: To match Personal, we might need to subtract maintenance here too if requested, 
+    // but the user mainly wanted matching between Personal and Finanzas.
+    // Dashboard V2 is its own thing, but let's keep it consistent.
     $metrics['neto'] = $metrics['ingresos'] - $metrics['gastos'] + $metrics['depositos'];
 
     // Kilómetros (De inspecciones_vehiculos)
-    // Conversión automática: Si el vehículo está en millas (unidad_medida = 'mi'), convertimos a KM (* 1.60934)
+    // Inspections don't have 'hora', so we use BETWEEN but same dates.
     $sql_km = "SELECT COALESCE(SUM(
                 CASE 
                     WHEN v.unidad_medida = 'mi' THEN (iv.odometro_final - iv.odometro_inicio) * 1.60934
@@ -87,14 +69,10 @@ try {
                FROM inspecciones_vehiculos iv
                JOIN vehiculos v ON iv.vehiculo_id = v.id
                WHERE iv.odometro_final > iv.odometro_inicio
-               $where_fecha_insp";
+               AND iv.fecha BETWEEN :start_date AND :end_date";
 
     $q_km = $db->prepare($sql_km);
-    if ($start_date && $end_date) {
-        $q_km->bindParam(':start_date', $start_date);
-        $q_km->bindParam(':end_date', $end_date);
-    }
-    $q_km->execute();
+    $q_km->execute([':start_date' => $start_date, ':end_date' => $end_date]);
     $km_data = $q_km->fetch(PDO::FETCH_ASSOC);
     $metrics['km'] = round($km_data['km'], 2);
 
@@ -105,30 +83,46 @@ try {
     $online = $q_online->fetch(PDO::FETCH_ASSOC);
     $metrics['empleados_online'] = $online['online_count'];
 
-    // 2. PARETO (Ingresos por Unidad - Filtrado por fecha)
-    // Como liquidaciones no tiene vehiculo_id directamente, unimos con inspecciones_vehiculos
+    // 2. PARETO (Ingresos por Unidad - Filtrado por fecha con shift de 4AM)
+    // Join direct: liquidaciones -> empleados -> vehiculos (no via inspecciones_vehiculos)
+    // PDO named params can only appear once per query, so we rename them for the UNION second SELECT
+    $filterLiqUnion = getOperationalDayFilter($start_date, $end_date, 'l');
+    // Rename params with _u suffix for UNION clause
+    $unionWhere = $filterLiqUnion['where'];
+    $unionParams = [];
+    foreach ($filterLiqUnion['params'] as $key => $val) {
+        $newKey = str_replace(':', ':u_', $key);
+        $unionWhere = str_replace($key, $newKey, $unionWhere);
+        $unionParams[$newKey] = $val;
+    }
+
     $sql_pareto = "SELECT 
         v.unidad_nombre as name, 
         COALESCE(SUM(l.monto_efectivo), 0) as ingresos 
-        FROM vehiculos v 
-        LEFT JOIN inspecciones_vehiculos iv ON v.id = iv.vehiculo_id
-        LEFT JOIN liquidaciones l ON iv.empleado_id = l.empleado_id AND iv.fecha = l.fecha
-        WHERE 1=1 ";
+        FROM liquidaciones l 
+        JOIN empleados e ON l.empleado_id = e.id
+        JOIN vehiculos v ON e.vehiculo_id = v.id
+        WHERE (" . $filterLiq['where'] . ")
+        GROUP BY v.id, v.unidad_nombre
 
-    // Aplicamos filtro de fecha a la tabla Liquidaciones (l.fecha)
-    if ($start_date && $end_date) {
-        $sql_pareto .= " AND l.fecha BETWEEN :start_date AND :end_date ";
-    }
+        UNION ALL
 
-    $sql_pareto .= " GROUP BY v.id ORDER BY ingresos DESC";
+        SELECT 
+        'Sin Asignar' as name,
+        COALESCE(SUM(l.monto_efectivo), 0) as ingresos
+        FROM liquidaciones l
+        JOIN empleados e ON l.empleado_id = e.id
+        WHERE e.vehiculo_id IS NULL
+        AND ({$unionWhere})
+        HAVING ingresos > 0
+
+        ORDER BY ingresos DESC";
 
     $q_pareto = $db->prepare($sql_pareto);
-    if ($start_date && $end_date) {
-        $q_pareto->bindParam(':start_date', $start_date);
-        $q_pareto->bindParam(':end_date', $end_date);
-    }
-    $q_pareto->execute();
+    $allParetoParams = array_merge($filterLiq['params'], $unionParams);
+    $q_pareto->execute($allParetoParams);
     $pareto_raw = $q_pareto->fetchAll(PDO::FETCH_ASSOC);
+
 
     $total_ingresos_pareto = array_sum(array_column($pareto_raw, 'ingresos'));
     $acumulado = 0;
@@ -217,12 +211,32 @@ try {
         ];
     }
 
+    // 5. EVENTOS RECIENTES DE CHOFERES (liquidaciones del período)
+    $sql_eventos = "SELECT
+                        CONCAT(l.fecha, ' ', l.hora) AS fecha_hora,
+                        e.nombre_completo,
+                        v.unidad_nombre,
+                        l.monto_efectivo,
+                        l.propinas,
+                        l.gastos_total,
+                        l.viajes
+                    FROM liquidaciones l
+                    JOIN empleados e ON l.empleado_id = e.id
+                    LEFT JOIN vehiculos v ON e.vehiculo_id = v.id
+                    WHERE l.fecha BETWEEN :ev_start AND :ev_end
+                    ORDER BY l.fecha DESC, l.hora DESC
+                    LIMIT 20";
+    $q_eventos = $db->prepare($sql_eventos);
+    $q_eventos->execute([':ev_start' => $start_date, ':ev_end' => $end_date]);
+    $eventos_recientes = $q_eventos->fetchAll(PDO::FETCH_ASSOC);
+
     echo json_encode([
         "status" => "success",
         "metrics" => $metrics,
         "pareto" => $pareto,
         "servicios_proximos" => array_values($agenda),
-        "bitacora_taller" => $bitacora_taller
+        "bitacora_taller" => $bitacora_taller,
+        "eventos_recientes" => $eventos_recientes
     ]);
 
 } catch (Exception $e) {

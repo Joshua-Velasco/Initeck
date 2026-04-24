@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Camera, CheckCircle2, X } from 'lucide-react';
 
-const CapturaEvidencia = ({ label, foto, onCaptura, onEliminar }) => (
-  <div className="col-md-4">
-    <label className="form-label small fw-bold text-muted">{label}</label>
-    <div className={`card border-2 ${foto ? 'border-success' : 'border-dashed'} rounded-4 overflow-hidden position-relative`} 
-         style={{ minHeight: '120px', backgroundColor: '#f8f9fa' }}>
-      {foto ? (
-        <>
-          <img src={foto} alt={label} className="w-100" style={{ height: '120px', objectFit: 'cover' }} />
-          <button 
-            onClick={onEliminar}
+const CapturaEvidencia = ({ label, foto, onCaptura, onEliminar }) => {
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  useEffect(() => {
+    if (foto && typeof foto !== 'string') {
+      const objectUrl = URL.createObjectURL(foto);
+      setPreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else if (typeof foto === 'string') {
+        setPreviewUrl(foto);
+    } else {
+        setPreviewUrl(null);
+    }
+  }, [foto]);
+
+  return (
+    <div className="col-md-4">
+      <label className="form-label small fw-bold text-muted">{label}</label>
+      <div className={`card border-2 ${foto ? 'border-success' : 'border-dashed'} rounded-4 overflow-hidden position-relative`} 
+           style={{ minHeight: '120px', backgroundColor: '#f8f9fa' }}>
+        {foto ? (
+          <>
+            <img src={previewUrl} alt={label} className="w-100" style={{ height: '120px', objectFit: 'cover' }} />
+            <button 
+              onClick={onEliminar}
             className="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle shadow"
           >
             <X size={14} />
@@ -34,6 +49,7 @@ const CapturaEvidencia = ({ label, foto, onCaptura, onEliminar }) => (
       )}
     </div>
   </div>
-);
+  );
+};
 
 export default CapturaEvidencia;

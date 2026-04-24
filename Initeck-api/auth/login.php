@@ -68,7 +68,8 @@ try {
                     "id" => (int)$user['empleado_id'], // ID operativo (para buscar vehículos/unidades)
                     "nombre" => $nombre_mostrar,
                     "rol" => $user['rol'], // admin, operator, employee, cleaning, development
-                    "usuario_id" => (int)$user['user_id'] // ID de la tabla usuarios
+                    "usuario_id" => (int)$user['user_id'], // ID de la tabla usuarios
+                    "usuario" => $user['usuario'] // login username (usado en Safar como CodigoChofer)
                 ]
             ]);
         } else {

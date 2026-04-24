@@ -1,0 +1,334 @@
+.signin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background-color: var(--color-black);
+}
+
+.signin-bg-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(230,215,190,0.1) 0%, transparent 60%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.signin-card {
+  position: relative;
+  z-index: 10;
+  background: rgba(15, 15, 15, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(230, 215, 190, 0.1);
+  padding: 3rem 2.5rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.signin-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.signin-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.signin-brand {
+  font-family: var(--font-secondary);
+  font-size: 2.5rem;
+  color: var(--color-secondary);
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.signin-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-white);
+  margin-bottom: 0.25rem;
+}
+
+.signin-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.signin-error {
+  background: rgba(220, 38, 38, 0.1);
+  color: #ef4444;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.signin-form .input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.signin-form label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.signin-form input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  color: var(--color-white);
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.signin-form input:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.signin-submit-btn {
+  background: var(--color-secondary);
+  color: var(--color-black);
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.signin-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(230, 215, 190, 0.2);
+}
+
+.signin-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.signin-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+}
+
+.signin-divider::before,
+.signin-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.signin-divider span {
+  padding: 0 10px;
+}
+
+.google-auth-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.google-custom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
+}
+
+.google-custom-btn:hover:not(:disabled) {
+  background: #f8f8f8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.google-custom-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.google-custom-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.signin-back-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.signin-back-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-toggle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: -0.5rem;
+  font-size: 0.8rem;
+}
+
+.auth-toggle-text {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.auth-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--color-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-primary);
+}
+
+.auth-toggle-btn:hover {
+  text-decoration: underline;
+}
+
+.signin-message {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.password-strength-container {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 4px;
+}
+
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.strength-bar.active-1 { background: #ef4444; }
+.strength-bar.active-2 { background: #f59e0b; }
+.strength-bar.active-3 { background: #3b82f6; }
+.strength-bar.active-4 { background: #10b981; }
+
+.strength-rules {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.strength-rules li {
+  position: relative;
+  padding-left: 14px;
+  transition: color 0.3s ease;
+}
+
+.strength-rules li::before {
+  content: 'x';
+  position: absolute;
+  left: 0;
+  color: #ef4444;
+}
+
+.strength-rules li.valid {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.strength-rules li.valid::before {
+  content: '✓';
+  color: #10b981;
+}
+
+.auth-toggle-container {
+  flex-wrap: wrap;
+}
+
+.auth-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+}

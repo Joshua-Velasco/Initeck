@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"DESCRIBE safar_Persona; DESCRIBE CatDireccion;\")",
+      "Bash(/Volumes/Dev/XAMPP_External/xamppfiles/bin/mysql -u root initeckc_tracker -e \"SHOW COLUMNS FROM safar_Persona;\" 2>/dev/null)",
+      "Read(//Volumes/Dev/XAMPP_External/xamppfiles/logs/**)",
+      "Read(//Volumes/Dev/XAMPP_External/**)",
+      "Bash(chmod 755 /Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/safar/api/uploads/perfiles)",
+      "Bash(find /Volumes/Dev/XAMPP_External/xamppfiles/htdocs/initeck-flota/safar/safar-page -type f \\\\\\(-name *onboarding* -o -name *modal* -o -name *contact* \\\\\\))",
+      "Bash(find:*)",
+      "Bash(wc:*)"
+    ]
+  }
+}

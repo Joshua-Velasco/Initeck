@@ -10,6 +10,10 @@
     "host": "npm run dev --workspace=host"
   },
   "dependencies": {
+  "jspdf": "^4.2.1",
     "react-router-dom": "^7.11.0"
+  },
+  "overrides": {
+    "jspdf": "$jspdf"
   }
 }

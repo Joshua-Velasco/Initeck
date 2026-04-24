@@ -1,0 +1,660 @@
+/* ──────────────────────────────────────────
+   Container & Card
+────────────────────────────────────────── */
+.profile-setup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background-color: #050505;
+}
+
+.profile-setup-bg-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.profile-setup-card {
+  position: relative;
+  z-index: 10;
+  background: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  padding: 3rem 2.5rem;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 175, 55, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: psFadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes psFadeInScale {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ──────────────────────────────────────────
+   Header
+────────────────────────────────────────── */
+.profile-setup-header {
+  text-align: center;
+}
+
+.profile-setup-brand {
+  font-family: 'Cinzel', serif;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #d4af37 0%, #f9e29c 50%, #d4af37 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 6px;
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-setup-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.profile-setup-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.profile-setup-subtitle strong {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+/* ──────────────────────────────────────────
+   Stepper
+────────────────────────────────────────── */
+.profile-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+  position: relative;
+}
+
+.profile-step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(255, 255, 255, 0.03);
+  transform: rotate(0deg);
+}
+
+.profile-step.active .profile-step-circle {
+  border-color: #d4af37;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+  transform: scale(1.1);
+}
+
+.profile-step.done .profile-step-circle {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.profile-step-check {
+  font-size: 1.1rem;
+}
+
+.profile-step-label {
+  font-size: 0.7rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.profile-step.active .profile-step-label {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.profile-step.done .profile-step-label {
+  color: #10b981;
+}
+
+.profile-step-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 -10px;
+  margin-bottom: 28px; /* align with circle center */
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.profile-step-line.done {
+  background: #10b981;
+  height: 2px;
+}
+
+/* ──────────────────────────────────────────
+   Error
+────────────────────────────────────────── */
+.profile-setup-error {
+  background: rgba(239, 68, 68, 0.05);
+  color: #f87171;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+/* ──────────────────────────────────────────
+   Step Content
+────────────────────────────────────────── */
+.profile-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.profile-step-content .input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-step-content label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+.profile-step-content input[type="text"],
+.profile-step-content input[type="tel"]:not(.phone-number-input) {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.1rem 1.25rem;
+  border-radius: 14px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.profile-step-content input:focus {
+  outline: none;
+  border-color: #d4af37;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ── Phone Input Group ── */
+.phone-input-group {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.phone-input-group:focus-within {
+  border-color: #d4af37;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1), inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.phone-country-select {
+  background: rgba(212, 175, 55, 0.07);
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.1rem 0.85rem;
+  color: #d4af37;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  min-width: 95px;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+}
+
+.phone-country-select option {
+  background: #1c1c1c;
+  color: #fff;
+}
+
+.phone-number-input {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 1.1rem 1.25rem !important;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.phone-number-input:focus {
+  outline: none;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* ──────────────────────────────────────────
+   Photo Upload
+────────────────────────────────────────── */
+.profile-photo-upload {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 30px; /* Squircle look */
+  border: 1px dashed rgba(212, 175, 55, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(212, 175, 55, 0.02);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  align-self: center;
+  overflow: hidden;
+}
+
+.profile-photo-upload:hover {
+  border-color: #d4af37;
+  background-color: rgba(212, 175, 55, 0.06);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+}
+
+.profile-photo-upload--ine {
+  width: 100%;
+  height: 180px;
+  border-radius: 18px;
+}
+
+.profile-photo-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+.profile-photo-upload:hover .profile-photo-icon {
+  transform: scale(1.1);
+}
+
+.profile-photo-hint {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  text-align: center;
+  padding: 0 12px;
+}
+
+.profile-photo-note-inline {
+  font-size: 0.7rem;
+  color: rgba(212, 175, 55, 0.5);
+  text-align: center;
+  padding: 0 20px;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.profile-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.profile-photo-upload:hover .profile-photo-overlay {
+  opacity: 1;
+}
+
+.profile-photo-note {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin-top: -0.5rem;
+}
+
+/* ──────────────────────────────────────────
+   Address — Enhanced fields (Step 3)
+────────────────────────────────────────── */
+.ps-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ps-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ps-field label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ps-field input,
+.ps-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  color: #fff;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ps-field input:focus,
+.ps-select:focus {
+  outline: none;
+  border-color: #d4af37;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ps-field input::placeholder { color: rgba(255, 255, 255, 0.2); }
+
+.ps-field--grow { flex: 1; min-width: 0; }
+.ps-field--sm   { flex: 0 0 86px; }
+.ps-field--cp   { width: 110px; }
+
+/* Autofilled highlight */
+.ps-field input.is-autofilled,
+.ps-select.is-autofilled {
+  border-color: #d4af37;
+  animation: psAutofillPulse 1.5s ease infinite;
+}
+
+@keyframes psAutofillPulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 12px rgba(212, 175, 55, 0.2); }
+}
+
+/* Colonia select */
+.ps-colonia-wrapper { display: flex; flex-direction: column; }
+
+.ps-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+.ps-select option { background: #1c1c1c; color: #fff; }
+
+/* Street autocomplete */
+.ps-street-wrapper { position: relative; }
+
+.ps-suggestions-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  z-index: 9999;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  animation: psFadeIn 0.18s ease;
+}
+
+@keyframes psFadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.ps-suggestion-item {
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
+}
+.ps-suggestion-item:last-child { border-bottom: none; }
+.ps-suggestion-item:hover { background: rgba(255, 255, 255, 0.06); }
+
+.ps-sugg-main { font-size: 0.88rem; font-weight: 700; color: #fff; }
+.ps-sugg-sub  { font-size: 0.72rem; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Map */
+.ps-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: psFadeIn 0.4s ease;
+}
+
+.ps-map-label {
+  font-size: 0.68rem !important;
+  font-weight: 600;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.ps-map-container {
+  height: 210px;
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+
+.ps-map-container .leaflet-tile {
+  filter: grayscale(0.75) invert(0.95) hue-rotate(180deg) brightness(0.88) contrast(1.1);
+}
+
+.ps-map-container .leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  margin: 10px !important;
+}
+
+.ps-map-container .leaflet-control-zoom-in,
+.ps-map-container .leaflet-control-zoom-out {
+  background: #1a1a1a !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.ps-map-container .leaflet-bar a:first-child { border-top-left-radius: 8px !important; border-top-right-radius: 8px !important; }
+.ps-map-container .leaflet-bar a:last-child  { border-bottom-left-radius: 8px !important; border-bottom-right-radius: 8px !important; }
+
+/* ──────────────────────────────────────────
+   Buttons
+────────────────────────────────────────── */
+.profile-step-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.profile-setup-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #d4af37 0%, #f9e29c 100%);
+  color: #000;
+  border: none;
+  padding: 1.15rem;
+  border-radius: 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+  text-transform: uppercase;
+}
+
+.profile-setup-btn:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4);
+  filter: brightness(1.1);
+}
+
+.profile-setup-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.profile-setup-btn:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.profile-setup-btn-back {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1.15rem 1.75rem;
+  border-radius: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-setup-btn-back:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* First step — full-width button */
+.profile-step-content > .profile-setup-btn {
+  margin-top: 0.5rem;
+}
+
+/* ──────────────────────────────────────────
+   Responsive
+────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .profile-setup-card {
+    padding: 2.5rem 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .profile-address-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-address-calle,
+  .profile-address-num,
+  .profile-address-colonia,
+  .profile-address-cp,
+  .profile-address-ciudad,
+  .profile-address-estado {
+    grid-column: 1;
+  }
+
+  .profile-step-label {
+    display: none;
+  }
+  
+  .profile-step-circle {
+    width: 36px;
+    height: 36px;
+  }
+}
